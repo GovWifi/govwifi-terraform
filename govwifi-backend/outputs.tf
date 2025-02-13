@@ -22,10 +22,6 @@ output "rds_monitoring_role" {
   value = aws_iam_role.rds_monitoring_role.arn
 }
 
-output "be_admin_in" {
-  value = aws_security_group.be_admin_in.id
-}
-
 output "vpc_cidr_block" {
   value = var.vpc_cidr_block
 }

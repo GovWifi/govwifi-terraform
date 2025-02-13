@@ -28,11 +28,6 @@ variable "backend_subnet_ids" {
   type        = list(string)
 }
 
-variable "be_admin_in" {
-  description = "The relevant security group for this component."
-  type        = string
-}
-
 variable "vpc_id" {
   description = "VPC ID used for the Application Load Balancer."
   type        = string

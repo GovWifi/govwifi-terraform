@@ -43,8 +43,7 @@ resource "aws_instance" "prometheus_instance" {
   monitoring              = false
 
   vpc_security_group_ids = [
-    aws_security_group.prometheus.id,
-    var.fe_admin_in,
+    aws_security_group.prometheus.id
   ]
 
   iam_instance_profile = aws_iam_instance_profile.prometheus_instance_profile.id

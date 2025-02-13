@@ -6,10 +6,6 @@ output "frontend_subnet_id" {
   value = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
 }
 
-output "fe_admin_in" {
-  value = aws_security_group.fe_admin_in.id
-}
-
 output "fe_ecs_out" {
   value = aws_security_group.fe_ecs_out.id
 }

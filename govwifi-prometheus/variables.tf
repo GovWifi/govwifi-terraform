@@ -16,9 +16,6 @@ variable "frontend_vpc_id" {
 variable "ssh_key_name" {
 }
 
-variable "fe_admin_in" {
-}
-
 variable "wifi_frontend_subnet" {
   type = list(string)
 }

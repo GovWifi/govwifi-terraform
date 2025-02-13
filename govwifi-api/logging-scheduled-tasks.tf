@@ -73,7 +73,6 @@ resource "aws_cloudwatch_event_target" "logging_daily_session_deletion" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -112,7 +111,6 @@ resource "aws_cloudwatch_event_target" "gdpr_set_user_last_login" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -151,7 +149,6 @@ resource "aws_cloudwatch_event_target" "hourly_request_statistics" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -191,7 +188,6 @@ resource "aws_cloudwatch_event_target" "publish_monthly_metrics_logging" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -230,7 +226,6 @@ resource "aws_cloudwatch_event_target" "publish_weekly_metrics_logging" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -269,7 +264,6 @@ resource "aws_cloudwatch_event_target" "publish_daily_metrics_logging" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -308,7 +302,6 @@ resource "aws_cloudwatch_event_target" "publish_monthly_metrics_to_elasticsearch
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -347,7 +340,6 @@ resource "aws_cloudwatch_event_target" "publish_weekly_metrics_to_elasticsearch"
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -386,7 +378,6 @@ resource "aws_cloudwatch_event_target" "publish_daily_metrics_to_elasticsearch" 
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -425,7 +416,6 @@ resource "aws_cloudwatch_event_target" "publish_metrics_to_data_bucket" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -464,7 +454,6 @@ resource "aws_cloudwatch_event_target" "smoke_test_cleanup" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -617,7 +606,6 @@ resource "aws_cloudwatch_event_target" "sync_s3_to_elasticsearch" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )

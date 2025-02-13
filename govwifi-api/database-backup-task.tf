@@ -281,7 +281,6 @@ resource "aws_cloudwatch_event_target" "backup_rds_to_s3" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id],
       )

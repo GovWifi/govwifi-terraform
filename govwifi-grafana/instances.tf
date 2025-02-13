@@ -37,7 +37,6 @@ resource "aws_instance" "grafana_instance" {
   ebs_optimized           = false
 
   vpc_security_group_ids = [
-    var.be_admin_in,
     aws_security_group.grafana_ec2_in.id,
     aws_security_group.grafana_ec2_out.id,
   ]

@@ -103,7 +103,6 @@ resource "aws_ecs_service" "authentication_api_service" {
 
   network_configuration {
     security_groups = concat(
-      var.backend_sg_list,
       [aws_security_group.api_in.id],
       [aws_security_group.api_out.id],
       [aws_security_group.authentication_api_service.id]

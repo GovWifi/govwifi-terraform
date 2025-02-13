@@ -1,5 +1,5 @@
 resource "aws_codepipeline" "staging_prod_apps_pipeline" {
-  for_each      = toset(var.deployed_app_names)
+  for_each = toset(var.deployed_app_names)
   name     = "STAGING-PROD-${each.key}-app-pipeline"
   role_arn = aws_iam_role.govwifi_codepipeline_global_role.arn
 
@@ -36,20 +36,20 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
       version          = 1
       run_order        = 1
       output_artifacts = ["${each.key}-source-art"]
-      
+
       configuration = {
-          Owner  = local.git_owner
-          Repo   = local.app[each.key].repo
-          Branch = local.branch
-          OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["token"]
-          PollForSourceChanges = true
+        Owner                = local.git_owner
+        Repo                 = local.app[each.key].repo
+        Branch               = local.branch
+        OAuthToken           = jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["token"]
+        PollForSourceChanges = true
       }
     }
   }
 
   stage {
     name = "Build_STAGING"
-    
+
     action {
       name            = "Build-push-${each.key}-staging-ECR"
       category        = "Build"
@@ -57,8 +57,8 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
       provider        = "CodeBuild"
       region          = "eu-west-2"
       input_artifacts = ["${each.key}-source-art"]
-      version  = 1
-      run_order = 1
+      version         = 1
+      run_order       = 1
       configuration = {
         ProjectName = "${aws_codebuild_project.govwifi_codebuild_deployed_app[each.key].name}"
         EnvironmentVariables = jsonencode([
@@ -86,9 +86,9 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
         input_artifacts = ["${each.key}-source-art"]
         # This resource lives in the Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
-        role_arn = "arn:aws:iam::${local.aws_staging_account_id}:role/govwifi-codebuild-role"
-        version  = "1"
-        run_order        = 1
+        role_arn  = "arn:aws:iam::${local.aws_staging_account_id}:role/govwifi-codebuild-role"
+        version   = "1"
+        run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"
         }
@@ -164,9 +164,9 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
         input_artifacts = ["${each.key}-source-art"]
         # This resource lives in the Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
-        role_arn = "arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role"
-        version  = "1"
-        run_order        = 1
+        role_arn  = "arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role"
+        version   = "1"
+        run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"
         }

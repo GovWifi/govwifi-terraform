@@ -22,8 +22,6 @@ resource "aws_instance" "management" {
   subnet_id     = aws_subnet.wifi_backend_subnet[data.aws_availability_zones.zones.names[0]].id
 
   vpc_security_group_ids = [
-    aws_security_group.be_vpn_in.id,
-    aws_security_group.be_vpn_out.id,
     aws_security_group.be_ecs_out.id,
   ]
 

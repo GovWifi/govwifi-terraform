@@ -302,10 +302,6 @@ module "api" {
   user_rr_hostname         = var.user_rr_hostname
   rds_mysql_backup_bucket  = module.backend.rds_mysql_backup_bucket
 
-  backend_sg_list = [
-    module.backend.be_admin_in,
-  ]
-
   alb_permitted_security_groups = [
     module.frontend.load_balanced_frontend_service_security_group_id
   ]
@@ -381,8 +377,6 @@ module "govwifi_prometheus" {
   ssh_key_name = var.ssh_key_name
 
   frontend_vpc_id = module.frontend.frontend_vpc_id
-
-  fe_admin_in = module.frontend.fe_admin_in
 
   wifi_frontend_subnet       = module.frontend.frontend_subnet_id
   london_radius_ip_addresses = var.london_radius_ip_addresses
