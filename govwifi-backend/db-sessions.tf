@@ -25,7 +25,7 @@ resource "aws_db_instance" "db" {
   skip_final_snapshot         = true
   deletion_protection         = true
 
-  enabled_cloudwatch_logs_exports = ["audit", "error", "general", "slowquery"]
+  enabled_cloudwatch_logs_exports = ["error"]
   option_group_name               = "default:mysql-8-0"
   parameter_group_name            = "default.mysql8.0"
 

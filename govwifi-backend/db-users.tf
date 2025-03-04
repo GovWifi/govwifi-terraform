@@ -25,7 +25,7 @@ resource "aws_db_instance" "users_db" {
   skip_final_snapshot         = true
   deletion_protection         = true
 
-  enabled_cloudwatch_logs_exports = ["error", "general", "slowquery"]
+  enabled_cloudwatch_logs_exports = ["error", "slowquery"]
   option_group_name               = aws_db_option_group.user_mariadb_audit[0].name
   parameter_group_name            = aws_db_parameter_group.user_db_parameters[0].name
 

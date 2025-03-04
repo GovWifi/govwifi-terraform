@@ -2,7 +2,7 @@ resource "aws_cloudwatch_log_group" "user_signup_api_log_group" {
   count = var.user_signup_enabled
   name  = "${var.env_name}-user-signup-api-docker-log-group"
 
-  retention_in_days = 90
+  retention_in_days = 30
 }
 
 resource "aws_iam_role" "user_signup_api_task_role" {

@@ -11,7 +11,7 @@ resource "aws_route53_record" "www_wifi" {
   name    = "www.wifi.service.gov.uk"
   type    = "CNAME"
   ttl     = "300"
-  records = ["alphagov.github.io."]
+  records = ["govwifi.github.io."]
 }
 
 resource "aws_cloudwatch_metric_alarm" "product_pages" {
@@ -51,7 +51,7 @@ resource "aws_route53_record" "tech_docs" {
   name    = "docs.wifi.service.gov.uk"
   type    = "CNAME"
   ttl     = "300"
-  records = ["alphagov.github.io."]
+  records = ["govwifi.github.io."]
 }
 
 resource "aws_route53_health_check" "tech_docs" {
@@ -91,7 +91,7 @@ resource "aws_route53_record" "dev_docs" {
   name    = "dev-docs.wifi.service.gov.uk"
   type    = "CNAME"
   ttl     = "300"
-  records = ["alphagov.github.io."]
+  records = ["govwifi.github.io."]
 }
 
 resource "aws_route53_health_check" "dev_docs" {
@@ -125,5 +125,3 @@ resource "aws_cloudwatch_metric_alarm" "dev_docs" {
     HealthCheckId = aws_route53_health_check.dev_docs.id
   }
 }
-
-

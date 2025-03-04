@@ -7,6 +7,8 @@ resource "aws_lambda_function" "user_api_sns_lambda" {
   description   = "This lambda forwards traffic from SNS to the user-signup-api"
 
   source_code_hash = filebase64sha256("../../govwifi-api/user_api_sns_lambda.zip")
+  # The unzipped source code can be found at: https://github.com/GovWifi/govwifi-lambda-for-user-signup-api
+  # Documentation can found in the README of this directory
 
   runtime       = "python3.8"
   architectures = ["x86_64"]

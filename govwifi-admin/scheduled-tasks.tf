@@ -56,8 +56,8 @@ DOC
 
 # rake cleanup:orphans
 
-resource "aws_cloudwatch_event_rule" "daily_cleanup_orphan_users" {
-  name                = "${var.env_name}-daily-cleanup-orphan-users"
+resource "aws_cloudwatch_event_rule" "daily_cleanup_data" {
+  name                = "${var.env_name}-daily-cleanup-data"
   description         = "Triggers daily 03:15 UTC"
   schedule_expression = "cron(15 3 * * ? *)"
   is_enabled          = true
@@ -66,7 +66,7 @@ resource "aws_cloudwatch_event_rule" "daily_cleanup_orphan_users" {
 resource "aws_cloudwatch_event_target" "cleanup_orphan_admin_users" {
   target_id = "${var.env_name}-cleanup-orphan-admin-users"
   arn       = aws_ecs_cluster.admin_cluster.arn
-  rule      = aws_cloudwatch_event_rule.daily_cleanup_orphan_users.name
+  rule      = aws_cloudwatch_event_rule.daily_cleanup_data.name
   role_arn  = aws_iam_role.scheduled_task.arn
 
   ecs_target {
@@ -93,6 +93,43 @@ resource "aws_cloudwatch_event_target" "cleanup_orphan_admin_users" {
     {
       "name": "admin",
       "command": ["bundle", "exec", "rake", "cleanup:orphans"]
+    }
+  ]
+}
+EOF
+
+}
+
+resource "aws_cloudwatch_event_target" "cleanup_unconfirmed_users" {
+  target_id = "${var.env_name}-cleanup-unconfirmed-users"
+  arn       = aws_ecs_cluster.admin_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_cleanup_data.name
+  role_arn  = aws_iam_role.scheduled_task.arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.admin_task.arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.admin_ec2_in.id],
+        [aws_security_group.admin_ec2_out.id]
+      )
+
+      assign_public_ip = true
+    }
+  }
+
+  input = <<EOF
+{
+  "containerOverrides": [
+    {
+      "name": "admin",
+      "command": ["bundle", "exec", "rake", "cleanup:unconfirmed"]
     }
   ]
 }

@@ -1,6 +1,6 @@
 [Unit]
 Description=Starts prometheus with the options needed by govwifi
-Documentation=https://github.com/alphagov/govwifi-terraform/blob/master/README.md
+Documentation=https://github.com/GovWifi/govwifi-terraform/blob/master/README.md
 
 [Service]
 Restart=always

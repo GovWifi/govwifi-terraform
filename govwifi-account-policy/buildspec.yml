@@ -1,12 +1,12 @@
 version: 0.2
 phases:
-    pre_build:
-        commands:
-            - echo "Pulling script from github"
-            - git clone https://github.com/alphagov/govwifi-terraform.git
-            - cd govwifi-terraform
+  pre_build:
+    commands:
+      - echo "Pulling script from github"
+      - git clone https://github.com/GovWifi/govwifi-terraform.git
+      - cd govwifi-terraform
 
-    build:
-        commands:
-            - echo "Running script"
-            - ./govwifi-account-policy/disable-inactive-iam-keys.sh
+  build:
+    commands:
+      - echo "Running script"
+      - ./govwifi-account-policy/disable-inactive-iam-keys.sh

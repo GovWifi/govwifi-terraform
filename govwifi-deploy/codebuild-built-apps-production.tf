@@ -48,7 +48,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app_production" {
 
   source {
     type            = "GITHUB"
-    location        = "https://github.com/alphagov/govwifi-${each.key}.git"
+    location        = "https://github.com/GovWifi/govwifi-${each.key}.git"
     git_clone_depth = 1
     buildspec       = "buildspec.yml"
   }

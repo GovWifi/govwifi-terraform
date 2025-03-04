@@ -133,7 +133,7 @@ resource "aws_route_table_association" "backend_private_subnets_route_tables" {
 resource "aws_cloudwatch_log_group" "database_backup_log_group" {
   count             = var.backup_mysql_rds ? 1 : 0
   name              = "${var.env_name}-database-backup-log-group"
-  retention_in_days = 90
+  retention_in_days = 30
 }
 
 # VPC Endpoints

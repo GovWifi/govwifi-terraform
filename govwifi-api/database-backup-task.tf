@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "backup_rds_to_s3_log_group" {
   count = var.backup_mysql_rds ? 1 : 0
   name  = "${var.env_name}-backup-rds-to-s3-docker-log-group"
 
-  retention_in_days = 90
+  retention_in_days = 30
 }
 
 resource "aws_ecs_task_definition" "backup_rds_to_s3_task_definition" {

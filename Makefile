@@ -65,7 +65,7 @@ format-terraform:
 	terraform fmt -recursive -diff .
 
 .private:
-	git clone git@github.com:alphagov/govwifi-build.git .private
+	git clone git@github.com:GovWifi/govwifi-build.git .private
 
 update-secrets: .private
 	cd .private && git pull

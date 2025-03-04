@@ -10,7 +10,7 @@ resource "aws_cloudwatch_log_group" "safe_restart_log_group" {
   count = var.safe_restart_enabled
   name  = "${var.env_name}-safe-restart-docker-log-group"
 
-  retention_in_days = 90
+  retention_in_days = 30
 }
 
 resource "aws_ecs_task_definition" "safe_restart_task_definition" {

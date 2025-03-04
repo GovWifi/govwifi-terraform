@@ -165,7 +165,7 @@ resource "aws_cloudwatch_log_group" "bastion_logs" {
     if var.aws_region == "eu-west-2" && var.enable_bastion == 1
   ])
   name              = "${var.env_name}-bastion/var/log/${each.key}"
-  retention_in_days = 90
+  retention_in_days = 30
 }
 
 

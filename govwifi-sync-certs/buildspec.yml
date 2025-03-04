@@ -1,18 +1,18 @@
 version: 0.2
 phases:
-    pre_build:
-        commands:
-              - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-              - apt-get update -y
-              - apt-get install pass -y
-              - git clone https://$GIT_USER:$GIT_TOKEN@github.com/alphagov/govwifi-build.git
-              - cd govwifi-build
-              - echo "Set params"
+  pre_build:
+    commands:
+      - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+      - apt-get update -y
+      - apt-get install pass -y
+      - git clone https://$GIT_USER:$GIT_TOKEN@github.com/GovWifi/govwifi-build.git
+      - cd govwifi-build
+      - echo "Set params"
 
-    build:
-        commands:
-            - echo "Synching certificates for $GOVWIFI_ENV"
-            - REGION=$AWS_REGION
-            - echo "Syncing certs. REGION is set to $REGION"
-            - CERTSDIR="$GOVWIFI_ENV"
-            - ci/tasks/scripts/sync-certs.sh #run script
+  build:
+    commands:
+      - echo "Synching certificates for $GOVWIFI_ENV"
+      - REGION=$AWS_REGION
+      - echo "Syncing certs. REGION is set to $REGION"
+      - CERTSDIR="$GOVWIFI_ENV"
+      - ci/tasks/scripts/sync-certs.sh #run script
