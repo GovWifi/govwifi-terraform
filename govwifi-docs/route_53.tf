@@ -38,7 +38,7 @@ resource "aws_route53_health_check" "product_pages" {
   port              = 443
   type              = "HTTPS"
   resource_path     = "/"
-  failure_threshold = "3"
+  failure_threshold = "10"
   request_interval  = "30"
 
   tags = {
@@ -59,7 +59,7 @@ resource "aws_route53_health_check" "tech_docs" {
   port              = 443
   type              = "HTTPS"
   resource_path     = "/"
-  failure_threshold = "3"
+  failure_threshold = "10"
   request_interval  = "30"
 
   tags = {
@@ -99,7 +99,7 @@ resource "aws_route53_health_check" "dev_docs" {
   port              = 443
   type              = "HTTPS"
   resource_path     = "/"
-  failure_threshold = "3"
+  failure_threshold = "10"
   request_interval  = "30"
 
   tags = {
