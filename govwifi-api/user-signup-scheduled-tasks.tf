@@ -37,6 +37,44 @@ EOF
 
 }
 
+resource "aws_cloudwatch_event_target" "backup_notify_templates" {
+  count     = var.user_signup_enabled
+  target_id = "${var.env_name}-backup-notify-templates"
+  arn       = aws_ecs_cluster.api_cluster.arn
+  rule      = aws_cloudwatch_event_rule.backup_notify_templates_event[0].name
+  role_arn  = aws_iam_role.user_signup_scheduled_task_role[0].arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.user_signup_api_scheduled_task[0].arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.api_in.id],
+        [aws_security_group.api_out.id],
+      )
+
+      assign_public_ip = true
+    }
+  }
+
+  input = <<EOF
+{
+  "containerOverrides": [
+    {
+      "name": "user-signup-api",
+      "command": ["bundle", "exec", "rake", "backup_notify_templates"]
+    }
+  ]
+}
+EOF
+
+}
+
 resource "aws_iam_role" "user_signup_scheduled_task_role" {
   count = var.user_signup_enabled
   name  = "${var.env_name}-user-signup-scheduled-task-role"

@@ -79,6 +79,14 @@ resource "aws_cloudwatch_event_rule" "retrieve_notifications_event" {
   state               = "ENABLED"
 }
 
+resource "aws_cloudwatch_event_rule" "backup_notify_templates_event" {
+  count               = var.event_rule_count
+  name                = "${var.env_name}-backup-notify-templates"
+  description         = "Triggers daily 06:00 UTC"
+  schedule_expression = "cron(0 6 * * ? *)"
+  state               = "ENABLED"
+}
+
 resource "aws_cloudwatch_event_rule" "active_users_signup_survey_event" {
   count               = var.event_rule_count
   name                = "${var.env_name}-active-users-signup-survey"
