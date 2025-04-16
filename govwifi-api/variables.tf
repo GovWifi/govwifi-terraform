@@ -68,10 +68,6 @@ variable "radius_server_ips" {
   type = list(string)
 }
 
-variable "backend_sg_list" {
-  type = list(string)
-}
-
 variable "critical_notifications_arn" {
 }
 

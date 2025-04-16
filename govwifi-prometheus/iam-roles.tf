@@ -28,9 +28,9 @@ EOF
 
 }
 
-resource aws_iam_role_policy_attachment "prometheus_instance_ssm" {
-    policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    role = aws_iam_role.prometheus_instance_role.id
+resource "aws_iam_role_policy_attachment" "prometheus_instance_ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.prometheus_instance_role.id
 }
 
 resource "aws_iam_role_policy" "prometheus_instance_policy" {

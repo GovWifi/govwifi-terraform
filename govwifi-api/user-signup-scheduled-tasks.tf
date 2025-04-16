@@ -15,7 +15,6 @@ resource "aws_cloudwatch_event_target" "retrieve_notifications" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id],
       )
@@ -150,7 +149,6 @@ resource "aws_cloudwatch_event_target" "user_signup_daily_user_deletion" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -189,7 +187,6 @@ resource "aws_cloudwatch_event_target" "trim_sessions_database_table" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
@@ -332,7 +329,6 @@ resource "aws_cloudwatch_event_target" "active_users_signup_surveys" {
       subnets = var.subnet_ids
 
       security_groups = concat(
-        var.backend_sg_list,
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )

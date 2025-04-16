@@ -32,25 +32,6 @@ resource "aws_security_group" "fe_ecs_out" {
   }
 }
 
-# Traffic from administrators
-
-resource "aws_security_group" "fe_admin_in" {
-  name        = "fe-admin-in"
-  description = "Allow inbound traffic from administrators"
-  vpc_id      = aws_vpc.wifi_frontend.id
-
-  tags = {
-    Name = "${title(var.env_name)} Frontend Admin in"
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${var.bastion_server_ip}/32"]
-  }
-}
-
 # Traffic from Prometheus server in London
 
 resource "aws_security_group" "fe_prometheus_in" {
@@ -284,7 +265,7 @@ resource "aws_security_group" "vpc_endpoints" {
       aws_security_group.fe_ecs_out.id
     ]
   }
-  
+
   ingress {
     description = "Allow HTTPS to AWS Service CW"
     from_port   = 443

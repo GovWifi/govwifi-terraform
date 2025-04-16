@@ -30,8 +30,8 @@ EOF
 
 
 resource "aws_iam_role_policy_attachment" "grafana_instance_ssm" {
-    policy_arn  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    role        = aws_iam_role.grafana_instance_role.id
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.grafana_instance_role.id
 }
 
 resource "aws_iam_role_policy" "grafana_instance_policy" {

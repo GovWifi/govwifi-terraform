@@ -215,7 +215,7 @@ module "london_admin" {
 
   elasticsearch_endpoint = module.london_elasticsearch.endpoint
 
-  frontend_cert_bucket = module.london_frontend.frontend_certs_bucket_name
+  frontend_cert_bucket     = module.london_frontend.frontend_certs_bucket_name
   trusted_certificates_key = module.london_frontend.trusted_certificates_key
 }
 
@@ -270,10 +270,6 @@ module "london_api" {
   user_signup_api_is_public = 1
 
   admin_app_data_s3_bucket_name = module.london_admin.app_data_s3_bucket_name
-
-  backend_sg_list = [
-    module.london_backend.be_admin_in,
-  ]
 
   metrics_bucket_name     = module.london_dashboard.metrics_bucket_name
   export_data_bucket_name = module.london_dashboard.export_data_bucket_name
@@ -335,10 +331,10 @@ module "govwifi_slack_alerts" {
 
   source = "../../govwifi-slack-alerts"
 
-  london_critical_notifications_topic_arn         = module.london_critical_notifications.topic_arn
-  london_capacity_notifications_topic_arn         = module.london_notifications.topic_arn
-  dublin_critical_notifications_topic_arn         = module.dublin_critical_notifications.topic_arn
-  dublin_capacity_notifications_topic_arn         = module.dublin_notifications.topic_arn
+  london_critical_notifications_topic_arn = module.london_critical_notifications.topic_arn
+  london_capacity_notifications_topic_arn = module.london_notifications.topic_arn
+  dublin_critical_notifications_topic_arn = module.dublin_critical_notifications.topic_arn
+  dublin_capacity_notifications_topic_arn = module.dublin_notifications.topic_arn
 
   route53_critical_notifications_topic_arn = module.london_route53_notifications.topic_arn
   # set to 1 to create config for slack chat bot.
@@ -370,8 +366,6 @@ module "london_prometheus" {
 
   frontend_vpc_id = module.london_frontend.frontend_vpc_id
 
-  fe_admin_in = module.london_frontend.fe_admin_in
-
   wifi_frontend_subnet       = module.london_frontend.frontend_subnet_id
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips
@@ -397,7 +391,6 @@ module "london_grafana" {
 
   subnet_ids         = module.london_backend.backend_subnet_ids
   backend_subnet_ids = module.london_backend.backend_subnet_ids
-  be_admin_in        = module.london_backend.be_admin_in
 
   vpc_id = module.london_backend.backend_vpc_id
 

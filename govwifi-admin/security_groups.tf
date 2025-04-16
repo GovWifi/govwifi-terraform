@@ -54,13 +54,6 @@ resource "aws_security_group" "admin_ec2_in" {
     protocol        = "tcp"
     security_groups = [aws_security_group.admin_alb_out.id]
   }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${var.bastion_server_ip}/32"]
-  }
 }
 
 resource "aws_security_group" "admin_ec2_out" {

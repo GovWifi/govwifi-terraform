@@ -1,5 +1,5 @@
 resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
-  for_each      = toset(var.deployed_app_names)
+  for_each = toset(var.deployed_app_names)
   name     = "DEV-ALPACA-${each.key}-app-pipeline"
   role_arn = aws_iam_role.govwifi_codepipeline_global_role.arn
 
@@ -35,18 +35,18 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       version          = 1
       run_order        = 1
       output_artifacts = ["${each.key}-source-art"]
-      
+
       configuration = {
-          S3Bucket = aws_s3_bucket.codepipeline_bucket.bucket
-          S3ObjectKey = "${local.s3_source_dir}/${each.key}/app.zip"
-          PollForSourceChanges = false
+        S3Bucket             = aws_s3_bucket.codepipeline_bucket.bucket
+        S3ObjectKey          = "${local.s3_source_dir}/${each.key}/app.zip"
+        PollForSourceChanges = false
       }
     }
   }
 
   stage {
     name = "Build"
-    
+
     action {
       name            = "Build-push-${each.key}-Alpaca-ECR"
       category        = "Build"
@@ -54,8 +54,8 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       provider        = "CodeBuild"
       region          = "eu-west-2"
       input_artifacts = ["${each.key}-source-art"]
-      version  = 1
-      run_order = 1
+      version         = 1
+      run_order       = 1
       configuration = {
         ProjectName = "${aws_codebuild_project.govwifi_codebuild_deployed_app[each.key].name}"
         EnvironmentVariables = jsonencode([
@@ -83,9 +83,9 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
         input_artifacts = ["${each.key}-source-art"]
         # This resource lives in the Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
-        role_arn = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
-        version  = "1"
-        run_order        = 1
+        role_arn  = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
+        version   = "1"
+        run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"
         }

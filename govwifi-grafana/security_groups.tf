@@ -57,14 +57,6 @@ resource "aws_security_group" "grafana_ec2_in" {
     protocol        = "tcp"
     security_groups = [aws_security_group.grafana_alb_out.id]
   }
-
-  ingress {
-    description = "grafana_ec2_in_22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${var.bastion_ip}/32"]
-  }
 }
 
 resource "aws_security_group" "grafana_ec2_out" {
@@ -74,14 +66,6 @@ resource "aws_security_group" "grafana_ec2_out" {
 
   tags = {
     Name = "${title(var.env_name)} Grafana EC2 Traffic Out"
-  }
-
-  egress {
-    description = "grafana_ec2_out_22"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["${var.bastion_ip}/32"]
   }
 
   egress {

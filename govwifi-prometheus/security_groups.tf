@@ -24,7 +24,7 @@ resource "aws_security_group" "prometheus" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   # for NTP Time keeping
   egress {
     description = "prometheus_ec2_out_123"
