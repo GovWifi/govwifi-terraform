@@ -265,6 +265,9 @@ resource "aws_ecs_task_definition" "user_signup_api_scheduled_task" {
         },{
           "name": "S3_METRICS_BUCKET",
           "value": "${var.metrics_bucket_name}"
+        },{
+          "name": "S3_NOTIFICATION_TEMPLATES_BUCKET",
+          "value": "${var.rack_env}_notification_templates"
         }
       ],
       "secrets": [

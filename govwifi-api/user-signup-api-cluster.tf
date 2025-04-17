@@ -131,9 +131,6 @@ resource "aws_ecs_task_definition" "user_signup_api_task" {
           "name": "S3_SIGNUP_ALLOWLIST_OBJECT_KEY",
           "value": "signup-allowlist.conf"
         },{
-          "name": "S3_NOTIFICATION_TEMPLATES_BUCKET",
-          "value": "${var.app_env}_notification_templates"
-        },{
           "name": "FIRETEXT_TOKEN",
           "value": "${var.firetext_token}"
         }
