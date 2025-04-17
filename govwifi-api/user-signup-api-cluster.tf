@@ -56,6 +56,19 @@ resource "aws_iam_role_policy" "user_signup_api_task_policy" {
         "s3:PutObject"
       ],
       "Resource": "arn:aws:s3:::${var.metrics_bucket_name}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:PutObject",
+        "s3:ListBucket",
+        "s3:HeadBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::govwifi-${var.env_name}-notification-templates",
+        "arn:aws:s3:::govwifi-${var.env_name}-notification-templates/*"
+      ]
     }
   ]
 }
@@ -130,9 +143,6 @@ resource "aws_ecs_task_definition" "user_signup_api_task" {
         },{
           "name": "S3_SIGNUP_ALLOWLIST_OBJECT_KEY",
           "value": "signup-allowlist.conf"
-        },{
-          "name": "S3_NOTIFICATION_TEMPLATES_BUCKET",
-          "value": "${var.app_env}_notification_templates"
         },{
           "name": "FIRETEXT_TOKEN",
           "value": "${var.firetext_token}"
