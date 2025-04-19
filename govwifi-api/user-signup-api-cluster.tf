@@ -62,7 +62,6 @@ resource "aws_iam_role_policy" "user_signup_api_task_policy" {
       "Action": [
         "s3:CreateBucket",
         "s3:PutObject",
-        "s3:GetObject",
         "s3:ListBucket",
         "s3:HeadBucket"
       ],
