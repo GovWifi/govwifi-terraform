@@ -67,7 +67,8 @@ resource "aws_iam_role_policy" "user_signup_api_task_policy" {
         "s3:HeadBucket"
       ],
       "Resource": [
-        "*"
+        "arn:aws:s3:::${var.env_name}-notification-templates",
+        "arn:aws:s3:::${var.env_name}-notification-templates/*"
       ]
     }
   ]
