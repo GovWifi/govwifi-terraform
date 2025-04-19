@@ -56,6 +56,19 @@ resource "aws_iam_role_policy" "user_signup_api_task_policy" {
         "s3:PutObject"
       ],
       "Resource": "arn:aws:s3:::${var.metrics_bucket_name}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:HeadBucket"
+      ],
+      "Resource": [
+        "*"
+      ]
     }
   ]
 }

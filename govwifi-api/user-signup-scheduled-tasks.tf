@@ -126,6 +126,19 @@ resource "aws_iam_role_policy" "user_signup_scheduled_task_policy" {
               "iam:PassedToService": "ecs-tasks.amazonaws.com"
             }
           }
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:CreateBucket",
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:HeadBucket"
+          ],
+          "Resource": [
+            "*"
+          ]
         }
     ]
 }
