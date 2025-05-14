@@ -457,6 +457,9 @@ module "london_smoke_tests" {
   create_slack_alert         = 0
   govwifi_phone_number       = "+447860003687"
   notify_field               = "govwifidevelopment"
+  smoke_tests_repo_name      = "govwifi-smoke-tests"
+
+
   depends_on = [
     module.london_frontend
   ]

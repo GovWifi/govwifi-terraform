@@ -540,6 +540,9 @@ module "smoke_tests" {
   create_slack_alert         = 1
   govwifi_phone_number       = "+447537417417"
   notify_field               = "govwifi"
+  smoke_tests_repo_name      = "govwifi-smoke-tests-light"
+
+
   depends_on = [
     module.frontend
   ]

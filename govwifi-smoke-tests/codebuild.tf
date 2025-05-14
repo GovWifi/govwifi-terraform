@@ -22,6 +22,11 @@ resource "aws_codebuild_project" "smoke_tests" {
     }
 
     environment_variable {
+      name  = "REPO_NAME" 
+      value = var.smoke_tests_repo_name
+    }
+
+    environment_variable {
       name  = "DOCKER_HUB_AUTHTOKEN_ENV"
       value = data.aws_secretsmanager_secret_version.docker_hub_authtoken.secret_string
     }

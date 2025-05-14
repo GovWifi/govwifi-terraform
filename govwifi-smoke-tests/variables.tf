@@ -33,3 +33,6 @@ variable "govwifi_phone_number" {
 
 variable "notify_field" {
 }
+
+variable "smoke_tests_repo_name" {
+}
