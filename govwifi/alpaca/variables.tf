@@ -29,7 +29,6 @@ variable "notification_email" {
 variable "smoketests_vpc_cidr" {
 }
 
-
 variable "smoketest_subnet_private_a" {
 }
 

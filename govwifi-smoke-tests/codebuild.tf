@@ -137,16 +137,16 @@ resource "aws_codebuild_project" "smoke_tests" {
   }
 
   vpc_config {
-    vpc_id = aws_vpc.smoke_tests.id
+    vpc_id = var.vpc_id
 
     # IDs of the two PRIVATE subnets
     subnets = [
-      "${aws_subnet.smoke_tests_private_a.id}",
-      "${aws_subnet.smoke_tests_private_b.id}",
+      "${var.smoketest_subnet_private_a}",
+      "${var.smoketest_subnet_private_b}",
     ] #
 
     security_group_ids = [
-      "${aws_vpc.smoke_tests.default_security_group_id}"
+      "${var.default_security_group_id}"
     ] #The default vpc security group goes here. Lets all traffic in and out (this is what all the codebuild jobs do anyway)
   }
 

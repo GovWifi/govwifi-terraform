@@ -16,13 +16,7 @@ variable "smoketest_subnet_private_b" {
 variable "create_slack_alert" {
 }
 
-variable "govwifi_phone_number" {
-}
-
-variable "notify_field" {
-}
-
-variable "smoke_tests_repo_name" {
+variable "canary_tests_repo_name" {
 }
 
 variable "vpc_id" {
@@ -30,3 +24,4 @@ variable "vpc_id" {
 
 variable "default_security_group_id" {
 }
+

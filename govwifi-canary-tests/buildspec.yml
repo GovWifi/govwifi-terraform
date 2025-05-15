@@ -1,0 +1,11 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+    - git clone -b $BRANCH https://github.com/GovWifi/$REPO_NAME.git
+  build:
+    commands:
+    - echo "Canary-tests running"
+    - cd $REPO_NAME
+    - make test-radius

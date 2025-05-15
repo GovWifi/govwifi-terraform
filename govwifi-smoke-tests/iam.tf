@@ -178,8 +178,8 @@ resource "aws_iam_policy" "govwifi_codebuild_vpc_policy" {
         },
         "ArnEquals": {
           "ec2:Subnet": [
-            "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/${aws_subnet.smoke_tests_private_a.id}",
-            "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/${aws_subnet.smoke_tests_private_b.id}"
+            "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/${var.smoketest_subnet_private_a}",
+            "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/${var.smoketest_subnet_private_b}"
           ]
         }
       }

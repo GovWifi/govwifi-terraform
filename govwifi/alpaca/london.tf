@@ -289,7 +289,7 @@ module "london_api" {
   low_cpu_threshold = 0.3
 
   elasticsearch_endpoint = module.london_elasticsearch.endpoint
-  smoke_test_ips         = module.london_smoke_tests.eip_public_ips
+  smoke_test_ips         = module.london_tests_vpc.eip_public_ips
 }
 
 module "london_route53_notifications" {
@@ -448,12 +448,10 @@ module "london_smoke_tests" {
   aws_account_id             = local.aws_account_id
   env_subdomain              = local.env_subdomain
   env                        = local.env_name
-  smoketests_vpc_cidr        = var.smoketests_vpc_cidr
-  smoketest_subnet_private_a = var.smoketest_subnet_private_a
-  smoketest_subnet_private_b = var.smoketest_subnet_private_b
-  smoketest_subnet_public_a  = var.smoketest_subnet_public_a
-  smoketest_subnet_public_b  = var.smoketest_subnet_public_b
-  aws_region                 = local.london_aws_region
+  vpc_id                     = module.london_tests_vpc.vpc_id
+  default_security_group_id  = module.london_tests_vpc.default_security_group_id
+  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
   create_slack_alert         = 0
   govwifi_phone_number       = "+447860003687"
   notify_field               = "govwifidevelopment"
@@ -461,8 +459,44 @@ module "london_smoke_tests" {
 
 
   depends_on = [
-    module.london_frontend
+    module.london_frontend,
+    module.london_tests_vpc
   ]
+}
+
+module "london_canary_tests" {
+  providers = {
+    aws        = aws.london
+    aws.dublin = aws.dublin
+  }
+
+  source = "../../govwifi-canary-tests"
+
+  aws_account_id             = local.aws_account_id
+  env_subdomain              = local.env_subdomain
+  env                        = local.env_name
+  vpc_id                     = module.london_tests_vpc.vpc_id
+  default_security_group_id  = module.london_tests_vpc.default_security_group_id
+  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
+  create_slack_alert         = 0
+  canary_tests_repo_name      = "govwifi-canary-tests"
+
+
+  depends_on = [
+    module.london_frontend,
+    module.london_tests_vpc
+  ]
+}
+
+module "london_tests_vpc" {
+  source = "../../govwifi_tests_vpc"
+  env_subdomain              = local.env_subdomain
+  smoketests_vpc_cidr        = var.smoketests_vpc_cidr
+  smoketest_subnet_private_a = var.smoketest_subnet_private_a
+  smoketest_subnet_private_b = var.smoketest_subnet_private_b
+  smoketest_subnet_public_a  = var.smoketest_subnet_public_a
+  smoketest_subnet_public_b  = var.smoketest_subnet_public_b
 }
 
 module "london_sync_certs" {
