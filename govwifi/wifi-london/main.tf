@@ -548,6 +548,34 @@ module "smoke_tests" {
   ]
 }
 
+module "canary_tests" {
+  providers = {
+    aws        = aws.main
+    aws.dublin = aws.dublin
+  }
+
+  source = "../../govwifi-canary-tests"
+
+  aws_account_id             = local.aws_account_id
+  env_subdomain              = local.env_subdomain
+  env                        = local.env_name
+  smoketests_vpc_cidr        = var.smoketests_vpc_cidr
+  smoketest_subnet_private_a = var.smoketest_subnet_private_a
+  smoketest_subnet_private_b = var.smoketest_subnet_private_b
+  smoketest_subnet_public_a  = var.smoketest_subnet_public_a
+  smoketest_subnet_public_b  = var.smoketest_subnet_public_b
+  aws_region                 = var.aws_region
+  create_slack_alert         = 1
+  govwifi_phone_number       = "+447537417417"
+  notify_field               = "govwifi"
+  canary_tests_repo_name     = "govwifi-canary-tests"
+
+
+  depends_on = [
+    module.frontend
+  ]
+}
+
 module "london_govwifi-ecs-update-service" {
   providers = {
     aws = aws.main
