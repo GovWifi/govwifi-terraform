@@ -2,7 +2,7 @@ resource "aws_codebuild_project" "canary_tests" {
   name          = "govwifi-canary-tests"
   description   = "This project runs the govwifi canary tests at regular intervals"
   build_timeout = "15"
-  service_role  = aws_iam_role.govwifi_codebuild.arn
+  service_role  = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -97,7 +97,7 @@ resource "aws_cloudwatch_event_target" "trigger_canary_tests" {
   rule = aws_cloudwatch_event_rule.canary_tests_schedule_rule.name
   arn  = aws_codebuild_project.canary_tests.id
 
-  role_arn = aws_iam_role.govwifi_codebuild.arn
+  role_arn = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
 }
 
 # Enable scheduled canary tests in production environment only
