@@ -28,7 +28,7 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
   stage {
     name = "Source"
     action {
-      name             = "S3-${each.key}-Alpaca"
+      name             = "S3-${each.key}-DEV"
       category         = "Source"
       owner            = "AWS"
       provider         = "S3"
@@ -48,7 +48,7 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
     name = "Build"
 
     action {
-      name            = "Build-push-${each.key}-Alpaca-ECR"
+      name            = "Build-push-${each.key}-ECR-DEV"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -58,8 +58,8 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       run_order       = 1
       configuration = {
         ProjectName = "${aws_codebuild_project.govwifi_codebuild_deployed_app[each.key].name}"
-        EnvironmentVariables = jsonencode([
-          {
+          EnvironmentVariables = jsonencode([
+            {
             name  = "STAGE"
             value = "alpaca"
             type  = "PLAINTEXT"
@@ -75,16 +75,16 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
     dynamic "action" {
       for_each = local.app[each.key].regions
       content {
-        name            = "Update-${each.key}-Alpaca-${action.value}-ECS"
+        name            = "Update-${each.key}-ECS-${action.value}-DEV"
         category        = "Build"
         owner           = "AWS"
         provider        = "CodeBuild"
         region          = action.value
         input_artifacts = ["${each.key}-source-art"]
-        # This resource lives in the Staging & Production environments. It will always have to
+        # This resource lives in the Dev, Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
         role_arn  = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
-        version   = "1"
+        version   = 1
         run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"
@@ -96,8 +96,27 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
   stage {
     name = "Test"
 
+    dynamic "action" {
+      for_each = contains(local.integration_tests, each.key) ? [each.key] : []
+      content {
+        name            = "Integration-tests-${each.key}-DEV"
+        category        = "Test"
+        owner           = "AWS"
+        provider        = "CodeBuild"
+        input_artifacts = ["${each.key}-source-art"]
+        # This resource lives in the Dev, Staging & Production environments. It will always have to
+        # either be hardcoded or retrieved from the AWS secrets or parameter store
+        version  = 1
+        run_order = 1
+        configuration = {
+          ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
+        }
+      }
+    }
+
+
     action {
-      name            = "Smoketests-${each.key}-Alpaca"
+      name            = "Smoke-tests-${each.key}-DEV"
       category        = "Test"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -106,7 +125,7 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       # either be hardcoded or retrieved from the AWS secrets or parameter store
       role_arn = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
       version  = "1"
-
+      run_order = 1
       configuration = {
         ProjectName = "govwifi-smoke-tests"
       }

@@ -51,7 +51,7 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
     name = "Build_STAGING"
 
     action {
-      name            = "Build-push-${each.key}-staging-ECR"
+      name            = "Build-push-${each.key}-ECR-STAGING"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -78,7 +78,7 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
     dynamic "action" {
       for_each = local.app[each.key].regions
       content {
-        name            = "Update-${each.key}-Staging-${action.value}-ECS"
+        name            = "Update-${each.key}-ECS-${action.value}-STAGING"
         category        = "Build"
         owner           = "AWS"
         provider        = "CodeBuild"
@@ -98,9 +98,26 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
 
   stage {
     name = "Test_STAGING"
+    dynamic "action" {
+      for_each = contains(local.integration_tests, each.key) ? [each.key] : []
+      content {
+        name            = "Integration-tests-${each.key}-STAGING"
+        category        = "Test"
+        owner           = "AWS"
+        provider        = "CodeBuild"
+        input_artifacts = ["${each.key}-source-art"]
+        # This resource lives in the Dev, Staging & Production environments. It will always have to
+        # either be hardcoded or retrieved from the AWS secrets or parameter store
+        version  = 1
+        run_order = 1
+        configuration = {
+          ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
+        }
+      }
+    }
 
     action {
-      name            = "Staging-Smoketests"
+      name            = "Smoke-tests-${each.key}-STAGING"
       category        = "Test"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -110,8 +127,8 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
       # This resource lives in the Staging & Production environments. It will always have to
       # either be hardcoded or retrieved from the AWS secrets or parameter store
       role_arn = "arn:aws:iam::${local.aws_staging_account_id}:role/govwifi-codebuild-role"
-      version  = "1"
-
+      version  = 1
+      run_order = 1
       configuration = {
         ProjectName = "govwifi-smoke-tests"
       }
@@ -128,7 +145,7 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
       owner    = "AWS"
       provider = "Manual"
       region   = "eu-west-2"
-      version  = "1"
+      version  = 1
     }
   }
 
@@ -136,13 +153,13 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
     name = "Build_PRODUCTION"
 
     action {
-      name            = "Push-PRODUCTION-image-to-ECR"
+      name            = "Push-image-to-ECR-PRODUCTION"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
       input_artifacts = ["${each.key}-source-art"]
 
-      version = "1"
+      version = 1
 
       configuration = {
         ProjectName = "${aws_codebuild_project.govwifi_codebuild_project_push_image_to_ecr_production[each.key].name}"
@@ -156,7 +173,7 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
     dynamic "action" {
       for_each = local.app[each.key].regions
       content {
-        name            = "Update-${each.key}-PRODUCTION-${action.value}-ECS"
+        name            = "Update-${each.key}-ECS-${action.value}-PRODUCTION"
         category        = "Build"
         owner           = "AWS"
         provider        = "CodeBuild"
@@ -165,7 +182,7 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
         # This resource lives in the Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
         role_arn  = "arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role"
-        version   = "1"
+        version   = 1
         run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"

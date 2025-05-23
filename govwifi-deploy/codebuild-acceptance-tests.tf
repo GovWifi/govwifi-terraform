@@ -25,7 +25,13 @@ resource "aws_codebuild_project" "govwifi_codebuild_acceptance_tests" {
       name  = "DOCKER_HUB_USERNAME_ENV"
       value = data.aws_secretsmanager_secret_version.docker_hub_username.secret_string
     }
-  
+
+    ## Use this to over ride the branch.
+    environment_variable {
+      name  = "BRANCH"
+      value = "master"
+    }
+
     ## if testing branches other than main/master, change these to match the branch name.
     environment_variable {
       name  = "FRONTEND_BRANCH"
@@ -38,19 +44,14 @@ resource "aws_codebuild_project" "govwifi_codebuild_acceptance_tests" {
     }
 
     environment_variable {
-      name  = "LOGGING_API_BRANCH" 
+      name  = "LOGGING_API_BRANCH"
       value = "master"
     }
-
   }
 
-  source_version = "master"
-
   source {
-    type            = "GITHUB"
-    location        = "https://github.com/GovWifi/govwifi-acceptance-tests.git"
-    git_clone_depth = 1
-    buildspec       = "buildspec.yml"
+    type      = "NO_SOURCE"
+    buildspec = file("${path.module}/buildspec_acceptance_tests.yml")
   }
 
 

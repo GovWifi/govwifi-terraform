@@ -20,6 +20,7 @@ locals {
   git_owner = "GovWifi"
   branch = "master"
   s3_source_dir = "source"
+  integration_tests = ["logging-api", "authentication-api"]
   app = {
     admin = {
       repo = "govwifi-admin"
