@@ -118,7 +118,7 @@ module "london_frontend" {
   backend_vpc_id = module.london_backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
-  radius_instance_count      = 3
+  radius_instance_count      = 9
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -138,7 +138,7 @@ module "london_frontend" {
 
   authentication_api_internal_dns_name = module.london_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
-
+  capacity_notifications_arn = module.london_notifications.topic_arn
   pagerduty_notifications_arn = module.london_notifications.topic_arn
   critical_notifications_arn  = module.london_critical_notifications.topic_arn
 
