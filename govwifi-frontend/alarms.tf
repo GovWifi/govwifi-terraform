@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "no_healthy_hosts" {
   alarm_name          = "${var.env_name} ${var.aws_region_name} frontend no healthy hosts"
   alarm_description   = "Alert: Detected when there are no healthy radius frontend targets, investigate and reboot tasks"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 5
+  evaluation_periods  = 2
   metric_name         = "HealthyHostCount"
   namespace           = "AWS/NetworkELB"
   period              = 60
