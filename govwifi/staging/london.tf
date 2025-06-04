@@ -140,6 +140,7 @@ module "london_frontend" {
 
   pagerduty_notifications_arn = module.london_notifications.topic_arn
   critical_notifications_arn  = module.london_critical_notifications.topic_arn
+  capacity_notifications_arn = module.london_notifications.topic_arn
 
   bastion_server_ip = module.london_backend.bastion_public_ip
 
@@ -173,7 +174,7 @@ module "london_admin" {
 
   route53_zone_id = data.aws_route53_zone.main.zone_id
   route53_zone_arn = data.aws_route53_zone.main.arn
-  
+
   admin_docker_image   = format("%s/admin:staging", local.docker_image_path)
   rails_env            = "production"
   app_env              = "staging"
