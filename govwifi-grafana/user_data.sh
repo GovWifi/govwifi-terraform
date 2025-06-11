@@ -1,6 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # set -ueo pipefail
+
+logger 'Govwifi Grafana User Data Script - Starting'
+echo "Govwifi Grafana User Data Script - Starting"
+
+echo "Echo message to see if this works"
 
 export DEBIAN_FRONTEND=noninteractive
 

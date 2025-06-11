@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+logger 'Govwifi Prometheus User Data Script - Starting'
+echo "Govwifi Prometheus User Data Script - Starting"
 
 export DEBIAN_FRONTEND=noninteractive
 
