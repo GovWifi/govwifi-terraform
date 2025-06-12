@@ -340,7 +340,7 @@ resource "aws_ecs_service" "load_balanced_frontend_service" {
   cluster         = aws_ecs_cluster.frontend_fargate.id
   launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.frontend_fargate.arn
-  desired_count   = var.radius_instance_count
+  desired_count   = var.radius_task_count
 
   enable_execute_command = true
 

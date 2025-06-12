@@ -214,6 +214,7 @@ module "frontend" {
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
+  radius_task_count          = 9
   enable_detailed_monitoring = true
 
   # eg. dns records are generated for radius(N).x.service.gov.uk

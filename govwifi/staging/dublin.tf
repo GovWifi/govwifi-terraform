@@ -207,6 +207,7 @@ module "dublin_frontend" {
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
+  radius_task_count          = 3
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk

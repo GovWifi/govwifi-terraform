@@ -28,6 +28,9 @@ variable "aws_region_name" {
 variable "radius_instance_count" {
 }
 
+variable "radius_task_count" {
+}
+
 variable "frontend_docker_image" {
 }
 
