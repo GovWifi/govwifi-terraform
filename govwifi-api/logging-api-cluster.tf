@@ -2,7 +2,7 @@ resource "aws_cloudwatch_log_group" "logging_api_log_group" {
   count = var.logging_enabled
   name  = "${var.env_name}-logging-api-docker-log-group"
 
-  retention_in_days = 30
+  retention_in_days = var.log_retention
 }
 
 resource "aws_ecs_task_definition" "logging_api_task" {

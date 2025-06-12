@@ -194,6 +194,8 @@ module "dublin_frontend" {
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
   env           = local.env
+  log_retention = local.log_retention
+
 
   # AWS VPC setup -----------------------------------------
   aws_region         = local.dublin_aws_region
@@ -259,6 +261,7 @@ module "dublin_api" {
   env           = "staging"
   env_name      = "staging"
   env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
 
   backend_elb_count      = 1
   backend_instance_count = 2
@@ -320,6 +323,8 @@ module "dublin_prometheus" {
   aws_region      = local.dublin_aws_region
   aws_region_name = local.dublin_aws_region_name
   aws_account_id  = local.aws_account_id
+  log_retention   = local.log_retention
+
 
   ssh_key_name = var.ssh_key_name
 

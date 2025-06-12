@@ -103,6 +103,7 @@ module "london_frontend" {
   env_subdomain  = local.env_subdomain
   env            = local.env
   aws_account_id = local.aws_account_id
+  log_retention  = local.log_retention
 
   # AWS VPC setup -----------------------------------------
   # LONDON
@@ -169,6 +170,7 @@ module "london_admin" {
   aws_region_name = local.london_aws_region_name
   vpc_id          = module.london_backend.backend_vpc_id
   instance_count  = 1
+  log_retention   = local.log_retention
 
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
@@ -229,6 +231,7 @@ module "london_api" {
   env           = "staging"
   env_name      = "staging"
   env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
 
   backend_elb_count      = 1
   backend_instance_count = 2
@@ -361,7 +364,7 @@ module "london_prometheus" {
   aws_region      = local.london_aws_region
   aws_region_name = local.london_aws_region_name
   aws_account_id  = local.aws_account_id
-
+  log_retention   = local.log_retention
 
   ssh_key_name = var.ssh_key_name
 

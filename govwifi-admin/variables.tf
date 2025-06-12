@@ -142,3 +142,6 @@ variable "frontend_cert_bucket" {
 
 variable "trusted_certificates_key" {
 }
+
+variable "log_retention" {
+}

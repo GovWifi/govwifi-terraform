@@ -115,3 +115,6 @@ variable "prometheus_security_group_id" {
 
 variable "london_backend_vpc_cidr" {
 }
+
+variable "log_retention" {
+}

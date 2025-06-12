@@ -7,6 +7,7 @@ locals {
 
   backup_mysql_rds              = true
   london_backend_vpc_cidr_block = "10.84.0.0/16"
+  log_retention = 90
 }
 
 locals {

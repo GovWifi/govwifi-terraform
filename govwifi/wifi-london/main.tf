@@ -176,6 +176,7 @@ module "frontend" {
   env_subdomain  = local.env_subdomain
   env            = local.env
   aws_account_id = local.aws_account_id
+  log_retention  = local.log_retention
 
   # AWS VPC setup -----------------------------------------
   # LONDON
@@ -236,6 +237,7 @@ module "govwifi_admin" {
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
   env           = local.env
+  log_retention = local.log_retention
 
   aws_region      = var.aws_region
   aws_region_name = var.aws_region_name
@@ -301,6 +303,7 @@ module "api" {
   env           = "production"
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
 
   backend_elb_count      = 1
   backend_instance_count = 3
@@ -452,7 +455,8 @@ module "govwifi_prometheus" {
   london_radius_ip_addresses = var.london_radius_ip_addresses
   dublin_radius_ip_addresses = var.dublin_radius_ip_addresses
 
-  grafana_ip = var.grafana_ip
+  grafana_ip    = var.grafana_ip
+  log_retention = local.log_retention
 }
 
 module "govwifi_grafana" {

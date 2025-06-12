@@ -18,13 +18,13 @@ resource "aws_ecs_cluster_capacity_providers" "frontend_fargate" {
 resource "aws_cloudwatch_log_group" "frontend_log_group" {
   name = "${var.env_name}-frontend-docker-log-group"
 
-  retention_in_days = 30
+  retention_in_days = var.log_retention
 }
 
 resource "aws_cloudwatch_log_group" "frontend" {
   name = "frontend"
 
-  retention_in_days = 30
+  retention_in_days = var.log_retention
 }
 
 data "aws_caller_identity" "current" {}

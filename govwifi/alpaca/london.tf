@@ -104,6 +104,8 @@ module "london_frontend" {
   env_subdomain  = local.env_subdomain
   env            = local.env
   aws_account_id = local.aws_account_id
+  log_retention  = local.log_retention
+
 
   # AWS VPC setup -----------------------------------------
   # LONDON
@@ -230,6 +232,8 @@ module "london_api" {
   env           = "alpaca"
   env_name      = "alpaca"
   env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
+
 
   backend_elb_count      = 1
   backend_instance_count = 2
@@ -345,6 +349,8 @@ module "london_prometheus" {
   aws_region      = local.london_aws_region
   aws_region_name = local.london_aws_region_name
   aws_account_id  = local.aws_account_id
+  log_retention   = local.log_retention
+
 
   ssh_key_name = var.ssh_key_name
 

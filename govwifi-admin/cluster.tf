@@ -5,7 +5,7 @@ resource "aws_ecs_cluster" "admin_cluster" {
 resource "aws_cloudwatch_log_group" "admin_log_group" {
   name = "${var.env_name}-admin-log-group"
 
-  retention_in_days = 90
+  retention_in_days = var.log_retention
 }
 
 resource "aws_ecs_task_definition" "admin_task" {

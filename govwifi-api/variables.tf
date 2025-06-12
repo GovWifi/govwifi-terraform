@@ -195,3 +195,6 @@ variable "smoke_test_ips" {
   type    = list(string)
   default = []
 }
+
+variable "log_retention" {
+}

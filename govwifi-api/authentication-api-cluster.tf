@@ -1,8 +1,9 @@
 resource "aws_cloudwatch_log_group" "authentication_api_log_group" {
   name = "${var.env_name}-authentication-api-docker-log-group"
 
-  retention_in_days = 30
+  retention_in_days = var.log_retention
 }
+
 
 resource "aws_ecs_task_definition" "authentication_api_task" {
   family                   = "authentication-api-task-${var.env_name}"
