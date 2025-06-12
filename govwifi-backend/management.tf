@@ -154,7 +154,7 @@ DATA
 }
 
 locals {
-  log_group_names     = ["syslog","authlog","dmesg","unattended-upgrades/unattended-upgrades.log","cloud-init-output.log"]
+  log_group_names = ["syslog", "authlog", "dmesg", "unattended-upgrades/unattended-upgrades.log", "cloud-init-output.log"]
 }
 
 resource "aws_cloudwatch_log_group" "bastion_logs" {
@@ -188,10 +188,10 @@ resource "aws_iam_role" "bastion_instance_role" {
 EOF
 }
 
-resource aws_iam_role_policy_attachment "bastion_instance_ssm" {
-    count      = var.enable_bastion
-    policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    role = aws_iam_role.bastion_instance_role[0].id
+resource "aws_iam_role_policy_attachment" "bastion_instance_ssm" {
+  count      = var.enable_bastion
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.bastion_instance_role[0].id
 }
 
 resource "aws_iam_role_policy" "bastion_instance_policy" {

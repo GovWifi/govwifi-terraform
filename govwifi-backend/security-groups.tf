@@ -91,15 +91,15 @@ resource "aws_security_group" "vpc_endpoints" {
 
   tags = {
     Name = "${title(var.env_name)} Backend VPC Endpoints"
-  }  
+  }
 }
 
 resource "aws_security_group_rule" "vpc_endpoints_ingress" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
-  description              = "Required for SSM"
-  security_group_id        = aws_security_group.vpc_endpoints.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Required for SSM"
+  security_group_id = aws_security_group.vpc_endpoints.id
 }

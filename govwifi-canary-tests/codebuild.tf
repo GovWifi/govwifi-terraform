@@ -17,12 +17,12 @@ resource "aws_codebuild_project" "canary_tests" {
 
     ## Use this to over ride the branch, unable to use the normal source method as accounts would need github access.
     environment_variable {
-      name  = "BRANCH" 
+      name  = "BRANCH"
       value = "main"
     }
 
     environment_variable {
-      name  = "REPO_NAME" 
+      name  = "REPO_NAME"
       value = var.canary_tests_repo_name
     }
 
@@ -107,7 +107,7 @@ resource "aws_cloudwatch_event_target" "trigger_canary_tests" {
 
 # Enable scheduled canary tests in production environment only
 resource "aws_cloudwatch_event_rule" "canary_tests_schedule_rule" {
-  state          = var.env == "wifi" ? "ENABLED" : "DISABLED"
+  state               = var.env == "wifi" ? "ENABLED" : "DISABLED"
   name                = "canary-tests-scheduled-build"
   schedule_expression = "cron(0/15 * * * ? *)"
 }

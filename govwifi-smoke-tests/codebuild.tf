@@ -17,12 +17,12 @@ resource "aws_codebuild_project" "smoke_tests" {
 
     ## Use this to over ride the branch, unable to use the normal source method as accounts would need github access.
     environment_variable {
-      name  = "BRANCH" 
+      name  = "BRANCH"
       value = "main"
     }
 
     environment_variable {
-      name  = "REPO_NAME" 
+      name  = "REPO_NAME"
       value = var.smoke_tests_repo_name
     }
 
@@ -174,7 +174,7 @@ resource "aws_cloudwatch_event_target" "trigger_smoke_tests" {
 
 # Enable scheduled smoke tests in production environment only
 resource "aws_cloudwatch_event_rule" "smoke_tests_schedule_rule" {
-  state          = var.env == "wifi" ? "ENABLED" : "DISABLED"
+  state               = var.env == "wifi" ? "ENABLED" : "DISABLED"
   name                = "smoke-tests-scheduled-build"
   schedule_expression = "cron(0/15 * * * ? *)"
 }

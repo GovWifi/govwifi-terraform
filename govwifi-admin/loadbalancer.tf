@@ -22,7 +22,7 @@ resource "aws_lb" "admin_alb" {
 
 # Shield advanced protection
 resource "aws_shield_protection" "admin_alb" {
-  name     = "admin-alb-${var.env_name}"
+  name         = "admin-alb-${var.env_name}"
   resource_arn = aws_lb.admin_alb.arn
 }
 

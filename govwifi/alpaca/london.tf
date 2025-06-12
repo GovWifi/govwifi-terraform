@@ -167,6 +167,7 @@ module "london_admin" {
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
   env           = local.env
+  log_retention = local.log_retention
 
   aws_region      = local.london_aws_region
   aws_region_name = local.london_aws_region_name
@@ -175,7 +176,7 @@ module "london_admin" {
 
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
-  route53_zone_id = data.aws_route53_zone.main.zone_id
+  route53_zone_id  = data.aws_route53_zone.main.zone_id
   route53_zone_arn = data.aws_route53_zone.main.arn
 
   admin_docker_image   = format("%s/admin:alpaca", local.docker_image_path)
@@ -487,7 +488,7 @@ module "london_canary_tests" {
   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
   smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
   create_slack_alert         = 0
-  canary_tests_repo_name      = "govwifi-canary-tests"
+  canary_tests_repo_name     = "govwifi-canary-tests"
 
 
   depends_on = [
@@ -497,7 +498,7 @@ module "london_canary_tests" {
 }
 
 module "london_tests_vpc" {
-  source = "../../govwifi_tests_vpc"
+  source                     = "../../govwifi_tests_vpc"
   env_subdomain              = local.env_subdomain
   smoketests_vpc_cidr        = var.smoketests_vpc_cidr
   smoketest_subnet_private_a = var.smoketest_subnet_private_a

@@ -42,8 +42,8 @@ resource "aws_s3_bucket_versioning" "export_data_bucket" {
 resource "aws_s3_bucket_public_access_block" "export_data_bucket" {
   bucket = aws_s3_bucket.export_data_bucket.id
 
-  block_public_acls       = false
-  block_public_policy     = false
+  block_public_acls   = false
+  block_public_policy = false
 }
 
 

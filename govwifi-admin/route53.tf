@@ -11,6 +11,6 @@ resource "aws_route53_record" "admin" {
 }
 # Shield advanced protection
 resource "aws_shield_protection" "admin_route53" {
-  name    = "admin.${var.env_subdomain}.service.gov.uk"
+  name         = "admin.${var.env_subdomain}.service.gov.uk"
   resource_arn = var.route53_zone_arn
 }

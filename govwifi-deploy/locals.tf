@@ -17,26 +17,26 @@ locals {
 }
 
 locals {
-  git_owner = "GovWifi"
-  branch = "master"
-  s3_source_dir = "source"
+  git_owner         = "GovWifi"
+  branch            = "master"
+  s3_source_dir     = "source"
   integration_tests = ["logging-api", "authentication-api"]
   app = {
     admin = {
-      repo = "govwifi-admin"
+      repo    = "govwifi-admin"
       regions = ["eu-west-2"]
     }
     logging-api = {
-        repo = "govwifi-logging-api"
-        regions = ["eu-west-2"]
+      repo    = "govwifi-logging-api"
+      regions = ["eu-west-2"]
     }
     authentication-api = {
-        repo = "govwifi-authentication-api"
-        regions = ["eu-west-1", "eu-west-2"]
+      repo    = "govwifi-authentication-api"
+      regions = ["eu-west-1", "eu-west-2"]
     }
-    user-signup-api ={
-        repo = "govwifi-user-signup-api"
-        regions = ["eu-west-2"]
+    user-signup-api = {
+      repo    = "govwifi-user-signup-api"
+      regions = ["eu-west-2"]
     }
   }
 }

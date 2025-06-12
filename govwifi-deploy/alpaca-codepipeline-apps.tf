@@ -58,8 +58,8 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       run_order       = 1
       configuration = {
         ProjectName = "${aws_codebuild_project.govwifi_codebuild_deployed_app[each.key].name}"
-          EnvironmentVariables = jsonencode([
-            {
+        EnvironmentVariables = jsonencode([
+          {
             name  = "STAGE"
             value = "alpaca"
             type  = "PLAINTEXT"
@@ -106,7 +106,7 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
         input_artifacts = ["${each.key}-source-art"]
         # This resource lives in the Dev, Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
-        version  = 1
+        version   = 1
         run_order = 1
         configuration = {
           ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
@@ -123,8 +123,8 @@ resource "aws_codepipeline" "alpaca_deploy_apps_pipeline" {
       input_artifacts = ["${each.key}-source-art"]
       # This resource lives in the alpaca & Production environments. It will always have to
       # either be hardcoded or retrieved from the AWS secrets or parameter store
-      role_arn = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
-      version  = "1"
+      role_arn  = "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role"
+      version   = "1"
       run_order = 1
       configuration = {
         ProjectName = "govwifi-smoke-tests"
