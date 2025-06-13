@@ -142,6 +142,7 @@ module "london_frontend" {
 
   pagerduty_notifications_arn = module.london_notifications.topic_arn
   critical_notifications_arn  = module.london_critical_notifications.topic_arn
+  capacity_notifications_arn = module.london_notifications.topic_arn
 
   bastion_server_ip = module.london_backend.bastion_public_ip
 

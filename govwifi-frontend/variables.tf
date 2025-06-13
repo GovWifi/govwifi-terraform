@@ -86,6 +86,9 @@ variable "create_ecr" {
 variable "bastion_server_ip" {
 }
 
+variable "capacity_notifications_arn" {
+}
+
 variable "pagerduty_notifications_arn" {
   type = string
 }

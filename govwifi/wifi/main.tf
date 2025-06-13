@@ -245,6 +245,7 @@ module "frontend" {
 
   pagerduty_notifications_arn = module.region_pagerduty.topic_arn
   critical_notifications_arn  = module.dublin_critical_notifications.topic_arn
+  capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
 
   bastion_server_ip = var.bastion_server_ip
 
