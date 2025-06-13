@@ -376,7 +376,7 @@ module "govwifi_prometheus" {
   aws_region      = var.aws_region
   aws_region_name = var.aws_region_name
   aws_account_id  = local.aws_account_id
-  log_retention   = local.log_retention
+  log_retention   = 30
 
   ssh_key_name = var.ssh_key_name
 

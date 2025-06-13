@@ -456,7 +456,7 @@ module "govwifi_prometheus" {
   dublin_radius_ip_addresses = var.dublin_radius_ip_addresses
 
   grafana_ip    = var.grafana_ip
-  log_retention = local.log_retention
+  log_retention = 30
 }
 
 module "govwifi_grafana" {

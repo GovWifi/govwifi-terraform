@@ -7,7 +7,7 @@ Restart=always
 User=prometheus
 ExecStart=/usr/bin/prometheus \
   --storage.tsdb.path=/srv/prometheus/metrics2 \
-  --storage.tsdb.retention.time=90d
+  --storage.tsdb.retention.time=365d
 TimeoutStopSec=30s
 
 [Install]
