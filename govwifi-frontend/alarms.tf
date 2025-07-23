@@ -88,5 +88,9 @@ resource "aws_cloudwatch_metric_alarm" "eap_too_many_sessions" {
   period              = 60
   statistic           = "Sum"
   treat_missing_data  = "missing"
-  alarm_actions = [var.critical_notifications_arn]
+  alarm_actions = [
+    var.capacity_notifications_arn,
+    aws_appautoscaling_policy.ecs_service_radius_frontend_load_scale_up_policy.arn
+  ]
+  ok_actions    = [aws_appautoscaling_policy.ecs_service_radius_frontend_load_scale_down_policy.arn]
 }
