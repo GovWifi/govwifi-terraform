@@ -36,7 +36,7 @@ resource "aws_s3_bucket_versioning" "rds_mysql_backup_bucket" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "rds_mysql_backup_bucket" {
   count      = var.backup_mysql_rds ? 1 : 0
-  depends_on = [aws_s3_bucket_versioning.rds_mysql_backup_bucket]
+  depends_on = [aws_s3_bucket_versioning.rds_mysql_backup_bucket[0]]
 
   bucket = aws_s3_bucket.rds_mysql_backup_bucket[0].id
 
@@ -70,3 +70,59 @@ resource "aws_s3_bucket_public_access_block" "rds_mysql_backup_bucket" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_replication_configuration" "rds_mysql_backup_bucket" {
+  count = var.recovery_backups_enabled ? 1 : 0
+  depends_on = [aws_s3_bucket_versioning.rds_mysql_backup_bucket]
+
+  role   = aws_iam_role.iam_for_recovery_database_backup[0].arn
+  bucket = aws_s3_bucket.rds_mysql_backup_bucket[0].id 
+
+  rule {
+    id       = "ReplicateDB"
+    priority = 0
+    status   = "Enabled"
+
+    filter {} # empty filter matches the entire bucket
+
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        status = "Enabled"
+      }
+    }
+
+    destination {
+      bucket = "arn:aws:s3:::govwifi-database-backups"
+      account = "${data.aws_secretsmanager_secret_version.recovery_account[0].secret_string}"
+
+      access_control_translation {
+        owner = "Destination"
+      }
+
+      encryption_configuration {
+        replica_kms_key_id = "arn:aws:kms:eu-west-2:${data.aws_secretsmanager_secret_version.recovery_account[0].secret_string}:key/${data.aws_secretsmanager_secret_version.recovery_kms_key[0].secret_string}"
+      }
+
+      replication_time {
+        status = "Enabled"
+
+        time {
+          minutes = 15
+        }
+      }
+
+      metrics {
+        status = "Enabled"
+
+        event_threshold {
+          minutes = 15
+        }
+      }
+    }
+
+    delete_marker_replication {
+      status = "Disabled"
+    }
+  }
+}
+

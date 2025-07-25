@@ -8,6 +8,8 @@ locals {
   dublin_frontend_vpc_cidr_block = "10.43.0.0/16"
   london_backend_vpc_cidr_block  = "10.84.0.0/16"
   log_retention                  = 365
+  recovery_backups_enabled       = true
+
 }
 
 locals {

@@ -4,8 +4,9 @@ locals {
   env           = "staging"
   product_name  = "GovWifi"
 
-  backup_mysql_rds = true
-  log_retention    = 90
+  backup_mysql_rds         = true
+  log_retention            = 90
+  recovery_backups_enabled = false
 }
 
 locals {

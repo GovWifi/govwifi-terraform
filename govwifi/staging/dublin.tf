@@ -143,6 +143,8 @@ module "dublin_backend" {
   grafana_ip            = module.london_grafana.eip_public_ip
 
   db_storage_alarm_threshold = 19327342936
+  recovery_backups_enabled = local.recovery_backups_enabled
+
 }
 
 # Emails ======================================================================

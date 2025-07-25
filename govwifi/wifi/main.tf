@@ -154,6 +154,8 @@ module "backend" {
   grafana_ip            = var.grafana_ip
 
   db_storage_alarm_threshold = 32212254720
+  recovery_backups_enabled = false
+
 }
 
 # Emails ======================================================================

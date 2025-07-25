@@ -160,6 +160,7 @@ module "backend" {
   grafana_ip            = var.grafana_ip
 
   backup_mysql_rds = local.backup_mysql_rds
+  recovery_backups_enabled = local.recovery_backups_enabled
 
   db_storage_alarm_threshold = 32212254720
 }

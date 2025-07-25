@@ -89,6 +89,7 @@ module "london_backend" {
   grafana_ip            = module.london_grafana.eip_public_ip
 
   backup_mysql_rds = local.backup_mysql_rds
+  recovery_backups_enabled = local.recovery_backups_enabled
 
   db_storage_alarm_threshold = 19327342936
 }

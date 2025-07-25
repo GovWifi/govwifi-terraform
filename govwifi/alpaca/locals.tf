@@ -4,8 +4,9 @@ locals {
   env           = "alpaca"
   product_name  = "GovWifi"
 
-  backup_mysql_rds = true
-  log_retention    = 30
+  backup_mysql_rds         = true
+  recovery_backups_enabled = true
+  log_retention            = 30
 }
 
 locals {

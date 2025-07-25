@@ -238,3 +238,101 @@ resource "aws_iam_role_policy" "bastion_reboot_policy" {
 EOF
 
 }
+
+#Role for copying govwifi database backups to recovery
+resource "aws_iam_role" "iam_for_recovery_database_backup" {
+  count = var.recovery_backups_enabled ? 1 : 0
+  name  = "govwifi-recovery-database-backup"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "s3.amazonaws.com",
+                    "batchoperations.s3.amazonaws.com"
+                ]
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "iam_for_recovery_database_backup" {
+  count = var.recovery_backups_enabled ? 1 : 0
+  name   = "govwifi-recovery-database-backup"
+  role   = aws_iam_role.iam_for_recovery_database_backup[0].id
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "SourceBucketPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObjectVersionForReplication",
+                "s3:GetObjectVersionTagging",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectRetention",
+                "s3:GetObjectLegalHold",
+                "s3:ListBucket",
+                "s3:GetReplicationConfiguration",
+                "s3:CreateJob"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.rds_mysql_backup_bucket[0].id}",
+                "arn:aws:s3:::${aws_s3_bucket.rds_mysql_backup_bucket[0].id}/*"
+            ]
+        },
+        {
+            "Sid": "DestinationBucketPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ReplicateObject",
+                "s3:ReplicateDelete",
+                "s3:ReplicateTags",
+                "s3:ObjectOwnerOverrideToBucketOwner",
+                "s3:GetBucketVersioning",
+                "s3:PutBucketVersioning",
+                "s3:CreateJob"
+            ],
+            "Resource": [
+                "arn:aws:s3:::govwifi-database-backups",
+                "arn:aws:s3:::govwifi-database-backups/*"
+            ]
+        },
+        {
+            "Sid": "KMSPermissions",
+            "Effect": "Allow",
+            "Action": [
+                "kms:Encrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+            ],
+            "Resource": "arn:aws:kms:eu-west-2:${data.aws_secretsmanager_secret_version.recovery_account[0].secret_string}:key/${data.aws_secretsmanager_secret_version.recovery_kms_key[0].secret_string}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "kms:*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::${var.aws_account_id}:role/${aws_iam_role.iam_for_recovery_database_backup[0].id}"
+        }
+    ]
+}
+EOF
+
+depends_on = [ 
+        aws_iam_role_policy.iam_for_recovery_database_backup[0]
+     ]
+
+}
