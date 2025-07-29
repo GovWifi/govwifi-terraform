@@ -143,7 +143,7 @@ module "dublin_backend" {
   grafana_ip            = module.london_grafana.eip_public_ip
 
   db_storage_alarm_threshold = 19327342936
-  recovery_backups_enabled = false
+  recovery_backups_enabled   = false
 
 }
 
@@ -239,7 +239,7 @@ module "dublin_frontend" {
 
   pagerduty_notifications_arn = module.dublin_notifications.topic_arn
   critical_notifications_arn  = module.dublin_notifications.topic_arn
-  capacity_notifications_arn = module.dublin_notifications.topic_arn
+  capacity_notifications_arn  = module.dublin_notifications.topic_arn
 
   bastion_server_ip = module.london_backend.bastion_public_ip
 

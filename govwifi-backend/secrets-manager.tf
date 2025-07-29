@@ -154,21 +154,21 @@ data "aws_secretsmanager_secret" "session_db_credentials" {
 }
 
 data "aws_secretsmanager_secret_version" "recovery_account" {
-  count = var.recovery_backups_enabled ? 1 : 0
+  count     = var.recovery_backups_enabled ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.recovery_account[0].id
 }
 
 data "aws_secretsmanager_secret" "recovery_account" {
   count = var.recovery_backups_enabled ? 1 : 0
-  name = "recovery/AccountID"
+  name  = "recovery/AccountID"
 }
 
 data "aws_secretsmanager_secret_version" "recovery_kms_key" {
-  count = var.recovery_backups_enabled ? 1 : 0
+  count     = var.recovery_backups_enabled ? 1 : 0
   secret_id = data.aws_secretsmanager_secret.recovery_kms_key[0].id
 }
 
 data "aws_secretsmanager_secret" "recovery_kms_key" {
   count = var.recovery_backups_enabled ? 1 : 0
-  name = "recovery/recovery-kms-key-arn"
+  name  = "recovery/recovery-kms-key-arn"
 }

@@ -129,5 +129,5 @@ variable "db_storage_alarm_threshold" {
   type        = number
 }
 
-variable "recovery_backups_enabled"{
+variable "recovery_backups_enabled" {
 }

@@ -72,11 +72,11 @@ resource "aws_s3_bucket_public_access_block" "rds_mysql_backup_bucket" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "rds_mysql_backup_bucket" {
-  count = var.recovery_backups_enabled ? 1 : 0
+  count      = var.recovery_backups_enabled ? 1 : 0
   depends_on = [aws_s3_bucket_versioning.rds_mysql_backup_bucket]
 
   role   = aws_iam_role.iam_for_recovery_database_backup[0].arn
-  bucket = aws_s3_bucket.rds_mysql_backup_bucket[0].id 
+  bucket = aws_s3_bucket.rds_mysql_backup_bucket[0].id
 
   rule {
     id       = "ReplicateDB"
@@ -92,8 +92,8 @@ resource "aws_s3_bucket_replication_configuration" "rds_mysql_backup_bucket" {
     }
 
     destination {
-      bucket = "arn:aws:s3:::govwifi-database-backups"
-      account = "${data.aws_secretsmanager_secret_version.recovery_account[0].secret_string}"
+      bucket  = "arn:aws:s3:::govwifi-database-backups"
+      account = data.aws_secretsmanager_secret_version.recovery_account[0].secret_string
 
       access_control_translation {
         owner = "Destination"

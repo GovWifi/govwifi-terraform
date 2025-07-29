@@ -87,7 +87,7 @@ module "london_backend" {
   prometheus_ip_ireland = module.dublin_prometheus.eip_public_ip
   grafana_ip            = module.london_grafana.eip_public_ip
 
-  backup_mysql_rds = local.backup_mysql_rds
+  backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
   db_storage_alarm_threshold = 19327342936
@@ -143,7 +143,7 @@ module "london_frontend" {
 
   pagerduty_notifications_arn = module.london_notifications.topic_arn
   critical_notifications_arn  = module.london_critical_notifications.topic_arn
-  capacity_notifications_arn = module.london_notifications.topic_arn
+  capacity_notifications_arn  = module.london_notifications.topic_arn
 
   bastion_server_ip = module.london_backend.bastion_public_ip
 

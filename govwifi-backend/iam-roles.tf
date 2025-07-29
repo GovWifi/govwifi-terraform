@@ -264,7 +264,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "iam_for_recovery_database_backup" {
-  count = var.recovery_backups_enabled ? 1 : 0
+  count  = var.recovery_backups_enabled ? 1 : 0
   name   = "govwifi-recovery-database-backup"
   role   = aws_iam_role.iam_for_recovery_database_backup[0].id
   policy = <<EOF
@@ -331,8 +331,8 @@ resource "aws_iam_role_policy" "iam_for_recovery_database_backup" {
 }
 EOF
 
-depends_on = [ 
-        aws_iam_role_policy.iam_for_recovery_database_backup[0]
-     ]
+  depends_on = [
+    aws_iam_role_policy.iam_for_recovery_database_backup[0]
+  ]
 
 }
