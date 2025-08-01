@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Create an S3 bucket "govwifi-database-backups" encrypted with a custom KMS key "govwifi-db-bu-key" with specified key policy.
+
+Parameters:
+  SourceAccountNumber:
+    Description: "Source bucket account number"
+    Type: String
+
+Resources:
+  GovWifiKMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "Custom KMS key named 'govwifi-db-bu-key' for S3 bucket encryption"
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: "govwifi-key-policy"
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+
+          - Sid: "Allow use of the key"
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::${SourceAccountNumber}:role/govwifi-recovery-database-backup"
+            Action:
+              - "kms:Encrypt"
+              - "kms:Decrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey*"
+              - "kms:DescribeKey"
+            Resource: "*"
+
+          - Sid: "Allow attachment of persistent resources"
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::${SourceAccountNumber}:role/govwifi-recovery-database-backup"
+            Action:
+              - "kms:CreateGrant"
+              - "kms:ListGrants"
+              - "kms:RevokeGrant"
+            Resource: "*"
+            Condition:
+              Bool:
+                kms:GrantIsForAWSResource: "true"
+
+  BackupBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: govwifi-database-backups
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref GovWifiKMSKey
+
+  BackupBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BackupBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${SourceAccountNumber}:role/govwifi-recovery-database-backup"
+            Action: 's3:*'
+            Resource:
+              - !Sub "arn:aws:s3:::govwifi-database-backups"
+              - !Sub "arn:aws:s3:::govwifi-database-backups/*"
+          - Sid: AllowBatchOperationsWrite
+            Effect: Allow
+            Principal:
+              Service: batchoperations.s3.amazonaws.com
+            Action: 's3:*'
+            Resource: !Sub "arn:aws:s3:::govwifi-database-backups/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref SourceAccountNumber

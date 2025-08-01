@@ -154,6 +154,8 @@ module "backend" {
   grafana_ip            = var.grafana_ip
 
   db_storage_alarm_threshold = 32212254720
+  recovery_backups_enabled   = false
+
 }
 
 # Emails ======================================================================
@@ -245,7 +247,7 @@ module "frontend" {
 
   pagerduty_notifications_arn = module.region_pagerduty.topic_arn
   critical_notifications_arn  = module.dublin_critical_notifications.topic_arn
-  capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
+  capacity_notifications_arn  = module.dublin_capacity_notifications.topic_arn
 
   bastion_server_ip = var.bastion_server_ip
 
