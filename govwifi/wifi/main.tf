@@ -102,7 +102,7 @@ module "backend" {
   }
 
   source        = "../../govwifi-backend"
-  env           = "production"
+  env           = local.env
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
 
@@ -209,13 +209,16 @@ module "frontend" {
   vpc_cidr_block          = local.dublin_frontend_vpc_cidr_block
   london_backend_vpc_cidr = local.london_backend_vpc_cidr_block
   rack_env                = "production"
-  sentry_current_env      = "production"
+  sentry_current_env      = local.env
 
   backend_vpc_id = module.backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
   radius_task_count          = 9
+  radius_task_count_min      = 9
+  radius_task_count_max      = 27
+
   enable_detailed_monitoring = true
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -262,7 +265,7 @@ module "api" {
     aws = aws.main
   }
 
-  env           = "production"
+  env           = local.env
   source        = "../../govwifi-api"
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
@@ -295,8 +298,8 @@ module "api" {
 
   db_hostname              = "db.${lower(var.aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   rack_env                 = "production"
-  app_env                  = "production"
-  sentry_current_env       = "production"
+  app_env                  = local.env
+  sentry_current_env       = local.env
   radius_server_ips        = local.frontend_radius_ips
   user_signup_docker_image = ""
   subnet_ids               = module.backend.backend_subnet_ids

@@ -43,7 +43,7 @@ module "london_backend" {
   }
 
   source        = "../../govwifi-backend"
-  env           = "alpaca"
+  env           = local.env
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
 
@@ -114,14 +114,16 @@ module "london_frontend" {
   aws_region_name    = local.london_aws_region_name
   route53_zone_id    = data.aws_route53_zone.main.zone_id
   vpc_cidr_block     = local.london_frontend_vpc_cidr_block
-  rack_env           = "alpaca"
-  sentry_current_env = "alpaca"
+  rack_env           = local.env
+  sentry_current_env = local.env
 
   backend_vpc_id = module.london_backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
   radius_task_count          = 3
+  radius_task_count_max       = 3
+  radius_task_count_min       = 3
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -182,7 +184,7 @@ module "london_admin" {
   admin_docker_image   = format("%s/admin:alpaca", local.docker_image_path)
   rails_env            = "production"
   app_env              = "alpaca" ## used for db name.
-  sentry_current_env   = "alpaca"
+  sentry_current_env   = local.env
   ecr_repository_count = 1
 
   subnet_ids = module.london_backend.backend_subnet_ids
@@ -230,8 +232,8 @@ module "london_api" {
   }
 
   source        = "../../govwifi-api"
-  env           = "alpaca"
-  env_name      = "alpaca"
+  env           = local.env
+  env_name      = local.env_name
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
@@ -267,8 +269,8 @@ module "london_api" {
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
   rack_env                  = "alpaca"
-  app_env                   = "alpaca"
-  sentry_current_env        = "alpaca"
+  app_env                   = local.env
+  sentry_current_env        = local.env
   radius_server_ips         = local.frontend_radius_ips
   subnet_ids                = module.london_backend.backend_subnet_ids
   private_subnet_ids        = module.london_backend.backend_private_subnet_ids
@@ -423,7 +425,7 @@ module "london-govwifi-ecs-update-service" {
 
   deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
 
-  env_name = "alpaca"
+  env_name = local.env_name
 
   aws_account_id = local.aws_account_id
 }
