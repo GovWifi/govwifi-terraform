@@ -64,6 +64,10 @@ BUILD_SOURCE="$BUILD_PATH/staging"
 # New env directory in build repo
 BUILD_DESTINATION="$BUILD_PATH/$NEW_ENV_NAME"
 
+# new env directory in build for certs
+BUILD_CERTS_SOURCE="$BUILD_REPO/passwords/certs/staging"
+BUILD_CERTS_DESTINATION="$BUILD_REPO/passwords/certs/$NEW_ENV_NAME"
+
 # Source env directory in terraform repo
 TERRAFORM_SOURCE="$TERRAFORM_PATH/staging"
 
@@ -143,9 +147,15 @@ fi
 
 # Copy the secrets path to a new environment directory with the specified name
 
-printf "Working in $BUILD_PATH\n\n"
+printf "Working in %s \n\n" $BUILD_PATH
 cp -Rp $BUILD_SOURCE/* $BUILD_DESTINATION
 printf "Done\n\n"
+
+# copy the certs from staging to the new environment
+printf "Working in %s \n\n" $BUILD_PATH
+mkdir "$BUILD_CERTS_DESTINATION"
+cp -ra "$BUILD_CERTS_SOURCE/." "$BUILD_CERTS_DESTINATION"
+printf "Copy Certs Done\n\n"
 
 # Loop through the environment files and replace 'govwifi' with the new environment nam
 
