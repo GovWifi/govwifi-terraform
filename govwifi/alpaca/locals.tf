@@ -5,7 +5,7 @@ locals {
   product_name  = "GovWifi"
 
   backup_mysql_rds         = true
-  recovery_backups_enabled = true
+  recovery_backups_enabled = false
   log_retention            = 30
 }
 
