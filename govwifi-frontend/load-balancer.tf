@@ -2,7 +2,7 @@ resource "aws_lb" "main" {
   name               = "frontend"
   load_balancer_type = "network"
 
-  enable_cross_zone_load_balancing = true
+  enable_cross_zone_load_balancing = false
 
   dynamic "subnet_mapping" {
     for_each = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
