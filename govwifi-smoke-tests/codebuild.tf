@@ -128,6 +128,11 @@ resource "aws_codebuild_project" "smoke_tests" {
       value = data.aws_secretsmanager_secret_version.eap_tls_client_key.secret_string
     }
 
+    environment_variable {
+      name  = "ENVIRONMENT"
+      value = var.env
+    }
+
   }
 
   source {
