@@ -455,6 +455,7 @@ module "london_smoke_tests" {
   aws_account_id             = local.aws_account_id
   env_subdomain              = local.env_subdomain
   env                        = local.env_name
+  environment                = local.env
   vpc_id                     = module.london_tests_vpc.vpc_id
   default_security_group_id  = module.london_tests_vpc.default_security_group_id
   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id

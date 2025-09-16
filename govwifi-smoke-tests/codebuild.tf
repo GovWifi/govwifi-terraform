@@ -130,7 +130,7 @@ resource "aws_codebuild_project" "smoke_tests" {
 
     environment_variable {
       name  = "ENVIRONMENT"
-      value = var.env
+      value = var.environment
     }
 
   }
