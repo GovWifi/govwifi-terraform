@@ -503,37 +503,6 @@ Once the task definitions for the above apps have been created by terraform, the
 
 ---
 
-## Rotating ELB Certificates
-
-To rotate the ELB ACM certificates, you need to create a new certificate in the
-aws console, with the domain name required, or by running the following from the
-cli
-
-```
-AWS_DEFAULT_REGION=<region> aws acm request-certificate --domain-name <domain-name> --domain-validation-options DomainName=<domain-name>,ValidationDomain=<validation-domain>
-```
-
-Where validation-domain is wifi.service.gov.uk for prod, and wifi.staging.service.gov.uk for staging
-
-Once this is created, you will need to validate the domain. There is some logic
-to listen to emails on the required domain and copy them to an s3 bucket in the
-govwifi-terraform repo. You can look in the `<ENV>-admin-emailbucket` to find
-this - it will likely be the last modified file. You can also use the CLI
-
-```
-aws s3 ls s3://<ENV>-admin-emailbucket/
-aws s3 cp s3://<ENV>-admin-emailbucket/<filename-of-last-modified-file> -
-```
-
-Find the validation link and load it in a browser
-
-You can then update the `elb-ssl-cert-arn` secret value in the terraform secrets
-file for the environment to be updated to be the arn of your newly requested
-certificate, and apply terraform
-
-Once you have applied terraform, you should clean up the unused certificates in
-the console
-
 ## How to contribute
 
 1. Create a feature or fix branch
