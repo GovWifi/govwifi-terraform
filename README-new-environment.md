@@ -2,48 +2,6 @@
 
 Follow the steps below to create a brand new GovWifi environment:
 
-<b>There are two methods available, [the manual method](#manual-step-by-step-creation) and the [automated method using bootstrap.sh script](#automated-creation). </b>
-
-## Automated creation
-
-The bootstrap.sh script is located in govwifi-terraform directory.
-It is called from the top level of this directory using:
-
-
-```
-scripts/bootstrap.sh [new environment name]
-```
-For example:
-```
-scripts/bootstrap.sh recovery
-```
-
-It can also be used with the 'tee' command to create a runfile preserving it's actions and outputs, e.g. name servers.
-
-
-```
-scripts/bootstrap.sh [new environment name] | tee [some file]
-```
-For example:
-```
-scripts/bootstrap.sh recovery | tee recovery.bootstrap
-```
-
-
-The script performs all the tasks starting from the section 'Duplicate & Rename All The Files' up to and including the section 'Initialize The Backend'.
-
-The manual steps to replicate the script functionality are below. If you used the script successfully, the next step is:
-
-[Import S3 State bucket](#s3-state-bucket)
-
-
-
-
-## Manual step by step creation
-
-
-(These steps have been left here as reference to provide better understanding of what the bootstrap.sh script does and to provide a fallback if the script fails at any point)
-
 #### Duplicate & Rename All The Files Used For Our Staging Environment
 Edit, then run the following command from the root of the govwifi-terraform directory to copy all the files you need for a new environment (replace `<NEW-ENV-NAME>` with the name of your new environment e.g. `foo`):
 
@@ -85,12 +43,14 @@ cp -Rp non-encrypted/secrets-to-copy/govwifi/staging non-encrypted/secrets-to-co
 for filename in ./non-encrypted/secrets-to-copy/govwifi/<NEW-ENV-NAME>/* ; do sed -i '' 's/staging/<NEW-ENV-NAME>/g' $filename ; done
 ```
 
+You will need to raise a PR and merge your change to the new environment to `master` before continuing.
+
 ##### Add An SSH Key That Will Be Used By Your New Environment
 
 - Generate an ssh keypair:
 
 ```
-ssh-keygen -C "govwifi-developers@digital.cabinet-office.gov.uk"
+ssh-keygen -t rsa -b 4096 -C "govwifi-developers@digital.cabinet-office.gov.uk"
 ```
 
 Use the following format when prompted for the file name:
