@@ -157,6 +157,11 @@ resource "aws_codebuild_project" "smoke_tests" {
       value = "smoke-tests"
     }
 
+    environment_variable {
+      name  = "ENVIRONMENT"
+      value = var.environment
+    }
+
   }
 
   source {

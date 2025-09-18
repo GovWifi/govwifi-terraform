@@ -597,6 +597,8 @@ module "london_govwifi-ecs-update-service" {
   env_name = local.env_name
 
   aws_account_id = local.aws_account_id
+
+  log_retention = local.log_retention
 }
 
 moved {

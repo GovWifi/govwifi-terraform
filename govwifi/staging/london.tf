@@ -434,11 +434,13 @@ module "london_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "frontend"]
 
   env_name = "staging"
 
   aws_account_id = local.aws_account_id
+
+  log_retention = local.log_retention
 }
 
 module "london_elasticsearch" {

@@ -134,7 +134,7 @@ Once the task definitions for the above apps have been created by terraform, the
 
 - First apply your task definition change.
 - Remove the "ignore_task" attribute for the service you are modifying. For example if you were changing the admin task [you would remove the task_definition element in this array](https://github.com/GovWifi/govwifi-terraform/blob/5482ac674b74b946b66040e158101bd4aa703a44/govwifi-admin/cluster.tf#L207). For example change the line so it reads `ignore_changes = [tags_all, task_definition]`)
-- Using terraform destroy pipeline for the particular application you are changing the task definition for. For example, if you were changing the task definition for the admin pipeline, [comment out this entire file](https://github.com/GovWifi/govwifi-terraform/blob/5482ac674b74b946b66040e158101bd4aa703a44/govwifi-deploy/alpaca-codepipeline-admin.tf).
+- Using terraform destroy pipeline for the particular application you are changing the task definition for. For example, if you were changing the task definition for the admin pipeline, [comment out this entire file](https://github.com/GovWifi/govwifi-terraform/blob/5482ac674b74b946b66040e158101bd4aa703a44/govwifi-deploy/development-codepipeline-admin.tf).
   - Run terraform the govwifi tools account with `gds-cli aws govwifi-tools -- make govwifi-tools apply`
 - Recreate the pipeline  using terraform
   - Uncomment previously commented lines

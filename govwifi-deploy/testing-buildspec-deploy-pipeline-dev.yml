@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+    ## Use github rev-parse to get the branch name and store in variable.
+    - GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    - echo "Git branch from webhook is $GIT_BRANCH"
+    - echo "Default branch is set to $MAIN_BRANCH"
+
+  build:
+    commands:
+    # Download the pipeline definition from the target pipeline.
+    - aws codepipeline get-pipeline --name $PIPELINE_NAME > pipeline.json
+    - PIPELINE_BRANCH=$(cat pipeline.json | jq -r '.pipeline.stages[0].actions[0].configuration.BranchName')
+    - echo "Pipeline branch is set to $PIPELINE_BRANCH"
+    ## if the git branch doesn't matches pipeline then update pipeline
+    - |
+      if [ "$GIT_BRANCH" != $PIPELINE_BRANCH ]; then
+        echo "Use JQ to update the branchName parameter."
+        jq --arg branch "$GIT_BRANCH" '.pipeline.stages[0].actions[0].configuration.Branch = $branch' pipeline.json > updated-pipeline.json
+        echo "Remove metadata to prepare for update."
+        jq 'del(.metadata)' updated-pipeline.json > final-pipeline.json
+        echo "Update the pipeline with the new branch."
+        aws codepipeline update-pipeline --cli-input-json file://final-pipeline.json
+      fi
+    # Explicitly start the pipeline.
+    - aws codepipeline start-pipeline-execution --name $PIPELINE_NAME --variables name=$APPLICATION_NAME,value="$GIT_BRANCH"
+
+  post_build:
+    commands:
+    - echo "Pipeline updated and started using branch $GIT_BRANCH"

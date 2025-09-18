@@ -12,9 +12,6 @@ govwifi-tools: #The name "tools" would be the obvious choice here, but this is a
 staging:
 	$(eval export DEPLOY_ENV=staging)
 	$(eval export REPO=staging)
-alpaca:
-	$(eval export DEPLOY_ENV=alpaca)
-	$(eval export REPO=alpaca)
 development:
 	$(eval export DEPLOY_ENV=development)
 	$(eval export REPO=development)
