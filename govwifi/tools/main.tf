@@ -36,9 +36,12 @@ module "govwifi_deploy" {
 
   source = "../../govwifi-deploy"
 
-  deployed_app_names     = ["user-signup-api", "logging-api", "admin", "authentication-api"]
+  ## CodePipeline Apps
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
+  ## Codebuild Apps
   built_app_names        = ["frontend", "safe-restarter", "database-backup"]
   frontend_docker_images = ["raddb", "frontend"]
+  test_app_pipeline      = ["frontend"]
 }
 
 module "govwifi_account_policy" {

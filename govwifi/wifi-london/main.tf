@@ -193,10 +193,10 @@ module "frontend" {
   backend_vpc_id = module.backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
-  radius_instance_count      = 3
-  radius_task_count          = 9
-  radius_task_count_min      = 9
-  radius_task_count_max      = 27
+  radius_instance_count = 3
+  radius_task_count     = 9
+  radius_task_count_min = 9
+  radius_task_count_max = 27
 
   enable_detailed_monitoring = true
 
@@ -541,6 +541,7 @@ module "smoke_tests" {
   aws_account_id             = local.aws_account_id
   env_subdomain              = local.env_subdomain
   env                        = local.env_name
+  environment                = local.env
   vpc_id                     = module.london_tests_vpc.vpc_id
   default_security_group_id  = module.london_tests_vpc.default_security_group_id
   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
@@ -548,7 +549,7 @@ module "smoke_tests" {
   create_slack_alert         = 1
   govwifi_phone_number       = "+447537417417"
   notify_field               = "govwifi"
-  smoke_tests_repo_name      = "govwifi-smoke-tests-light"
+  smoke_tests_repo_name      = "govwifi-smoke-tests"
 
 
   depends_on = [
@@ -604,6 +605,8 @@ module "london_govwifi-ecs-update-service" {
   env_name = local.env_name
 
   aws_account_id = local.aws_account_id
+
+  log_retention = local.log_retention
 }
 
 moved {

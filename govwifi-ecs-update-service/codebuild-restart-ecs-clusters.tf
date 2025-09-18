@@ -1,3 +1,9 @@
+resource "aws_cloudwatch_log_group" "govwifi_codebuild_project_restart_ecs_cluster_log_group" {
+  for_each          = toset(var.deployed_app_names)
+  name              = "codebuild-ecs-update-service-${each.key}"
+  retention_in_days = 30
+}
+
 resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster" {
   for_each      = toset(var.deployed_app_names)
   name          = "govwifi-ecs-update-service-${each.key}"
@@ -11,25 +17,27 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:5.0"
+    image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
 
     environment_variable {
-      name  = "SERVICE_NAME"
-      value = each.key == "admin" ? "admin-${var.env_name}" : "${each.key}-service-${var.env_name}"
+      name = "SERVICE_NAME"
+      #value = each.key == "admin" ? "admin-${var.env_name}" : "${each.key}-service-${var.env_name}"
+      value = local.app[each.key].service
     }
 
     environment_variable {
-      name  = "CLUSTER_NAME"
-      value = each.key == "admin" ? "${var.env_name}-admin-cluster" : "${var.env_name}-api-cluster"
+      name = "CLUSTER_NAME"
+      #value = each.key == "admin" ? "${var.env_name}-admin-cluster" : "${var.env_name}-api-cluster"
+      value = local.app[each.key].cluster
     }
 
     # This is the Task Definition Family Name
     environment_variable {
       name  = "FAMILY_NAME"
-      value = "${each.key}-task-${var.env_name}"
+      value = local.app[each.key].task_def
     }
 
     environment_variable {
@@ -41,8 +49,8 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
 
   logs_config {
     cloudwatch_logs {
-      group_name  = "govwifi-codebuild-ecs-update-service"
-      stream_name = "govwifi-codebuild-push-image-to-ecr-log-stream"
+      group_name  = aws_cloudwatch_log_group.govwifi_codebuild_project_restart_ecs_cluster_log_group[each.key].name
+      stream_name = aws_cloudwatch_log_group.govwifi_codebuild_project_restart_ecs_cluster_log_group[each.key].name
     }
 
     s3_logs {

@@ -30,3 +30,6 @@ variable "vpc_id" {
 
 variable "default_security_group_id" {
 }
+
+variable "environment" {
+}

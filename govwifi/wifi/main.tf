@@ -216,10 +216,10 @@ module "frontend" {
   backend_vpc_id = module.backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
-  radius_instance_count      = 3
-  radius_task_count          = 9
-  radius_task_count_min      = 9
-  radius_task_count_max      = 27
+  radius_instance_count = 3
+  radius_task_count     = 9
+  radius_task_count_min = 9
+  radius_task_count_max = 27
 
   enable_detailed_monitoring = true
 
@@ -463,6 +463,8 @@ module "dublin_govwifi-ecs-update-service" {
   env_name = "wifi"
 
   aws_account_id = local.aws_account_id
+
+  log_retention = local.log_retention
 }
 
 moved {

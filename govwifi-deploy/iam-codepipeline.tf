@@ -76,7 +76,7 @@ resource "aws_iam_policy" "govwifi_pipeline_role_additional_policy" {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "",
+            "Sid": "kms",
             "Effect": "Allow",
 						"Action": [
                 "kms:GenerateDataKey",
@@ -85,7 +85,7 @@ resource "aws_iam_policy" "govwifi_pipeline_role_additional_policy" {
             "Resource": "*"
         },
 				{
-						"Sid": "",
+						"Sid": "ecr",
 						"Effect": "Allow",
 						"Action": "ecr:DescribeImages",
 						"Resource": "*"

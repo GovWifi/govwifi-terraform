@@ -69,8 +69,7 @@ resource "aws_s3_bucket_policy" "codepipeline_bucket_policy" {
                       "arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role",
                       "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-crossaccount-tools-deploy",
                       "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role",
-                      "${aws_iam_role.govwifi_codepipeline_global_role.arn}",
-                      "${aws_iam_role.govwifi_codebuild_convert.arn}"
+                      "${aws_iam_role.govwifi_codepipeline_global_role.arn}"
 									]
             },
             "Action": [
@@ -137,8 +136,7 @@ resource "aws_s3_bucket_policy" "codepipeline_bucket_policy_ireland" {
 										"arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role",
                     "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-crossaccount-tools-deploy",
                     "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role",
-										"${aws_iam_role.govwifi_codepipeline_global_role.arn}",
-										"${aws_iam_role.govwifi_codebuild_convert.arn}"
+										"${aws_iam_role.govwifi_codepipeline_global_role.arn}"
 									]
             },
             "Action": [

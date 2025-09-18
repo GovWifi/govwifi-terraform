@@ -210,8 +210,8 @@ module "dublin_frontend" {
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
   radius_task_count          = 3
-  radius_task_count_max       = 3
-  radius_task_count_min       = 3
+  radius_task_count_max      = 3
+  radius_task_count_min      = 3
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -379,11 +379,13 @@ module "dublin_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["authentication-api"]
+  deployed_app_names = ["authentication-api", "frontend"]
 
   env_name = local.env_name
 
   aws_account_id = local.aws_account_id
+
+  log_retention = local.log_retention
 }
 
 module "dublin_sync_certs" {
