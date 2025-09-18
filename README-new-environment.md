@@ -2,7 +2,7 @@
 
 Follow the steps below to create a brand new GovWifi environment:
 
-#### Duplicate & Rename All The Files Used For Our Staging Environment
+#### Duplicate & Rename All The Files Copied From The Staging Environment
 Edit, then run the following command from the root of the govwifi-terraform directory to copy all the files you need for a new environment (replace `<NEW-ENV-NAME>` with the name of your new environment e.g. `foo`):
 
 
@@ -114,14 +114,14 @@ This holds information related to the terraform state, and must be created manua
 
 `govwifi-<ENV>-<AWS-REGION-NAME>-accesslogs`
 
-An example commands for creating buckets in the Staging environment for the London and Dublin regions would be:
+An example command for creating buckets in the Development environment for the London and Dublin regions would be:
 
 ```
-gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-staging-london-accesslogs --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
+gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-development-london-accesslogs --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
 ```
 
 ```
-gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-staging-dublin-accesslogs --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
+gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-development-dublin-accesslogs --region eu-west-1 --create-bucket-configuration LocationConstraint=eu-west-1
 ```
 
 Use the following command to validate if the new buckets have been created:
@@ -141,7 +141,7 @@ gds-cli aws <account-name> -- aws s3api create-bucket --bucket govwifi-<ENV>-tfs
 For example:
 
 ```
-gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-staging-tfstate-eu-west-2 --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
+gds-cli aws govwifi-development -- aws s3api create-bucket --bucket govwifi-development-tfstate-eu-west-2 --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
 ```
 
 #### Initialize The Backend
@@ -164,6 +164,7 @@ gds-cli aws <account-name> -- make <ENV> terraform terraform_cmd="import module.
 ```
 
 Then comment out the lines related to replication configuration in govwifi-terraform/terraform-state/accesslogs.tf and govwifi-terraform/terraform-state/tfstate.tf.
+
 ```
 replication_configuration{
   ....
@@ -211,7 +212,7 @@ When all RDS instances are created you need to use the AWS console to check conf
 - rds/database_name/credentials/dbInstanceIdentifier
 
 #### Add DKIM Authentication
-Ensure you are in the eu-west-1 region (Ireland) and follow the instructions here(https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-authentication-dkim-easy-setup-domain.html) to verify your new subdomain (e.g. staging.wifi.service.gov.uk)
+Ensure you are in the eu-west-1 region (Ireland) and follow the instructions here(https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-email-authentication-dkim-easy-setup-domain.html) to verify your new subdomain (e.g. development.wifi.service.gov.uk)
 
 #### Activate SES Rulesets
 The SES ruleset must be manually activated.
@@ -265,12 +266,20 @@ You will also need to do the following in the tools account:
 
 Follow the instructions in the team [manual](https://dev-docs.wifi.service.gov.uk/infrastructure/database-restore.html#restoring-databases) to restore the databases.
 
-**NOTE:**
+- For an environment other than the Production ensure RDS database names are:
+  - For the Users Database is set as `govwifi_<ENV>_users`
+  - For the Session Database is set as `govwifi_<ENV>`
+  - For the Admin Database is set as `govwifi_admin_<ENV>`
+
+- The `app_env` value in terraform MUST match the database environment reference otherwise the GovWifi applications will fail to start.
+
+**NOTE (ignore unless in a REAL BCP scenario ):**
 - In a BCP scenario for the Production environment change the Bastion instance type to `m4.xlarge` and allocate `100GB` of `gp3` storage with `12000IOPS` and `500mbps` provisioned. You can complete this via the AWS Console. You need to make all the storage changes at the same time, otherwise, you will get a notification that further changes can be done in 6 hours.
 
   More info about expanding Linux storage [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html).
 
   Remember to complete the volume size expansion on the Bastion level as well. SSH to the Bastion and run the following commands:
+
 ```
     lsblk
     sudo growpart /dev/xvda 1
@@ -278,14 +287,6 @@ Follow the instructions in the team [manual](https://dev-docs.wifi.service.gov.u
 ```
 
 - If you are attempting to recover the production environment change the RDS instance type for the `session` database to the `m4.xlarge` and allocate `400GB` of `gp3` storage which gives you `12000IOPS` and `500mbps`. You may need to consider disabling the Multi-AZ setup while restoring data.
-
-- For an environment other than the Production ensure RDS database names are:
-  - For the Users Database is set as `govwifi_<ENV>_users`
-  - For the Session Database is set as `govwifi_<ENV>`
-  - For the Admin Database is set as `govwifi_admin_staging`
-
-- If you are setting up a new environment and the `app_env` variable has been set to `staging` then copy the databases from the pre-existing staging environment and leave any references to `staging` in the database names unchanged. For example the user database name would be left as `govwifi_staging_users`. The `app_env` value in terraform MUST match the database environment reference otherwise the GovWifi applications will fail to start.
-
 
 ---
 ## Application deployment
