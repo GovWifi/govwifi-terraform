@@ -26,8 +26,9 @@ module "london_keys" {
 
   source = "../../govwifi-keys"
 
-  govwifi_bastion_key_name = "development-bastion-20200717"
-  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDL5wGVJ8aXL0QUhIvfLV2BMLC9Tk74jnChC40R9ipzK0AuatcaXdj0PEm8sh8sHlXEmdmVDq/4s8XaEkF7MDl38qbjxxHRTpCgcTrYzJGad3xgr1+zhpD8Kfnepex/2pR7z7kOCv7EDx4vRTc8vu1ttcmJiniBmgjc1xVk1A5aB72GxffZrow7B0iopP16vEPvllUjsDoOaeLJukDzsbZaP2RRYBqIA4qXunfJpuuu/o+T+YR4LkTB+9UBOOGrX50T80oTtJMKD9ndQ9CC9sqlrOzE9GiZz9db7D9iOzIZoTT6dBbgEOfCGmkj7WS2NjF+D/pEN/edkIuNGvE+J/HqQ179Xm/VCx5Kr6ARG+xk9cssCQbEFwR46yitaPA7B4mEiyD9XvUW2tUeVKdX5ybUFqV++2c5rxTczuH4gGlEGixIqPeltRvkVrN6qxnrbDAXE2bXymcnEN6BshwGKR+3OUKTS8c53eWmwiol6xwCp8VUI8/66tC/bCTmeur07z2LfQsIo745GzPuinWfUm8yPkZOD3LptkukO1aIfgvuNmlUKTwKSLIIwwsqTZ2FcK39A8g3Iq3HRV+4JwOowLJcylRa3QcSH9wdjd69SqPrZb0RhW0BN1mTX2tEBl1ryUUpKsqpMbvjl28tn6MGsU/sRhBLqliduOukGubD29LlAQ== "
+  govwifi_bastion_key_name = "govwifi-development-bastion-20250922"
+  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFgOGlHTZTKAnwIC+/NOqfjZayz2v0h2mdSd9BXPkMrbWxoZQ9KBalxI4GlL8xItEQ3VMaVCM4SUx0+V7XMlBLFjG8hLneiHjnMFZqqvTJIVOjp3nreydWzRTcU6KxHCis/k5GUs85dQjtwrVp7QEfEvRNEaXmNf725MBO20GOMWOWbi30HNmMHTL1o3eZA876qPWcfigOQXX1auy+y4xnM4s0loMCksG+m3iaV4qr1WvEQxTvghXXZPhNWsBTxE4QGqX2S/OctpNHn7ycU7q/Oha+1dCEB/MfMhoE7a0qEDcPLWESwsbN6IcgAqdhq1GxEytadGenen1JGRBKEgwmK6wbY2o0e4XOyrCgZViv1l/oSaP7OT566dEikw6lo0spps8OO/LXZdIX0KfjlL64H92yyjaVQ4a7SzCPCiOQM40oNi1rSvZKMIW5vr4m3dxZOpQhkMXCoHtehggNduDvVGMMoFinFH+LQD3d4glGyqZ7g0tGUnL/H7bjs9MkdCPzCaNS+pe4rjU4Z2cqofbYwxObe1D9rzVrS10MtlmH9OvM/y5A5ympsWjFR7RChPtr1VgH7gOSHa30WSxA7c8m5xaynijl6uwvbeOgy7smMnJb82KlqfMeU8hWNlFo/xM6KVyu3QbPFVOIpSXr0C9vaGa0r09QYRYfxnZwTq8/IQ== govwifi-developers@digital.cabinet-office.gov.uk
+"
 
   create_production_bastion_key = 0
 
@@ -56,7 +57,7 @@ module "london_backend" {
   frontend_radius_ips = local.frontend_radius_ips
 
   bastion_instance_type     = "t2.micro"
-  bastion_ssh_key_name      = "development-bastion-20200717"
+  bastion_ssh_key_name      = "govwifi-development-bastion-20250922"
   enable_bastion_monitoring = false
   aws_account_id            = local.aws_account_id
   db_instance_count         = 1
@@ -533,4 +534,3 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
-
