@@ -64,7 +64,12 @@ resource "aws_ecs_task_definition" "radius_task" {
   container_definitions = <<EOF
 [
   {
-    "memory": 1500,
+    "name": "frontend-radius",
+    "image": "${local.frontend_image_new}",
+    "cpu": 1536,
+    "memory": 2048,
+    "expanded": true,
+    "essential": true,
     "portMappings": [
       {
         "hostPort": 8080,
@@ -92,14 +97,12 @@ resource "aws_ecs_task_definition" "radius_task" {
         "protocol": "tcp"
       }
     ],
-    "essential": true,
     "mountPoints": [
       {
         "sourceVolume": "raddb-certs",
         "containerPath": "/etc/raddb/certs"
       }
     ],
-    "name": "frontend-radius",
     "environment": [
       {
         "name": "AUTHORISATION_API_BASE_URL",
@@ -139,7 +142,6 @@ resource "aws_ecs_task_definition" "radius_task" {
         "valueFrom": "${data.aws_secretsmanager_secret_version.healthcheck.arn}:ssid::"
       }
     ],
-    "image": "${local.frontend_image_new}",
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -148,8 +150,6 @@ resource "aws_ecs_task_definition" "radius_task" {
         "awslogs-stream-prefix": "${var.env_name}-docker-logs"
       }
     },
-    "cpu": 1000,
-    "expanded": true,
     "dependsOn": [
       {
         "containerName": "populate-radius-certs",
@@ -158,14 +158,18 @@ resource "aws_ecs_task_definition" "radius_task" {
     ]
   },
   {
+    "name": "populate-radius-certs",
+    "image": "${local.raddb_image_new}",
     "essential": false,
+    "memory": 1500,
+    "cpu": 1000,
+    "expanded": true,
     "mountPoints": [
       {
         "sourceVolume": "raddb-certs",
         "containerPath": "/etc/raddb/certs"
       }
     ],
-    "name": "populate-radius-certs",
     "environment": [
       {
         "name": "ALLOWLIST_BUCKET",
@@ -175,7 +179,6 @@ resource "aws_ecs_task_definition" "radius_task" {
         "value": "s3://${aws_s3_bucket.frontend_cert_bucket.bucket}"
       }
     ],
-    "image": "${local.raddb_image_new}",
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -183,10 +186,7 @@ resource "aws_ecs_task_definition" "radius_task" {
         "awslogs-region": "${var.aws_region}",
         "awslogs-stream-prefix": "${var.env_name}-docker-logs"
       }
-    },
-    "memory": 1500,
-    "cpu": 1000,
-    "expanded": true
+    }
   }
 ]
 EOF
