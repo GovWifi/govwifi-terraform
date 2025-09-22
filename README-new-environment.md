@@ -25,6 +25,9 @@ Add the new environment to the Makefile. [See here for an example commit](https:
 
 The APP_ENV environment variable for any new GovWifi environment should be set to the name of your environment (e.g. `recovery`), unless this is a real disaster recovery of production (in which case set the APP_ENV to `production`).
 
+**Note: Where would the APP_ENV be set. In all the modules the app_env was red from locals (F.S)**
+
+
 #### Update Govwifi-Build
 
 ##### Add A Directory For Your New Environment
@@ -33,7 +36,7 @@ Instructions
 - Make a copy of the staging directory and rename it to your environment name
 
 ```
-cp -Rp non-encrypted/secrets-to-copy/govwifi/staging non-encrypted/secrets-to-copy/govwifi/<NEW-ENV-NAME>
+cp -Rp non-encrypted/secrets-to-copy/govwifi/staging/* non-encrypted/secrets-to-copy/govwifi/<NEW-ENV-NAME>
 ```
 
 - Replace any references to `staging` in the newly created directory with your new environment name.
@@ -42,6 +45,7 @@ cp -Rp non-encrypted/secrets-to-copy/govwifi/staging non-encrypted/secrets-to-co
 ```
 for filename in ./non-encrypted/secrets-to-copy/govwifi/<NEW-ENV-NAME>/* ; do sed -i '' 's/staging/<NEW-ENV-NAME>/g' $filename ; done
 ```
+
 
 You will need to raise a PR and merge your change to the new environment to `master` before continuing.
 
