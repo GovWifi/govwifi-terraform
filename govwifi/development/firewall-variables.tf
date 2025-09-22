@@ -1,0 +1,2 @@
+variable "administrator_cidrs" {
+}
