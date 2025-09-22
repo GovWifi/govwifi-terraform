@@ -31,7 +31,7 @@ The APP_ENV environment variable for any new GovWifi environment should be set t
 #### Update Govwifi-Build
 
 ##### Add A Directory For Your New Environment
-We keep sensitive (but non secret information) in a private repo called govwifi-build(https://github.com/GovWifi/govwifi-build). This folder is only accessible to GovWifi team members.  If you create a new GovWifi environment you will need to add new directory of the same name [here](https://github.com/GovWifi/govwifi-build/tree/master/non-encrypted/secrets-to-copy/govwifi).
+We keep sensitive (but non secret information) in a private repo called govwifi-build (https://github.com/GovWifi/govwifi-build). This folder is only accessible to GovWifi team members.  If you create a new GovWifi environment you will need to add new directory of the same name [here](https://github.com/GovWifi/govwifi-build/tree/master/non-encrypted/secrets-to-copy/govwifi).
 Instructions
 - Make a copy of the staging directory and rename it to your environment name
 
@@ -47,7 +47,7 @@ for filename in ./non-encrypted/secrets-to-copy/govwifi/<NEW-ENV-NAME>/* ; do se
 ```
 
 
-You will need to raise a PR and merge your change to the new environment to `master` before continuing.
+You will need to raise a PR and merge your change to the new environment to `master` before continuing. This needs to be merge before continuing.
 
 ##### Add An SSH Key That Will Be Used By Your New Environment
 
@@ -63,17 +63,21 @@ Use the following format when prompted for the file name:
 ./govwifi-<NEW-ENV-NAME>-bastion-yyyymmdd
 ```
 
-Use an empty passphrase.
-
+Use an empty passphrase when asked to enter one during key generation.
 - Add encrypted versions of the files to the govwifi-build/passwords/keys/ [using the instructions here](https://dev-docs.wifi.service.gov.uk/infrastructure/secrets.html#adding-editing-a-secret).
+
+```
+cat ./govwifi-<NEW-ENV-NAME>-bastion-yyyymmdd | pass insert keys/govwifi-<NEW-ENV-NAME>-bastion-yyyymmdd
+cat ./govwifi-<NEW-ENV-NAME>-bastion-yyyymmdd.pub | pass insert keys/govwifi-<NEW-ENV-NAME>-bastion-yyyymmdd.pub
+```
 - Update the terraform for your environment:
-  - With the name of the key in in the dublin-keys module in the dublin.tf file of your environment [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R171).
-  - With the **public** key file in the dublin-keys module in the dublin.tf file of your environment [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R172).
-  - Update name of key in dublin_backend module of dublin.tf, [see here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R105).
-  - With the name of the key in in the london-keys module in the london.tf file. To see an example [open the london.tf file in the commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-adf1083457d3aaad1753c8b333a2dbae1f1aff6f202d4b2390a983cef0389f88), click on the `Load diff` and navigate to a **line 24**.
-  - With the **public** key file in the london-keys module in the london.tf file. To see an example [open the london.tf file in the commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-adf1083457d3aaad1753c8b333a2dbae1f1aff6f202d4b2390a983cef0389f88), click on the `Load diff` and navigate to a **line 25**.
+  - With the name of the key in the **dublin_keys** module in the ```dublin.tf``` file of your environment. [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R171).
+  - With the **public** key file in the **dublin_keys** module in the ```dublin.tf``` file of your environment. [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R172).
+  - Update name of key in **dublin_backend** module of ```dublin.tf```. [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-9745914b44847dfa981046a838f8d8886ddf9454939ee465b8ea257950c5ca85R105).
+  - With the name of the key in the **london_keys** module in the ```london.tf``` file. To see an example [open the london.tf file in the commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-adf1083457d3aaad1753c8b333a2dbae1f1aff6f202d4b2390a983cef0389f88), click on the `Load diff` and navigate to a **line 24**.
+  - With the **public** key file in the **london_keys** module in the ```london.tf``` file. To see an example [open the london.tf file in the commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-adf1083457d3aaad1753c8b333a2dbae1f1aff6f202d4b2390a983cef0389f88), click on the `Load diff` and navigate to a **line 25**.
   - To see an example [open the london.tf file in the commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-adf1083457d3aaad1753c8b333a2dbae1f1aff6f202d4b2390a983cef0389f88), click on the `Load diff` and navigate to a **line 55**.
-  - Update the `ssh_key_name` variable in the variables.ft with the name of the ssh key [see here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-481c8f75e7c6c7ff9da71e734bc80ea24feff6f398f07b81ce8bd0439d9e8c8eR3)
+  - Update the `ssh_key_name` variable in the ```variables.tf``` with the name of the ssh key [see here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-481c8f75e7c6c7ff9da71e734bc80ea24feff6f398f07b81ce8bd0439d9e8c8eR3)
 
 ### Prepare The AWS Environment
 If you are running terraform in a brand new AWS account, then you will need to ensure the following steps have been completed before terraform will execute without error.
