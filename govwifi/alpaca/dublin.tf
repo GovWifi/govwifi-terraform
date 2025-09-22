@@ -406,5 +406,5 @@ module "dublin_admin_portal_cyber_logs" {
 
   region = local.dublin_aws_region
   env = local.env
-  account_access_arns = ["arn:aws:logs:eu-west-2:269352317959:*"]
+  account_access_arns = ["arn:aws:logs:${local.dublin_aws_region}:269352317959:*"]
 }

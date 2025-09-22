@@ -85,8 +85,8 @@ resource "aws_iam_role_policy_attachment" "kinesis_role_policy_attachment" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_subscription_filter" {
-  name            = "alpaca-admin-log-group-subscription-filter"
-  log_group_name  = "alpaca-admin-log-group"
+  name            = "${var.env}-admin-log-group-subscription-filter"
+  log_group_name  = "${var.env}-admin-log-group"
   filter_pattern  = ""
   destination_arn = aws_kinesis_stream.log_stream.arn
   distribution    = "ByLogStream"      # or "Random"

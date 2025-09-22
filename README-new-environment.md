@@ -7,7 +7,7 @@ Edit, then run the following command from the root of the govwifi-terraform dire
 
 
 ```
-cp -Rp govwifi/staging govwifi/<NEW-ENV-NAME>
+cp -Rp ./govwifi/staging govwifi/<NEW-ENV-NAME>
 
 ```
 
