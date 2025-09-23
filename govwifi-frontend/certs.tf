@@ -17,10 +17,12 @@ data "aws_kms_key" "kms_s3_dublin" {
 }
 
 data "aws_ssm_parameter" "dublin_bucket_name" {
-  # These values are only needed for the bucket replication. Therefore this should only run in London, but refers to values in eu-west-1 (ireland)
-  count    = "${lower(var.aws_region_name)}" == "london" ? 1 : 0
-  provider = aws.eu-west-1
-  name     = "/govwifi-terraform/frontend-certs-bucket"
+  # These values are only needed for the bucket replication.
+  # Therefore this should only run in London, but refers to values in eu-west-1 (ireland)
+  count      = "${lower(var.aws_region_name)}" == "london" ? 1 : 0
+  provider   = aws.eu-west-1
+  name       = "/govwifi-terraform/frontend-certs-bucket"
+  depends_on = [aws_s3_bucket.frontend_cert_bucket]
 }
 
 resource "aws_s3_bucket" "frontend_cert_bucket" {
