@@ -31,7 +31,7 @@ validate_task: check-env
 validate: check-env unencrypt-secrets validate_task delete-secrets ## Run terraform validate after decrypting secrets. Must run in form make <env> validate
 plan_task: check-env
 	@for variable in ${modules}; do module_flags="$$module_flags -target=module.$$variable"; done; [ "$$module_flags" != "" ] && echo " Plan Warning: Modules have been set to '$$module_flags'"; scripts/run-terraform.sh plan ${terraform_flags} $$module_flags
-plan: check-env unencrypt-secrets plan_task delete-secrets ## Run terraform plan after decrypting secrets. Must run in form make <env> plan
+plan: check-env unencrypt-secrets plan_task # delete-secrets ## Run terraform plan after decrypting secrets. Must run in form make <env> plan
 apply_task: check-env
 	@for variable in ${modules}; do module_flags="$$module_flags -target=module.$$variable"; done; [ "$$module_flags" != "" ] && echo " Apply Warning: Modules have been set to '$$module_flags'"; scripts/run-terraform.sh apply ${terraform_flags} $$module_flags
 apply: check-env unencrypt-secrets apply_task delete-secrets ## Run terraform apply after decrypting secrets. Must run in form make <env> apply

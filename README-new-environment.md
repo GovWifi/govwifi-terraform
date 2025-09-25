@@ -188,6 +188,9 @@ gds-cli aws govwifi-development -- make development init-backend
 gds-cli aws <account-name> -- make <ENV> terraform terraform_cmd="import module.tfstate.aws_s3_bucket.state_bucket govwifi-<env>-tfstate-eu-west-2"
 ```
 
+> [!NOTE]:
+> The command above didn't work (it was looking for AWS resources like VPC, subnets ,... that are not created yet), so we decided to skip (F.S & L.A)
+
 Then comment out the lines related to replication configuration in govwifi-terraform/terraform-state/accesslogs.tf and govwifi-terraform/terraform-state/tfstate.tf.
 
 ```
@@ -195,6 +198,11 @@ replication_configuration{
   ....
 }
 ```
+
+>[!NOTE]:
+> We commented out the whole resource ```aws_s3_bucket_replication_configuration.accesslogs_bucket``` in ```terraform-state/accesslogs.tf``` file 
+> and ```aws_s3_bucket_replication_configuration.state_bucket``` in ```terraform-state/tfstate.tf``` file.
+> Also commented out task ```delete-secrets``` from Makefile in the ```plan_task:``` task.
 
 The first time terraform is run in a new environment the replication configuration lines need to be commented out because the replication bucket in eu-west-1 will not yet exist. Leaving these lines uncommented will cause an error.
 
