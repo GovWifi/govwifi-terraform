@@ -35,18 +35,26 @@ resource "aws_s3_bucket" "product_page_data_bucket" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "product_page_data_bucket" {
+resource "aws_s3_bucket_public_access_block" "product_page_data_bucket" {
   bucket = aws_s3_bucket.product_page_data_bucket.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
+
+  block_public_acls   = false
+  block_public_policy = false
 }
 
-resource "aws_s3_bucket_acl" "product_page_data_bucket" {
-  bucket = aws_s3_bucket.product_page_data_bucket.id
-  acl    = "public-read"
 
-  depends_on = [aws_s3_bucket_ownership_controls.product_page_data_bucket]
+# resource "aws_s3_bucket_ownership_controls" "product_page_data_bucket" {
+#   bucket = aws_s3_bucket.product_page_data_bucket.id
+#   rule {
+#     object_ownership = "BucketOwnerPreferred"
+#   }
+# }
+
+# resource "aws_s3_bucket_acl" "product_page_data_bucket" {
+#   bucket = aws_s3_bucket.product_page_data_bucket.id
+#   acl    = "public-read"
+
+#   depends_on = [aws_s3_bucket_ownership_controls.product_page_data_bucket]
 
 }
 
