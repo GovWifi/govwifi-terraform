@@ -56,7 +56,7 @@ resource "aws_s3_bucket_public_access_block" "product_page_data_bucket" {
 
 #   depends_on = [aws_s3_bucket_ownership_controls.product_page_data_bucket]
 
-}
+# }
 
 resource "aws_s3_bucket_versioning" "product_page_data_bucket" {
   bucket = aws_s3_bucket.product_page_data_bucket.id
