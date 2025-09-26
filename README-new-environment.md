@@ -200,7 +200,7 @@ replication_configuration{
 ```
 
 >[!NOTE]:
-> We commented out the whole resource ```aws_s3_bucket_replication_configuration.accesslogs_bucket``` in ```terraform-state/accesslogs.tf``` file 
+> We commented out the whole resource ```aws_s3_bucket_replication_configuration.accesslogs_bucket``` in ```terraform-state/accesslogs.tf``` file
 > and ```aws_s3_bucket_replication_configuration.state_bucket``` in ```terraform-state/tfstate.tf``` file.
 > Also commented out task ```delete-secrets``` from Makefile in the ```plan_task:``` task.
 
@@ -209,6 +209,25 @@ The first time terraform is run in a new environment the replication configurati
 #### Plan and apply terraform
 
 **NOTE:** Before running the command below you may need to edit the `Makefile` file and remove the `delete-secret` parameter from the `terraform` command.
+
+**NOTE:** You need to comment the secret creation section in the following two files:
+
+- govwifi-terraform/govwifi-admin/secrets-manager.tf
+- govwifi-terraform/govwifi-backend/secrets-manager.tf
+- Comment out between these markers when doing plan and apply:
+
+```
+## COMMENT BELOW IN IF CREATING A NEW ENVIRONMENT FROM SCRATCH
+:
+etc
+:
+## END CREATING A NEW ENVIRONMENT FROM SCRATCH
+```
+
+- Inside the <env>/london.tf file search for `create_wordlist_bucket` and set it to false for the creation run.
+
+  - This was needed due as the work list was present already
+  - Should it have been present, need to check that?
 
 Now run
 
