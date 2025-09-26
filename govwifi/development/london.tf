@@ -258,7 +258,7 @@ module "london_api" {
   safe_restart_docker_image     = format("%s/safe-restarter:development", local.docker_image_path)
   backup_rds_to_s3_docker_image = format("%s/database-backup:development", local.docker_image_path)
 
-  create_wordlist_bucket = true
+  create_wordlist_bucket = false
   wordlist_file_path     = "../wordlist-short"
   ecr_repository_count   = 1
 
