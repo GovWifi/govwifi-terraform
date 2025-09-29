@@ -10,56 +10,56 @@ resource "random_password" "users_db_username" {
 }
 
 ## COMMENT BELOW IN IF CREATING A NEW ENVIRONMENT FROM SCRATCH
+#
+# resource "aws_secretsmanager_secret" "users_db_credentials" {
+#   count       = (var.aws_region == "eu-west-2" ? 1 : 0)
+#   name        = "rds/users-db/credentials"
+#   description = "User Details database main username and password. Stored as an RDS password."
+#
+#   tags = {
+#     Service = "User-Details-DB"
+#   }
+#
+# }
 
-resource "aws_secretsmanager_secret" "users_db_credentials" {
-  count       = (var.aws_region == "eu-west-2" ? 1 : 0)
-  name        = "rds/users-db/credentials"
-  description = "User Details database main username and password. Stored as an RDS password."
 
-  tags = {
-    Service = "User-Details-DB"
-  }
-
-}
-
-
-resource "aws_secretsmanager_secret_version" "users_db_username_password" {
-  # Write password and username to secret so users_db database can be created
-  count         = (var.aws_region == "eu-west-2" ? 1 : 0)
-  secret_id     = aws_secretsmanager_secret.users_db_credentials[0].id
-  secret_string = jsonencode({ "password" : "${random_password.users_db_password.result}", "username" : "${random_password.users_db_username.result}" })
-
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-}
+# resource "aws_secretsmanager_secret_version" "users_db_username_password" {
+#   # Write password and username to secret so users_db database can be created
+#   count         = (var.aws_region == "eu-west-2" ? 1 : 0)
+#   secret_id     = aws_secretsmanager_secret.users_db_credentials[0].id
+#   secret_string = jsonencode({ "password" : "${random_password.users_db_password.result}", "username" : "${random_password.users_db_username.result}" })
+#
+#   lifecycle {
+#     ignore_changes = [
+#       secret_string
+#     ]
+#   }
+# }
 
 # Once the users_db database has been created update the secret with host etc:
 
-data "aws_secretsmanager_secret_version" "users_db_creds_password_username" {
-  count     = (var.aws_region == "eu-west-2" ? 1 : 0)
-  secret_id = aws_secretsmanager_secret.users_db_credentials[0].id
-}
+# data "aws_secretsmanager_secret_version" "users_db_creds_password_username" {
+#   count     = (var.aws_region == "eu-west-2" ? 1 : 0)
+#   secret_id = aws_secretsmanager_secret.users_db_credentials[0].id
+# }
 
-resource "aws_secretsmanager_secret_version" "users_db_creds_update_existing" {
-  count     = (var.aws_region == "eu-west-2" ? 1 : 0)
-  secret_id = aws_secretsmanager_secret.users_db_credentials[0].id
-
-  secret_string = jsonencode({ "username" : jsondecode(data.aws_secretsmanager_secret_version.users_db_creds_password_username[0].secret_string)["username"], "password" : jsondecode(data.aws_secretsmanager_secret_version.users_db_creds_password_username[0].secret_string)["password"], "engine" : "${aws_db_instance.users_db[0].engine}", "host" : "${aws_db_instance.users_db[0].address}", "port" : "${aws_db_instance.users_db[0].port}", "dbname" : " ${aws_db_instance.users_db[0].db_name}", "dbInstanceIdentifier" : "${aws_db_instance.users_db[0].id}" })
-
-  #We only want this to be run once when the environment first comes up. Hence we ignore changes every other time
-  lifecycle {
-    ignore_changes = [
-      secret_string
-    ]
-  }
-
-  depends_on = [
-    aws_db_instance.users_db
-  ]
-}
+# resource "aws_secretsmanager_secret_version" "users_db_creds_update_existing" {
+#   count     = (var.aws_region == "eu-west-2" ? 1 : 0)
+#   secret_id = aws_secretsmanager_secret.users_db_credentials[0].id
+#
+#   secret_string = jsonencode({ "username" : jsondecode(data.aws_secretsmanager_secret_version.users_db_creds_password_username[0].secret_string)["username"], "password" : jsondecode(data.aws_secretsmanager_secret_version.users_db_creds_password_username[0].secret_string)["password"], "engine" : "${aws_db_instance.users_db[0].engine}", "host" : "${aws_db_instance.users_db[0].address}", "port" : "${aws_db_instance.users_db[0].port}", "dbname" : " ${aws_db_instance.users_db[0].db_name}", "dbInstanceIdentifier" : "${aws_db_instance.users_db[0].id}" })
+#
+#   #We only want this to be run once when the environment first comes up. Hence we ignore changes every other time
+#   lifecycle {
+#     ignore_changes = [
+#       secret_string
+#     ]
+#   }
+#
+#   depends_on = [
+#     aws_db_instance.users_db
+#   ]
+# }
 
 ## END CREATING A NEW ENVIRONMENT FROM SCRATCH
 
