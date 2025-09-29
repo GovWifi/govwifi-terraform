@@ -208,13 +208,25 @@ The first time terraform is run in a new environment the replication configurati
 
 #### Plan and apply terraform
 
-**NOTE:** Before running the command below you may need to edit the `Makefile` file and remove the `delete-secret` parameter from the `terraform` command.
+> **NOTE:** Before running the command below you may need to edit the `Makefile` file and remove the `delete-secret` parameter from the `terraform` command.
 
-**NOTE:** You need to comment the secret creation section in the following two files:
+> **NOTE:** You need to comment the secret creation section in the following two files:
+> - govwifi-terraform/govwifi-admin/secrets-manager.tf
+> - govwifi-terraform/govwifi-backend/secrets-manager.tf
+> - Comment out between these markers when doing plan and apply:
 
-- govwifi-terraform/govwifi-admin/secrets-manager.tf
-- govwifi-terraform/govwifi-backend/secrets-manager.tf
-- Comment out between these markers when doing plan and apply:
+
+> **NOTE:** we had to go to AWS KMS (Key Management Service) and enable all the kesy that were marked for deletion, 
+> and comment out the ```mysql_rds_backup_s3_key``` and ```mysql_rds_backup_s3_key_alias``` resources in
+> - govwifi-terraform/govwifi-backend/kms.tf
+
+> **NOTE: ** the ```rds/users-db/credentials``` already exists in **Secrets Manager** in AWS, so we need to comment out the:
+> - govwifi-terraform/govwifi-backend/secrets-manager.tf resource ```users_db_credentials```, 
+> ```users_db_creds_password_username```, ```users_db_creds_update_existing```
+
+
+> **NOTE: ** the ```aws_cloudwatch_log_group.bastion_logs``` has a retention period, so we need to comment out the:
+> - govwifi-terraform/govwifi-backend/management.tf resource ```bastion_logs```
 
 ```
 ## COMMENT BELOW IN IF CREATING A NEW ENVIRONMENT FROM SCRATCH
