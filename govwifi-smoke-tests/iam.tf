@@ -1,26 +1,3 @@
-resource "aws_iam_role" "govwifi_codebuild" {
-  name = "govwifi-codebuild-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com",
-				"AWS": [
-						"arn:aws:iam::${data.aws_secretsmanager_secret_version.tools_account.secret_string}:role/govwifi-codepipeline-global-role"
-					]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
-}
-
-
 resource "aws_iam_policy" "govwifi_codebuild_role_policy" {
   name = "GovwifiCodeBuildServiceRolePolicy"
   path = "/"
@@ -81,13 +58,8 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "govwifi_codebuild_role_policy" {
-  role       = aws_iam_role.govwifi_codebuild.name
+  role       = var.govwifi_codebuild_role_name
   policy_arn = aws_iam_policy.govwifi_codebuild_role_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "govwifi_codebuild_role_deploy_policy" {
-  role       = aws_iam_role.govwifi_codebuild.name
-  policy_arn = "arn:aws:iam::${var.aws_account_id}:policy/govwifi-crossaccount-tools-deploy"
 }
 
 resource "aws_iam_policy" "crossaccount_tools" {
@@ -140,7 +112,7 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "crossaccount_tools" {
-  role       = aws_iam_role.govwifi_codebuild.name
+  role       = var.govwifi_codebuild_role_name
   policy_arn = aws_iam_policy.govwifi_codebuild_role_policy.arn
 }
 
@@ -190,26 +162,9 @@ EOF
 
 }
 
-
-resource "aws_iam_role_policy_attachment" "crossaccount_tools_ecs_access_ecs_restart" {
-  role       = aws_iam_role.govwifi_codebuild.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
-}
-
-
 resource "aws_iam_role_policy_attachment" "codebuild_vpc" {
-  role       = aws_iam_role.govwifi_codebuild.name
+  role       = var.govwifi_codebuild_role_name
   policy_arn = aws_iam_policy.govwifi_codebuild_vpc_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "codepipeline_ssm_readonly" {
-  role       = aws_iam_role.govwifi_codebuild.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "codebuild_start_build_perm" {
-  role       = aws_iam_role.govwifi_codebuild.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
 

@@ -66,6 +66,7 @@ resource "aws_ssm_parameter" "frontend_cert_bucket" {
   description = "Name of the frontend-certs bucket for ${var.aws_region_name}"
   type        = "String"
   value       = aws_s3_bucket.frontend_cert_bucket.bucket
+  overwrite   = true
 }
 
 resource "aws_iam_policy" "govwifi_frontend_cert_bucket_access" {

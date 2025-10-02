@@ -387,6 +387,10 @@ module "dublin_govwifi-ecs-update-service" {
   env_name = "development"
 
   aws_account_id = local.aws_account_id
+
+  depends_on = [
+    module.london_smoke_tests
+  ]
 }
 
 module "dublin_sync_certs" {
