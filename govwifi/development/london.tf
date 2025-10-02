@@ -19,6 +19,18 @@ provider "aws" {
   }
 }
 
+
+module "london_deployment_roles" {
+  providers = {
+    aws        = aws.london
+    aws.dublin = aws.dublin
+  }
+
+  source = "../../govwifi-deployment-roles"
+  aws_account_id             = local.aws_account_id
+
+}
+
 module "london_keys" {
   providers = {
     aws = aws.london
@@ -96,6 +108,7 @@ module "london_frontend" {
   providers = {
     aws           = aws.london
     aws.us_east_1 = aws.us_east_1
+    aws.dublin    = aws.dublin
   }
 
   source         = "../../govwifi-frontend"
@@ -425,6 +438,10 @@ module "london_govwifi-ecs-update-service" {
   env_name = "development"
 
   aws_account_id = local.aws_account_id
+
+  depends_on = [
+    module.london_smoke_tests
+  ]
 }
 
 module "london_elasticsearch" {
@@ -451,23 +468,27 @@ module "london_smoke_tests" {
 
   source = "../../govwifi-smoke-tests"
 
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  environment                = local.env
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 0
-  govwifi_phone_number       = "+447537417039"
-  notify_field               = "govwifidevelopment"
-  smoke_tests_repo_name      = "govwifi-smoke-tests"
+  aws_account_id              = local.aws_account_id
+  env_subdomain               = local.env_subdomain
+  env                         = local.env_name
+  environment                 = local.env
+  vpc_id                      = module.london_tests_vpc.vpc_id
+  default_security_group_id   = module.london_tests_vpc.default_security_group_id
+  smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
+  create_slack_alert          = 0
+  govwifi_phone_number        = "+447537417039"
+  notify_field                = "govwifidevelopment"
+  smoke_tests_repo_name       = "govwifi-smoke-tests"
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+
 
 
   depends_on = [
     module.london_frontend,
-    module.london_tests_vpc
+    module.london_tests_vpc,
+    module.london_deployment_roles
   ]
 }
 

@@ -2,7 +2,7 @@ resource "aws_codebuild_project" "smoke_tests" {
   name          = "govwifi-smoke-tests"
   description   = "This project runs the govwifi tests at regular intervals"
   build_timeout = "15"
-  service_role  = aws_iam_role.govwifi_codebuild.arn
+  service_role  = var.govwifi_codebuild_role_arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -174,7 +174,7 @@ resource "aws_cloudwatch_event_target" "trigger_smoke_tests" {
   rule = aws_cloudwatch_event_rule.smoke_tests_schedule_rule.name
   arn  = aws_codebuild_project.smoke_tests.id
 
-  role_arn = aws_iam_role.govwifi_codebuild.arn
+  role_arn = var.govwifi_codebuild_role_arn
 }
 
 # Enable scheduled smoke tests in production environment only
