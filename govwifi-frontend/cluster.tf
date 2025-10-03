@@ -477,6 +477,6 @@ resource "aws_service_discovery_service" "main" {
   }
 
   health_check_custom_config {
-    failure_threshold = 10
+    failure_threshold = 1
   }
 }
