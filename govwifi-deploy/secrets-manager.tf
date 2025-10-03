@@ -22,6 +22,14 @@ data "aws_secretsmanager_secret" "alpaca_aws_account_no" {
   name = "alpaca/AccountID"
 }
 
+data "aws_secretsmanager_secret_version" "development_aws_account_no" {
+  secret_id = data.aws_secretsmanager_secret.development_aws_account_no.id
+}
+
+data "aws_secretsmanager_secret" "development_aws_account_no" {
+  name = "development/AccountID"
+}
+
 data "aws_secretsmanager_secret_version" "production_aws_account_no" {
   secret_id = data.aws_secretsmanager_secret.production_aws_account_no.id
 }

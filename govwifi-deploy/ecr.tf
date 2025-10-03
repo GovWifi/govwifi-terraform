@@ -82,6 +82,94 @@ data "aws_iam_policy_document" "govwifi_ecr_repo_policy_alpaca" {
 ### End Alpaca
 
 
+### Begin Development
+
+resource "aws_ecr_repository" "govwifi_ecr_repo_deployed_apps_development" {
+  for_each = toset(var.deployed_app_names)
+  name     = "govwifi/${each.key}/development"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_ecr_repo_policy_deployed_apps_development" {
+  for_each   = toset(var.deployed_app_names)
+  repository = aws_ecr_repository.govwifi_ecr_repo_deployed_apps_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
+
+resource "aws_ecr_repository" "govwifi_frontend_development" {
+  for_each = toset(var.frontend_docker_images)
+  name     = "govwifi/development/${each.key}"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_frontend_policy_development" {
+  for_each   = toset(var.frontend_docker_images)
+  repository = aws_ecr_repository.govwifi_frontend_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
+
+resource "aws_ecr_repository" "govwifi_frontend_development_ire" {
+  provider = aws.dublin
+  for_each = toset(var.frontend_docker_images)
+  name     = "govwifi/development/${each.key}"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_frontend_policy_development_ire" {
+  provider   = aws.dublin
+  for_each   = toset(var.frontend_docker_images)
+  repository = aws_ecr_repository.govwifi_frontend_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
+
+resource "aws_ecr_repository" "safe_restarter_ecr_development" {
+  name = "govwifi/development/safe-restarter"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_ecr_saferestater_policy_development" {
+  repository = aws_ecr_repository.safe_restarter_ecr_development.name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
+
+resource "aws_ecr_repository" "database_backup_ecr_development" {
+  name = "govwifi/development/database-backup"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_ecr_database_backup_policy_development" {
+  repository = aws_ecr_repository.database_backup_ecr_development.name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
+
+data "aws_iam_policy_document" "govwifi_ecr_repo_policy_development" {
+  statement {
+    sid = "AllowPushPull"
+
+    effect = "Allow"
+
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:CompleteLayerUpload",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.aws_development_account_id}:root"]
+    }
+
+  }
+
+}
+
+
+### End Development
+
+
+
+
+
+
 ### Begin Staging
 
 resource "aws_ecr_repository" "govwifi_frontend_staging" {
