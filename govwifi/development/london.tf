@@ -474,7 +474,7 @@ module "london_smoke_tests" {
   smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
   smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
   create_slack_alert          = 0
-  govwifi_phone_number        = "+447537417039"
+  govwifi_phone_number        = "+447860003687"
   notify_field                = "govwifidevelopment"
   smoke_tests_repo_name       = "govwifi-smoke-tests"
   govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
