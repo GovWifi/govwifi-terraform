@@ -277,7 +277,7 @@ module "london_api" {
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
-  rack_env                  = "development"
+  rack_env                  = "staging"
   app_env                   = "development"
   sentry_current_env        = "development"
   radius_server_ips         = local.frontend_radius_ips
