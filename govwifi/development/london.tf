@@ -489,30 +489,30 @@ module "london_smoke_tests" {
   ]
 }
 
-module "london_canary_tests" {
-  providers = {
-    aws        = aws.london
-    aws.dublin = aws.dublin
-  }
+# module "london_canary_tests" {
+#   providers = {
+#     aws        = aws.london
+#     aws.dublin = aws.dublin
+#   }
 
-  source = "../../govwifi-canary-tests"
+#   source = "../../govwifi-canary-tests"
 
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 0
-  canary_tests_repo_name     = "govwifi-canary-tests"
+#   aws_account_id             = local.aws_account_id
+#   env_subdomain              = local.env_subdomain
+#   env                        = local.env_name
+#   vpc_id                     = module.london_tests_vpc.vpc_id
+#   default_security_group_id  = module.london_tests_vpc.default_security_group_id
+#   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
+#   smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
+#   create_slack_alert         = 0
+#   canary_tests_repo_name     = "govwifi-canary-tests"
 
 
-  depends_on = [
-    module.london_frontend,
-    module.london_tests_vpc
-  ]
-}
+#   depends_on = [
+#     module.london_frontend,
+#     module.london_tests_vpc
+#   ]
+# }
 
 module "london_tests_vpc" {
   source                     = "../../govwifi_tests_vpc"
