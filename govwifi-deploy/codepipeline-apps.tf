@@ -96,11 +96,11 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
     }
   }
 
-  stage {
-    name = "Test_STAGING"
-    dynamic "action" {
-      for_each = contains(local.integration_tests, each.key) ? [each.key] : []
+ dynamic "stage" {
+    for_each = contains(local.integration_tests, each.key) ? [each.key] : []
       content {
+      name = "Integration_Test_STAGING"
+      action {
         name            = "Integration-tests-${each.key}-STAGING"
         category        = "Test"
         owner           = "AWS"
@@ -115,6 +115,11 @@ resource "aws_codepipeline" "staging_prod_apps_pipeline" {
         }
       }
     }
+  }
+
+
+  stage {
+    name = "Smoke_Test_STAGING"
 
     action {
       name            = "Smoke-tests-${each.key}-STAGING"
