@@ -37,6 +37,11 @@ resource "aws_codebuild_project" "development_govwifi_codebuild_built_app" {
       value = "development"
     }
 
+    environment_variable {
+      name  = "ACCEPTANCE_TESTS_PROJECT_NAME"
+      value = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
+    }
+
   }
 
   source_version = "master"

@@ -28,20 +28,18 @@ resource "aws_codepipeline" "development_deploy_apps_pipeline" {
   stage {
     name = "Source"
     action {
-      name             = "Github-${each.key}-development"
+      name             = "S3-${each.key}-DEV"
       category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
+      owner            = "AWS"
+      provider         = "S3"
       version          = 1
       run_order        = 1
       output_artifacts = ["${each.key}-source-art"]
 
       configuration = {
-        Owner                = local.git_owner
-        Repo                 = local.app[each.key].repo
-        Branch               = local.branch
-        OAuthToken           = jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["token"]
-        PollForSourceChanges = true
+        S3Bucket             = aws_s3_bucket.codepipeline_bucket.bucket
+        S3ObjectKey          = "${local.s3_source_dir}/${each.key}/app.zip"
+        PollForSourceChanges = false
       }
     }
   }
@@ -50,7 +48,7 @@ resource "aws_codepipeline" "development_deploy_apps_pipeline" {
     name = "Build"
 
     action {
-      name            = "Build-push-${each.key}-development-ECR"
+      name            = "Build-push-${each.key}-ECR-DEV"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
@@ -77,16 +75,16 @@ resource "aws_codepipeline" "development_deploy_apps_pipeline" {
     dynamic "action" {
       for_each = local.app[each.key].regions
       content {
-        name            = "Update-${each.key}-development-${action.value}-ECS"
+        name            = "Update-${each.key}-ECS-${action.value}-DEV"
         category        = "Build"
         owner           = "AWS"
         provider        = "CodeBuild"
         region          = action.value
         input_artifacts = ["${each.key}-source-art"]
-        # This resource lives in the development & Production environments. It will always have to
+        # This resource lives in the Dev, Staging & Production environments. It will always have to
         # either be hardcoded or retrieved from the AWS secrets or parameter store
         role_arn  = "arn:aws:iam::${local.aws_development_account_id}:role/govwifi-codebuild-role"
-        version   = "1"
+        version   = 1
         run_order = 1
         configuration = {
           ProjectName = "govwifi-ecs-update-service-${each.key}"
@@ -95,23 +93,47 @@ resource "aws_codepipeline" "development_deploy_apps_pipeline" {
     }
   }
 
+  dynamic "stage" {
+      for_each = contains(local.integration_tests, each.key) ? [each.key] : []
+      content {
+        name = "Integration_Tests"
+
+        action {
+
+          name            = "Integration-tests-${each.key}-DEV"
+          category        = "Test"
+          owner           = "AWS"
+          provider        = "CodeBuild"
+          input_artifacts = ["${each.key}-source-art"]
+          # This resource lives in the Dev, Staging & Production environments. It will always have to
+          # either be hardcoded or retrieved from the AWS secrets or parameter store
+          version   = 1
+          run_order = 1
+          configuration = {
+            ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
+          }
+        }
+      }
+  }
+
   stage {
-    name = "Test"
+    name = "Smoke_Tests"
 
     action {
-      name            = "Smoketests-${each.key}-development"
+      name            = "Smoke-tests-${each.key}-DEV"
       category        = "Test"
       owner           = "AWS"
       provider        = "CodeBuild"
       input_artifacts = ["${each.key}-source-art"]
       # This resource lives in the development & Production environments. It will always have to
       # either be hardcoded or retrieved from the AWS secrets or parameter store
-      role_arn = "arn:aws:iam::${local.aws_development_account_id}:role/govwifi-codebuild-role"
-      version  = "1"
-
+      role_arn  = "arn:aws:iam::${local.aws_development_account_id}:role/govwifi-codebuild-role"
+      version   = "1"
+      run_order = 1
       configuration = {
         ProjectName = "govwifi-smoke-tests"
       }
     }
   }
+
 }
