@@ -17,21 +17,21 @@ EOF
 }
 
 
-# resource "aws_iam_role_policy" "codepipeline_eventbridge" {
-#   name   = "govwifi-codepipeline-global-policy"
-#   role   = aws_iam_role.govwifi_codepipeline_eventbridge_role.id
-#   policy = data.aws_iam_policy_document.codepipeline_eventbridge_policy.json
-# }
+resource "aws_iam_role_policy" "codepipeline_eventbridge" {
+  name   = "govwifi-codepipeline-global-policy"
+  role   = aws_iam_role.govwifi_codepipeline_eventbridge_role.id
+  policy = data.aws_iam_policy_document.codepipeline_eventbridge_policy.json
+}
 
-# data "aws_iam_policy_document" "codepipeline_eventbridge_policy" {
-#   statement {
-#     sid = "StartPipelineExecution"
-#     actions = [
-#       "codepipeline:StartPipelineExecution"
-#     ]
-#     resources = [
-#       for name in var.deployed_app_names :
-#       "${aws_codepipeline.alpaca_deploy_apps_pipeline[name].arn}"
-#     ]
-#   }
-# }
+data "aws_iam_policy_document" "codepipeline_eventbridge_policy" {
+  statement {
+    sid = "StartPipelineExecution"
+    actions = [
+      "codepipeline:StartPipelineExecution"
+    ]
+    resources = [
+      for name in var.deployed_app_names :
+      "${aws_codepipeline.development_deploy_apps_pipeline[name].arn}"
+    ]
+  }
+}
