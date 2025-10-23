@@ -7,10 +7,6 @@ locals {
 }
 
 locals {
-  aws_alpaca_account_id = jsondecode(data.aws_secretsmanager_secret_version.alpaca_aws_account_no.secret_string)["account-id"]
-}
-
-locals {
   aws_development_account_id = jsondecode(data.aws_secretsmanager_secret_version.development_aws_account_no.secret_string)["account-id"]
 }
 
