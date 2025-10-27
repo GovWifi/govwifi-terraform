@@ -458,6 +458,7 @@ module "london_smoke_tests" {
   environment                = local.env
   vpc_id                     = module.london_tests_vpc.vpc_id
   default_security_group_id  = module.london_tests_vpc.default_security_group_id
+  vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
   smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
   create_slack_alert         = 0

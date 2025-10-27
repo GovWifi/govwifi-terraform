@@ -33,3 +33,7 @@ variable "default_security_group_id" {
 
 variable "environment" {
 }
+
+variable "vpc_endpoints_security_group_id" {
+}
+
