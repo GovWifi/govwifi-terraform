@@ -6,6 +6,8 @@ phases:
     - git clone -b $BRANCH https://github.com/GovWifi/$REPO_NAME.git
   build:
     commands:
+    - echo "clean up smoke tests before run"
+    - aws lambda invoke --function-name reset-smoke-tests --cli-binary-format raw-in-base64-out response.json
     - echo "Smoke-tests running"
     - cd $REPO_NAME
     - make test
