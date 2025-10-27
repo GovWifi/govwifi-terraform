@@ -271,3 +271,33 @@ resource "aws_iam_role_policy_attachment" "slack_alert" {
   role       = aws_iam_role.iam_for_lambda[0].name
   policy_arn = aws_iam_policy.iam_for_lambda[0].arn
 }
+
+
+resource "aws_iam_policy" "codebuild_lambda_invoke" {
+  name = "CodeBuildLambdaInvokePolicy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "lambda:InvokeFunction"
+        Resource = [
+          "arn:aws:lambda:eu-west-2:${var.aws_account_id}:function:reset-smoke-tests",
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "codebuild_invoke_lambda_policy" {
+  name        = "CodeBuildInvokeResetSmokeTestsLambdaPolicy"
+  description = "Allows CodeBuild to invoke the specific smoke test reset lambda."
+  policy      = aws_iam_policy.codebuild_lambda_invoke.policy
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_invoke_lambda_attach" {
+  role       = aws_iam_role.govwifi_codebuild.name
+  policy_arn = aws_iam_policy.codebuild_invoke_lambda_policy.arn
+}
+
