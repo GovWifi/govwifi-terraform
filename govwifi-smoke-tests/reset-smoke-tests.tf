@@ -26,7 +26,7 @@ data "archive_file" "lambda_zip" {
 }
 
 # IAM role for Lambda
-resource "aws_iam_role" "reset-smoke-tests-lambda_role" {
+resource "aws_iam_role" "reset_smoke_tests_lambda_role" {
   name = "${var.function_name}-role"
 
   assume_role_policy = jsonencode({
@@ -45,7 +45,7 @@ resource "aws_iam_role" "reset-smoke-tests-lambda_role" {
 
 resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
   name = "Reset-Smoke-Tests-Lambda-Invoke-Policy"
-  role = aws_iam_role.reset-smoke-tests-lambda_role.id
+  role = aws_iam_role.reset_smoke_tests_lambda_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -72,10 +72,19 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
                 "ec2:DeleteNetworkInterface",
                 "ec2:DescribeNetworkInterfaces"
             ],
-            Resource = [
+            "Resource" = [
                 "arn:aws:ec2:eu-west-2:${var.aws_account_id}:network-interface/*",
                 "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/*",
                 "arn:aws:ec2:eu-west-2:${var.aws_account_id}:security-group/database_allow_reset_smoke_tests_lambda"
+            ]
+        },
+        {
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:secretsmanager:eu-west-2:${var.aws_account_id}:secret:rds/admin-db/credentials*"
             ]
         }
     ]
@@ -85,16 +94,16 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
 # Attach basic execution policy
 resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_role.name
+  role = aws_iam_role.reset_smoke_tests_lambda_role.id
 }
 
 # Lambda function
 resource "aws_lambda_function" "mysql_lambda" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = var.function_name
-  role            = aws_iam_role.lambda_role.arn
+  role             = aws_iam_role.reset_smoke_tests_lambda_role.id
   handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.14"
+  runtime         = "python3.13"
   timeout         = 30
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
@@ -105,10 +114,12 @@ resource "aws_lambda_function" "mysql_lambda" {
       GW_SUPER_ADMIN_PASS = data.aws_secretsmanager_secret_version.gw_super_admin_pass.secret_string
       GW_USER = data.aws_secretsmanager_secret_version.gw_user.secret_string
       GW_PASS = data.aws_secretsmanager_secret_version.gw_pass.secret_string
+######  Move this to the Lambda and use Secrets Manager there ##############
       DB_HOST = "${data.aws_secretsmanager_secret_version.admin_db.arn}:host::"
       DB_NAME = "${data.aws_secretsmanager_secret_version.admin_db.arn}:dbname::"
       DB_PASS = "${data.aws_secretsmanager_secret_version.admin_db.arn}:password::"
       DB_USER =  "${data.aws_secretsmanager_secret_version.admin_db.arn}:username::"
+#####
       # Don't put passwords in environment variables in production
       # Use AWS Secrets Manager or Parameter Store instead
     }
