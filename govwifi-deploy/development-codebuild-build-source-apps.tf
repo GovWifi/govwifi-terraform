@@ -73,16 +73,16 @@ resource "aws_codebuild_project" "govwifi_codebuild_get_source_apps_newdev" {
   }
 }
 
-resource "aws_codebuild_webhook" "govwifi_app_webhook_newdev" {
-  for_each     = toset(var.deployed_app_names)
-  project_name = aws_codebuild_project.govwifi_codebuild_get_source_apps_newdev[each.key].name
+# resource "aws_codebuild_webhook" "govwifi_app_webhook_newdev" {
+#   for_each     = toset(var.deployed_app_names)
+#   project_name = aws_codebuild_project.govwifi_codebuild_get_source_apps_newdev[each.key].name
 
-  build_type = "BUILD"
+#   build_type = "BUILD"
 
-  filter_group {
-    filter {
-      type    = "EVENT"
-      pattern = "PULL_REQUEST_MERGED"
-    }
-  }
-}
+#   filter_group {
+#     filter {
+#       type    = "EVENT"
+#       pattern = "PULL_REQUEST_MERGED"
+#     }
+#   }
+# }
