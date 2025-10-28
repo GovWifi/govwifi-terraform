@@ -103,7 +103,7 @@ resource "aws_lambda_function" "mysql_lambda" {
   function_name    = var.function_name
   role             = aws_iam_role.reset_smoke_tests_lambda_role.id
   handler         = "lambda_function.lambda_handler"
-  runtime         = "python3.13"
+  runtime         = "python3.12"
   timeout         = 30
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
