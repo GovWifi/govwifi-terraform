@@ -70,16 +70,17 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
         "Action" : [
           "ec2:CreateNetworkInterface",
           "ec2:DeleteNetworkInterface",
-          "ec2:DescribeNetworkInterfaces"
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeSecurityGroups"
         ],
         "Resource" = [
           "arn:aws:ec2:eu-west-2:${var.aws_account_id}:network-interface/*",
           "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/*",
-          "arn:aws:ec2:eu-west-2:${var.aws_account_id}:security-group/database_allow_reset_smoke_tests_lambda"
+          "${aws_security_group.reset_smoke_tests_lambda_sg.arn}"
         ]
       },
       {
-        "Action" : [
+      "Action" : [
           "secretsmanager:GetSecretValue"
         ],
         "Effect" : "Allow",
@@ -91,14 +92,9 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
   })
 }
 
-# Attach basic execution policy
-resource "aws_iam_role_policy_attachment" "lambda_basic" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.reset_smoke_tests_lambda_role.id
-}
 
 # Lambda function
-resource "aws_lambda_function" "mysql_lambda" {
+resource "aws_lambda_function" "reset_smoke_tests_lambda" {
   filename      = data.archive_file.lambda_zip.output_path
   function_name = var.function_name
   role          = aws_iam_role.reset_smoke_tests_lambda_role.arn
@@ -133,7 +129,7 @@ resource "aws_lambda_function" "mysql_lambda" {
 
 # Output
 output "lambda_function_arn" {
-  value = aws_lambda_function.mysql_lambda.arn
+  value = aws_lambda_function.reset_smoke_tests_lambda.arn
 }
 
 resource "aws_security_group" "reset_smoke_tests_lambda_sg" {
