@@ -34,6 +34,19 @@ variable "default_security_group_id" {
 variable "environment" {
 }
 
-variable "vpc_endpoints_security_group_id" {
+variable "aws_security_group_admin_db_in" {
 }
 
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs for the Lambda function"
+  type        = list(string)
+  # Example default, replace with your actual subnet IDs
+  # default     = ["subnet-0123456", "subnet-abcdefg"]
+}
+
+variable "backend_vpc_id" {
+  description = "The VPC ID where the backend resources are located"
+  type        = string
+  # Example default, replace with your actual VPC ID
+  # default     = "vpc-0123456789abcdef0"
+}

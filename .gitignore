@@ -15,3 +15,6 @@ govwifi/wordlist-short
 
 .private
 .idea
+govwifi-smoke-tests/reset-smoke-tests/*.zip
+govwifi-smoke-tests/reset-smoke-tests/package/
+
