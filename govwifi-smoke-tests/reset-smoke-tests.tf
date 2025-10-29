@@ -141,3 +141,19 @@ resource "aws_security_group" "reset_smoke_tests_lambda_sg" {
   # If your Lambda needs to talk to other services (e.g., S3/SecretsManager via VPC Endpoints),
   # you would add other egress rules here (e.g., for port 443).
 }
+
+resource "aws_security_group" "secrets_manager_endpoint_sg" {
+  name        = "SecretsManagerEndpointSG"
+  description = "Allows Lambda access to Secrets Manager VPC Endpoint"
+  vpc_id      = var.backend_vpc_id
+
+  # Inbound Rule: Allow traffic from the Lambda's Security Group on 443
+  ingress {
+    description = "Allow from Lambda Security Group"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    # IMPORTANT: Reference the Security Group attached to your Lambda's ENI
+    security_groups = [aws_security_group.reset_smoke_tests_lambda_sg.id]
+  }
+}
