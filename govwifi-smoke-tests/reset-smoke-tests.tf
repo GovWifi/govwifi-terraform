@@ -25,6 +25,12 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/reset-smoke-tests/lambda_deployment_package.zip"
 }
 
+data "aws_subnet" "lambda_subnets" {
+  # The for_each loop iterates over the list of IDs
+  for_each = toset(var.private_subnet_ids)
+  id       = each.key
+}
+
 # IAM role for Lambda
 resource "aws_iam_role" "reset_smoke_tests_lambda_role" {
   name = "${var.function_name}-role"
@@ -66,20 +72,6 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
         ]
       },
       {
-        "Effect" : "Allow",
-        "Action" : [
-          "ec2:CreateNetworkInterface",
-          "ec2:DeleteNetworkInterface",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeSecurityGroups"
-        ],
-        "Resource" = [
-          "arn:aws:ec2:eu-west-2:${var.aws_account_id}:network-interface/*",
-          "arn:aws:ec2:eu-west-2:${var.aws_account_id}:subnet/*",
-          "${aws_security_group.reset_smoke_tests_lambda_sg.arn}"
-        ]
-      },
-      {
       "Action" : [
           "secretsmanager:GetSecretValue"
         ],
@@ -91,7 +83,10 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
     ]
   })
 }
-
+resource "aws_iam_role_policy_attachment" "reset_smoke_tests_vpc_access" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  role = aws_iam_role.reset_smoke_tests_lambda_role.name
+}
 
 # Lambda function
 resource "aws_lambda_function" "reset_smoke_tests_lambda" {
