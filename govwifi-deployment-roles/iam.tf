@@ -43,13 +43,6 @@ resource "aws_iam_role_policy_attachment" "codebuild_start_build_perm" {
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
 }
 
-
-
-
-
-
-
-
 resource "aws_iam_role" "crossaccount_tools" {
   name               = "govwifi-crossaccount-tools-deploy"
   assume_role_policy = <<POLICY
@@ -132,3 +125,33 @@ resource "aws_iam_role_policy_attachment" "crossaccount_tools_ecs_access" {
   role       = aws_iam_role.crossaccount_tools.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
+
+
+resource "aws_iam_policy" "govwifi_read_secrets" {
+  name        = "govwifi-read-secrets"
+  path        = "/"
+  description = "Allows AWS Tools account to deploy new ECS tasks"
+
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+          "Effect": "Allow",
+            "Action": [
+              "secretsmanager:GetSecretValue"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+POLICY
+
+}
+
+
+resource "aws_iam_role_policy_attachment" "codebuild_read_secrets" {
+  role       = aws_iam_role.govwifi_codebuild.name
+  policy_arn = aws_iam_policy.govwifi_read_secrets.arn
+}
+
