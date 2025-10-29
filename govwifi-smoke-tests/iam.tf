@@ -62,61 +62,6 @@ resource "aws_iam_role_policy_attachment" "govwifi_codebuild_role_policy" {
   policy_arn = aws_iam_policy.govwifi_codebuild_role_policy.arn
 }
 
-resource "aws_iam_policy" "crossaccount_tools" {
-  name        = "govwifi-crossaccount-tools-run-smoke-tests"
-  path        = "/"
-  description = "Allows AWS Tools account to run smoke-tests"
-
-  policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:Get*",
-                "s3:List*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::govwifi-codepipeline-bucket",
-                "arn:aws:s3:::govwifi-codepipeline-bucket/*"
-            ]
-        },
-        {
-            "Sid": "AllowUseOfKeyInAccountTools",
-            "Effect": "Allow",
-            "Action": [
-                "kms:Encrypt",
-                "kms:Decrypt",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-                "kms:DescribeKey"
-            ],
-            "Resource": [
-                "arn:aws:kms:eu-west-2:${data.aws_secretsmanager_secret_version.tools_account.secret_string}:key/${data.aws_secretsmanager_secret_version.tools_kms_key.secret_string}"
-            ]
-        },
-        {
-            "Sid": "ECRRepositoryPolicy",
-            "Effect": "Allow",
-            "Action": [
-                "ecr:DescribeImages",
-                "ecr:DescribeRepositories"
-            ],
-            "Resource": "arn:aws:ecr:eu-west-2:${data.aws_secretsmanager_secret_version.tools_account.secret_string}:govwifi/*"
-        }
-    ]
-}
-POLICY
-
-}
-
-resource "aws_iam_role_policy_attachment" "crossaccount_tools" {
-  role       = var.govwifi_codebuild_role_name
-  policy_arn = aws_iam_policy.govwifi_codebuild_role_policy.arn
-}
-
-
 resource "aws_iam_policy" "govwifi_codebuild_vpc_policy" {
   name = "GovwifiVPC"
   path = "/"
