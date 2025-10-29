@@ -1,9 +1,3 @@
-variable "function_name" {
-  description = "Reset Smoke Tests Lambda function"
-  type        = string
-  default     = "reset-smoke-tests"
-}
-
 # Build the deployment package
 resource "null_resource" "build_lambda" {
   triggers = {
@@ -25,8 +19,8 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/reset-smoke-tests/lambda_deployment_package.zip"
 }
 
+# The for_each loop iterates over the list of IDs
 data "aws_subnet" "lambda_subnets" {
-  # The for_each loop iterates over the list of IDs
   for_each = toset(var.private_subnet_ids)
   id       = each.key
 }
@@ -49,6 +43,7 @@ resource "aws_iam_role" "reset_smoke_tests_lambda_role" {
   })
 }
 
+# IAM policy for Lambda to allow logging and access to Secrets Manager
 resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
   name = "Reset-Smoke-Tests-Lambda-Invoke-Policy"
   role = aws_iam_role.reset_smoke_tests_lambda_role.id
@@ -83,6 +78,7 @@ resource "aws_iam_role_policy" "lambda_invoke_reset_smoke_tests" {
     ]
   })
 }
+# Attach AWSLambdaVPCAccessExecutionRole managed policy to the Lambda role to grant lambda access to the VPC
 resource "aws_iam_role_policy_attachment" "reset_smoke_tests_vpc_access" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
   role = aws_iam_role.reset_smoke_tests_lambda_role.name
@@ -111,8 +107,6 @@ resource "aws_lambda_function" "reset_smoke_tests_lambda" {
       GW_USER             = data.aws_secretsmanager_secret_version.gw_user.secret_string
       GW_PASS             = data.aws_secretsmanager_secret_version.gw_pass.secret_string
       ADMIN_DB_SM_PATH    = "rds/admin-db/credentials"
-      # Don't put passwords in environment variables in production
-      # Use AWS Secrets Manager or Parameter Store instead
     }
   }
 }
@@ -122,38 +116,70 @@ output "lambda_function_arn" {
   value = aws_lambda_function.reset_smoke_tests_lambda.arn
 }
 
+# Security Group for Lambda to access VPC Endpoints, Secrets Manger and RDS
 resource "aws_security_group" "reset_smoke_tests_lambda_sg" {
   name_prefix = "${var.function_name}-lambda-sg"
   vpc_id      = var.backend_vpc_id
-  description = "Security group for the reset-smoke-tests Lambda function"
-
-  # Outbound rule for database access (MySQL/Aurora)
-  # This allows the Lambda to talk TO the database
-  egress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [var.aws_security_group_admin_db_in]
-    description     = "MySQL/Aurora database access"
+  description = "Security group for the reset-smoke-tests Lambda function sg rules"
+  tags = {
+    Name = "${var.env} Smoke Test Reset lambda Access"
   }
-
-  # By default, all ingress is denied, which is correct for a Lambda.
-  # If your Lambda needs to talk to other services (e.g., S3/SecretsManager via VPC Endpoints),
-  # you would add other egress rules here (e.g., for port 443).
 }
 
-resource "aws_security_group" "secrets_manager_endpoint_sg" {
-  name        = "SecretsManagerEndpointSG"
-  description = "Allows Lambda access to Secrets Manager VPC Endpoint"
-  vpc_id      = var.backend_vpc_id
+# Ingress rule to allow Lambda to initiate outbound connections from Secrets Manager VPC Endpoint
+resource "aws_security_group_rule" "allow_lambda_to_secretsmanager_endpoint" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  # This is the EXISTING security group ID attached to your VPC Endpoint
+  security_group_id        = var.vpc_endpoints_security_group_id
 
-  # Inbound Rule: Allow traffic from the Lambda's Security Group on 443
-  ingress {
-    description = "Allow from Lambda Security Group"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    # IMPORTANT: Reference the Security Group attached to your Lambda's ENI
-    security_groups = [aws_security_group.reset_smoke_tests_lambda_sg.id]
-  }
+  # CRITICAL: This is the ID of the Security Group attached to your Lambda function
+  source_security_group_id = aws_security_group.reset_smoke_tests_lambda_sg.id
+  description              = "Allow HTTPS from Lambda to Secrets Manager VPC Endpoint"
+}
+
+# Egress rule to allow Lambda to initiate outbound connections to Secrets Manager VPC Endpoint
+resource "aws_security_group_rule" "lambda_to_secretsmanager_egress" {
+  type                     = "egress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  # The security_group_id refers to the group getting the rule (your Lambda's SG)
+  security_group_id        = aws_security_group.reset_smoke_tests_lambda_sg.id
+
+  # The "destination" source_security_group_id refers to the TARGET (the Endpoint's SG)
+  source_security_group_id = var.vpc_endpoints_security_group_id
+
+  description              = "Allow outbound HTTPS from Lambda to Secrets Manager VPC Endpoint"
+}
+
+# Ingress rule to allow Lambda to connect to the RDS database
+resource "aws_security_group_rule" "allow_lambda_to_database_endpoint" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  # This is the EXISTING security group ID attached to the admin db
+  security_group_id        = var.aws_security_group_admin_db_in
+
+  # CRITICAL: This is the ID of the Security Group attached to the Lambda function
+  source_security_group_id = aws_security_group.reset_smoke_tests_lambda_sg.id
+  description              = "Allow HTTPS from Lambda to RDS security group"
+}
+
+# Egress rule to allow Lambda to connect to the RDS database
+resource "aws_security_group_rule" "lambda_to_database_egress" {
+  type                     = "egress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  # The security_group_id refers to the group getting the rule (the Lambda's SG)
+  security_group_id        = aws_security_group.reset_smoke_tests_lambda_sg.id
+
+  # The "destination" source_security_group_id refers to the TARGET (the admin db's SG)
+  source_security_group_id = var.aws_security_group_admin_db_in
+
+  description              = "Allow outbound HTTPS from Lambda to RDS security group"
 }

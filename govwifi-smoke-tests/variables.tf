@@ -37,6 +37,12 @@ variable "environment" {
 variable "aws_security_group_admin_db_in" {
 }
 
+variable "function_name" {
+  description = "Reset Smoke Tests Lambda function"
+  type        = string
+  default     = "reset-smoke-tests"
+}
+
 variable "private_subnet_ids" {
   description = "List of private subnet IDs for the Lambda function"
   type        = list(string)
@@ -49,4 +55,8 @@ variable "backend_vpc_id" {
   type        = string
   # Example default, replace with your actual VPC ID
   # default     = "vpc-0123456789abcdef0"
+}
+variable "vpc_endpoints_security_group_id"{
+  description = "The security group ID associated with the backend VPC endpoints"
+  type        = string
 }
