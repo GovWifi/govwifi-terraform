@@ -6,13 +6,19 @@ import pymysql
 import traceback
 import datetime
 from typing import Any
+import logging
+from botocore.exceptions import ClientError
 
-# RDS settings
-db_hostname = os.environ['DB_HOST']
-db_name = os.environ['DB_NAME']
-db_pass = os.environ['DB_PASS']
-db_user_name = os.environ['DB_USER']
-db_port = 3306
+# Configure logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# --- Configuration ---
+# Your secret name (as provided in your request)
+SECRET_NAME = os.environ['ADMIN_DB_SM_PATH']
+# Your AWS Region (Lambda often infers this, but it's good practice to define or get it)
+REGION_NAME = "eu-west-2"
+# --- End Configuration ---
 
 # Smoke Test user details
 gw_user = os.environ['GW_USER']
@@ -22,6 +28,88 @@ gw_super_pass = os.environ['GW_SUPER_ADMIN_PASS']
 
 aws_region = "eu-west-2"
 
+def get_db_connection_details(secret_name, region_name):
+    """
+    Retrieves the database connection details from AWS Secrets Manager.
+
+    :param secret_name: The name or ARN of the secret.
+    :param region_name: The AWS region where the secret is stored.
+    :return: A dictionary containing host, username, password, dbname, and port, or None on failure.
+    """
+
+    # 1. Initialize the Secrets Manager client
+    try:
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
+    except Exception as e:
+        logger.error(f"Error initializing AWS client for Secrets Manager: {e}")
+        return None
+
+    # 2. Call the Secrets Manager API
+    try:
+        logger.info(f"Attempting to retrieve secret: {secret_name}")
+        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+
+    except ClientError as e:
+        # Handle specific Secrets Manager API errors
+        error_code = e.response['Error']['Code']
+
+        if error_code == 'DecryptionFailureException':
+            logger.error("Secrets Manager: KMS decryption failure. Check KMS key permissions.")
+        elif error_code == 'InternalServiceError':
+            logger.error("Secrets Manager: An internal service error occurred.")
+        elif error_code == 'InvalidParameterException':
+            logger.error("Secrets Manager: Invalid parameter in the request.")
+        elif error_code == 'InvalidRequestException':
+            logger.error("Secrets Manager: Invalid request, potentially due to resource being deleted.")
+        elif error_code == 'ResourceNotFoundException':
+            logger.error(f"Secrets Manager: The requested secret '{secret_name}' was not found.")
+        elif error_code == 'AccessDeniedException':
+             # This is a critical error if your IAM policy is incorrect
+            logger.error("Secrets Manager: Access Denied. Check the IAM policy for secretsmanager:GetSecretValue.")
+        else:
+            logger.error(f"Secrets Manager ClientError: {error_code}: {e}")
+
+        # In all failure cases above, we stop execution and return None
+        return None
+
+    # 3. Process the secret value
+    try:
+        # Secrets Manager returns the JSON payload as a string under 'SecretString'
+        if 'SecretString' in get_secret_value_response:
+            secret_string = get_secret_value_response['SecretString']
+            secret_dict = json.loads(secret_string)
+        else:
+            # Handle binary secrets, though RDS secrets are typically strings
+            logger.error("Secret is in binary format, expected string/JSON format.")
+            return None
+
+        # 4. Extract and validate required keys
+        details = {
+            "host": secret_dict["host"],
+            "username": secret_dict["username"],
+            "password": secret_dict["password"],
+            "dbname": secret_dict["dbname"],
+            # Ensure port is an integer
+            "port": int(secret_dict["port"])
+        }
+
+        logger.info("Successfully extracted database connection details.")
+        return details
+
+    except json.JSONDecodeError:
+        logger.error("Error: Could not decode SecretString into JSON format.")
+    except KeyError as e:
+        logger.error(f"Error: Required key {e} missing from the secret JSON payload.")
+    except ValueError as e:
+        logger.error(f"Error: Port value could not be converted to integer. {e}")
+    except Exception as e:
+        logger.error(f"An unexpected error occurred during secret processing: {e}")
+
+    return None
 
 def get_smoke_users_status(connection):
     status = []
@@ -109,18 +197,20 @@ def json_response(body: dict[str, Any], status_code: int):
 
 def lambda_handler(event, context):
     try:
+        db_details = get_db_connection_details(SECRET_NAME, REGION_NAME)
         connection = pymysql.connect(
-            host=db_hostname,
-            user=db_user_name,
-            password=db_pass,
-            db=db_name,
-            port=db_port
+            host=db_details['host'],
+            user=db_details['username'],
+            password=db_details['password'],
+            db=db_details['host'],
+            port=db_details['port']
         )
 
         before_status = get_smoke_users_status(connection)
         update_result = fix_user_2fa_lockouts(connection)
         after_status = get_smoke_users_status(connection)
         gw_users_fix = fix_gw_user_and_super_user_passwords(connection)
+
 
         return json_response(
             body=dict(
@@ -141,5 +231,5 @@ def lambda_handler(event, context):
                 "reason": str(e),
                 "traceback": traceback.format_tb(tb)
             },
-            status_code=400
+            status_code=500
         )

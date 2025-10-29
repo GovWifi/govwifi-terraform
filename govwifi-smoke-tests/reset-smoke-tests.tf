@@ -110,12 +110,7 @@ resource "aws_lambda_function" "reset_smoke_tests_lambda" {
       GW_SUPER_ADMIN_PASS = data.aws_secretsmanager_secret_version.gw_super_admin_pass.secret_string
       GW_USER             = data.aws_secretsmanager_secret_version.gw_user.secret_string
       GW_PASS             = data.aws_secretsmanager_secret_version.gw_pass.secret_string
-      ######  Move this to the Lambda and use Secrets Manager there ##############
-      DB_HOST = "${data.aws_secretsmanager_secret_version.admin_db.arn}:host::"
-      DB_NAME = "${data.aws_secretsmanager_secret_version.admin_db.arn}:dbname::"
-      DB_PASS = "${data.aws_secretsmanager_secret_version.admin_db.arn}:password::"
-      DB_USER = "${data.aws_secretsmanager_secret_version.admin_db.arn}:username::"
-      #####
+      ADMIN_DB_SM_PATH    = "rds/admin-db/credentials"
       # Don't put passwords in environment variables in production
       # Use AWS Secrets Manager or Parameter Store instead
     }

@@ -167,10 +167,3 @@ data "aws_secretsmanager_secret_version" "tools_kms_key" {
 data "aws_secretsmanager_secret" "tools_kms_key" {
   name = "tools/codepipeline-kms-key-arn"
 }
-data "aws_secretsmanager_secret_version" "admin_db" {
-  secret_id = data.aws_secretsmanager_secret.admin_db.id
-}
-
-data "aws_secretsmanager_secret" "admin_db" {
-  name = "rds/admin-db/credentials"
-}
