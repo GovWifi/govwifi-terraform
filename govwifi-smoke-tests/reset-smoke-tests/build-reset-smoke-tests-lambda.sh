@@ -6,7 +6,12 @@ rm -f lambda_deployment_package.zip
 mkdir package
 
 # Install dependencies
-pip install --target ./package -r requirements.txt
+PIP=pip
+if [ -z "$(which $PIP)" ]; then
+    echo "pip is not installed. Using pip3 instead."
+    PIP=pip3
+fi
+$PIP install --target ./package -r requirements.txt
 
 # Copy your function code
 cp src/lambda_function.py package/
