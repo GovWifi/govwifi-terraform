@@ -452,22 +452,22 @@ module "london_smoke_tests" {
 
   source = "../../govwifi-smoke-tests"
 
-  aws_account_id                 = local.aws_account_id
-  env_subdomain                  = local.env_subdomain
-  env                            = local.env_name
-  environment                    = local.env
-  vpc_id                         = module.london_tests_vpc.vpc_id
-  default_security_group_id      = module.london_tests_vpc.default_security_group_id
-  aws_security_group_admin_db_in = module.london_admin.aws_security_group_admin_db_in
+  aws_account_id                  = local.aws_account_id
+  env_subdomain                   = local.env_subdomain
+  env                             = local.env_name
+  environment                     = local.env
+  vpc_id                          = module.london_tests_vpc.vpc_id
+  default_security_group_id       = module.london_tests_vpc.default_security_group_id
+  aws_security_group_admin_db_in  = module.london_admin.aws_security_group_admin_db_in
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
-  smoketest_subnet_private_a     = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b     = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert             = 0
-  govwifi_phone_number           = "+447537417039"
-  notify_field                   = "govwifistaging"
-  smoke_tests_repo_name          = "govwifi-smoke-tests"
-  private_subnet_ids             = module.london_backend.backend_private_subnet_ids
-  backend_vpc_id                 = module.london_backend.backend_vpc_id
+  smoketest_subnet_private_a      = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b      = module.london_tests_vpc.subnet_private_b_id
+  create_slack_alert              = 0
+  govwifi_phone_number            = "+447537417039"
+  notify_field                    = "govwifistaging"
+  smoke_tests_repo_name           = "govwifi-smoke-tests"
+  private_subnet_ids              = module.london_backend.backend_private_subnet_ids
+  backend_vpc_id                  = module.london_backend.backend_vpc_id
 
   depends_on = [
     module.london_frontend,

@@ -468,6 +468,10 @@ module "london_smoke_tests" {
   govwifi_phone_number       = "+447860003687"
   notify_field               = "govwifidevelopment"
   smoke_tests_repo_name      = "govwifi-smoke-tests"
+  vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
+  private_subnet_ids             = module.london_backend.backend_private_subnet_ids
+  backend_vpc_id                 = module.london_backend.backend_vpc_id
+  aws_security_group_admin_db_in = module.london_admin.aws_security_group_admin_db_in
 
 
   depends_on = [

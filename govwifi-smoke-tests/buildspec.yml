@@ -2,12 +2,13 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-    - git clone -b $BRANCH https://github.com/GovWifi/$REPO_NAME.git
+      - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+      - git clone -b $BRANCH https://github.com/GovWifi/$REPO_NAME.git
   build:
     commands:
-    - echo "clean up smoke tests before run"
-    - aws lambda invoke --function-name Reset-Smoke-Tests --cli-binary-format raw-in-base64-out response.json
-    - echo "Smoke-tests running"
-    - cd $REPO_NAME
-    - make test
+      - echo "clean up smoke tests before run"
+      - aws lambda invoke --function-name reset-smoke-tests --cli-binary-format raw-in-base64-out response.json
+      - cat response.json
+      - echo "Smoke-tests running"
+      - cd $REPO_NAME
+      - make test
