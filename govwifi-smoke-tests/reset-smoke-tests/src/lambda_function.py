@@ -15,18 +15,19 @@ logger.setLevel(logging.INFO)
 
 # --- Configuration ---
 # Your secret name (as provided in your request)
-SECRET_NAME = os.environ['ADMIN_DB_SM_PATH']
+SECRET_NAME = os.environ["ADMIN_DB_SM_PATH"]
 # Your AWS Region (Lambda often infers this, but it's good practice to define or get it)
 REGION_NAME = "eu-west-2"
 # --- End Configuration ---
 
 # Smoke Test user details
-gw_user = os.environ['GW_USER']
-gw_pass = os.environ['GW_PASS']
-gw_super_user = os.environ['GW_SUPER_ADMIN_USER']
-gw_super_pass = os.environ['GW_SUPER_ADMIN_PASS']
+gw_user = os.environ["GW_USER"]
+gw_pass = os.environ["GW_PASS"]
+gw_super_user = os.environ["GW_SUPER_ADMIN_USER"]
+gw_super_pass = os.environ["GW_SUPER_ADMIN_PASS"]
 
 aws_region = "eu-west-2"
+
 
 def get_db_connection_details(secret_name, region_name):
     """
@@ -40,10 +41,7 @@ def get_db_connection_details(secret_name, region_name):
     # 1. Initialize the Secrets Manager client
     try:
         session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=region_name
-        )
+        client = session.client(service_name="secretsmanager", region_name=region_name)
     except Exception as e:
         logger.error(f"Error initializing AWS client for Secrets Manager: {e}")
         return None
@@ -55,21 +53,29 @@ def get_db_connection_details(secret_name, region_name):
 
     except ClientError as e:
         # Handle specific Secrets Manager API errors
-        error_code = e.response['Error']['Code']
+        error_code = e.response["Error"]["Code"]
 
-        if error_code == 'DecryptionFailureException':
-            logger.error("Secrets Manager: KMS decryption failure. Check KMS key permissions.")
-        elif error_code == 'InternalServiceError':
+        if error_code == "DecryptionFailureException":
+            logger.error(
+                "Secrets Manager: KMS decryption failure. Check KMS key permissions."
+            )
+        elif error_code == "InternalServiceError":
             logger.error("Secrets Manager: An internal service error occurred.")
-        elif error_code == 'InvalidParameterException':
+        elif error_code == "InvalidParameterException":
             logger.error("Secrets Manager: Invalid parameter in the request.")
-        elif error_code == 'InvalidRequestException':
-            logger.error("Secrets Manager: Invalid request, potentially due to resource being deleted.")
-        elif error_code == 'ResourceNotFoundException':
-            logger.error(f"Secrets Manager: The requested secret '{secret_name}' was not found.")
-        elif error_code == 'AccessDeniedException':
-             # This is a critical error if your IAM policy is incorrect
-            logger.error("Secrets Manager: Access Denied. Check the IAM policy for secretsmanager:GetSecretValue.")
+        elif error_code == "InvalidRequestException":
+            logger.error(
+                "Secrets Manager: Invalid request, potentially due to resource being deleted."
+            )
+        elif error_code == "ResourceNotFoundException":
+            logger.error(
+                f"Secrets Manager: The requested secret '{secret_name}' was not found."
+            )
+        elif error_code == "AccessDeniedException":
+            # This is a critical error if your IAM policy is incorrect
+            logger.error(
+                "Secrets Manager: Access Denied. Check the IAM policy for secretsmanager:GetSecretValue."
+            )
         else:
             logger.error(f"Secrets Manager ClientError: {error_code}: {e}")
 
@@ -79,8 +85,8 @@ def get_db_connection_details(secret_name, region_name):
     # 3. Process the secret value
     try:
         # Secrets Manager returns the JSON payload as a string under 'SecretString'
-        if 'SecretString' in get_secret_value_response:
-            secret_string = get_secret_value_response['SecretString']
+        if "SecretString" in get_secret_value_response:
+            secret_string = get_secret_value_response["SecretString"]
             secret_dict = json.loads(secret_string)
         else:
             # Handle binary secrets, though RDS secrets are typically strings
@@ -94,7 +100,7 @@ def get_db_connection_details(secret_name, region_name):
             "password": secret_dict["password"],
             "dbname": secret_dict["dbname"],
             # Ensure port is an integer
-            "port": int(secret_dict["port"])
+            "port": int(secret_dict["port"]),
         }
 
         logger.info("Successfully extracted database connection details.")
@@ -110,6 +116,7 @@ def get_db_connection_details(secret_name, region_name):
         logger.error(f"An unexpected error occurred during secret processing: {e}")
 
     return None
+
 
 def get_smoke_users_status(connection):
     status = []
@@ -131,11 +138,16 @@ def get_smoke_users_status(connection):
         for row in cursor.fetchall():
             uid, email, failed_attempts, locked_at, second_factor_attempts_count = row
             status.append(
-                dict(uid=uid, email=email, failed_attempts=failed_attempts, locked_at=locked_at, second_factor_attempts_count=second_factor_attempts_count)
+                dict(
+                    uid=uid,
+                    email=email,
+                    failed_attempts=failed_attempts,
+                    locked_at=locked_at,
+                    second_factor_attempts_count=second_factor_attempts_count,
+                )
             )
 
     return status
-
 
 
 def fix_user_2fa_lockouts(connection):
@@ -153,20 +165,20 @@ def fix_user_2fa_lockouts(connection):
 def fix_gw_user_and_super_user_passwords(connection):
     users = [
         dict(
-            email=r'govwifi-tests@digital.cabinet-office.gov.uk',
-            encrypted_password=r'$2a$11$2oY.L1IsTH96zu6DMPsetuskCNLuqXYiB2Gw7uRcsWGTGWmFoN6re'
+            email=r"govwifi-tests@digital.cabinet-office.gov.uk",
+            encrypted_password=r"$2a$11$2oY.L1IsTH96zu6DMPsetuskCNLuqXYiB2Gw7uRcsWGTGWmFoN6re",
         ),
         dict(
-            email=r'govwifi-tests+superadmin@digital.cabinet-office.gov.uk',
-            encrypted_password=r'$2a$11$8ko2IcYDW8zYP5ks0OcZNehWzcRoxjRgjQp.DC5I05GGcyKgtbQyy'
-        )
+            email=r"govwifi-tests+superadmin@digital.cabinet-office.gov.uk",
+            encrypted_password=r"$2a$11$8ko2IcYDW8zYP5ks0OcZNehWzcRoxjRgjQp.DC5I05GGcyKgtbQyy",
+        ),
     ]
     results = []
     for smoke_test_user in users:
         with connection.cursor() as cursor:
             now = datetime.datetime.now().isoformat()
-            email = smoke_test_user['email']
-            encrypted_password = smoke_test_user['encrypted_password']
+            email = smoke_test_user["email"]
+            encrypted_password = smoke_test_user["encrypted_password"]
             query = f"""UPDATE
                 users
             SET
@@ -175,23 +187,16 @@ def fix_gw_user_and_super_user_passwords(connection):
             WHERE
                 users.email = '{email}'
             """
-            results.append(
-                dict(
-                    email=email,
-                    rows_affected=cursor.execute(query)
-                )
-            )
+            results.append(dict(email=email, rows_affected=cursor.execute(query)))
 
     return results
 
 
 def json_response(body: dict[str, Any], status_code: int):
     return {
-        'statusCode': status_code,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'body': body
+        "statusCode": status_code,
+        "headers": {"Content-Type": "application/json"},
+        "body": body,
     }
 
 
@@ -199,11 +204,11 @@ def lambda_handler(event, context):
     try:
         db_details = get_db_connection_details(SECRET_NAME, REGION_NAME)
         connection = pymysql.connect(
-            host=db_details['host'],
-            user=db_details['username'],
-            password=db_details['password'],
-            db=db_details['host'],
-            port=db_details['port']
+            host=db_details["host"],
+            user=db_details["username"],
+            password=db_details["password"],
+            db=db_details["dbname"],
+            port=db_details["port"],
         )
 
         before_status = get_smoke_users_status(connection)
@@ -211,16 +216,15 @@ def lambda_handler(event, context):
         after_status = get_smoke_users_status(connection)
         gw_users_fix = fix_gw_user_and_super_user_passwords(connection)
 
-
         return json_response(
             body=dict(
-		        status="ok",
+                status="ok",
                 before_status=before_status,
                 update_result=update_result,
                 after_status=after_status,
                 gw_users_fix=gw_users_fix,
             ),
-            status_code=200
+            status_code=200,
         )
 
     except Exception as e:
@@ -229,7 +233,7 @@ def lambda_handler(event, context):
             body={
                 "status": "fail",
                 "reason": str(e),
-                "traceback": traceback.format_tb(tb)
+                "traceback": traceback.format_tb(tb),
             },
-            status_code=500
+            status_code=500,
         )
