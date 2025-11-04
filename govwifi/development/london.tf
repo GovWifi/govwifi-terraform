@@ -26,8 +26,8 @@ module "london_deployment_roles" {
     aws.dublin = aws.dublin
   }
 
-  source = "../../govwifi-deployment-roles"
-  aws_account_id             = local.aws_account_id
+  source         = "../../govwifi-deployment-roles"
+  aws_account_id = local.aws_account_id
 
 }
 

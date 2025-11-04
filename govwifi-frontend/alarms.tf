@@ -7,7 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts_warning" {
   namespace           = "AWS/NetworkELB"
   period              = 60
   statistic           = "Maximum"
-  threshold           = var.radius_instance_count/2
+  threshold           = var.radius_instance_count / 2
   datapoints_to_alarm = 1
 
   dimensions = {
@@ -78,7 +78,7 @@ resource "aws_cloudwatch_metric_alarm" "eap_outer_and_inner_identities_are_the_s
 ## Radius has a limit of open sessions, if a task is overloaded, this message will appear in the logs, indicating a task or loadbalancer failure.
 resource "aws_cloudwatch_metric_alarm" "eap_too_many_sessions_high" {
   alarm_name          = "${var.env_name}-${var.aws_region_name}-EAP-too-many-open-sessions"
-  alarm_description  = "Radius has a limit of EAP Open sessions, this should now trigger the auto scaler to spin up new tasks, monitor as this indicates increase in traffic or a radius problem."
+  alarm_description   = "Radius has a limit of EAP Open sessions, this should now trigger the auto scaler to spin up new tasks, monitor as this indicates increase in traffic or a radius problem."
   metric_name         = aws_cloudwatch_log_metric_filter.eap_too_many_sessions.metric_transformation[0].name
   threshold           = 1 #error in logs detected
   statistic           = "Maximum"
