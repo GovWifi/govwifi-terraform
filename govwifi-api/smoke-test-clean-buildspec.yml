@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+    - echo "Running smoketests cleanup"
+    - |
+      aws ecs run-task --region eu-west-2 --cluster $CLUSTER \
+      --task-definition $TASK_DEF \
+      --launch-type FARGATE \
+      --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUPS],assignPublicIp='ENABLED'}" \
+      --overrides '{"containerOverrides":[{"name":$CONTAINER_NAME, "command": ["bundle", "exec", "rake", $RAKE_TASK_NAME]}]}'

@@ -126,33 +126,33 @@ resource "aws_s3_bucket_policy" "state_bucket" {
 EOF
 }
 
-resource "aws_s3_bucket_replication_configuration" "state_bucket" {
-  depends_on = [
-    aws_s3_bucket_versioning.state_bucket
-  ]
-
-  bucket = aws_s3_bucket.state_bucket.id
-  role   = aws_iam_role.tfstate_replication.arn
-
-  rule {
-    id = "${lower(var.aws_region_name)}-to-${lower(var.backup_region_name)}-tfstate-backup"
-
-    filter {
-      prefix = "${lower(var.aws_region_name)}-tfstate"
-    }
-
-    destination {
-      bucket        = "arn:aws:s3:::${lower(var.product_name)}-${lower(var.env_name)}-${lower(var.backup_region_name)}-tfstate"
-      storage_class = "STANDARD_IA"
-    }
-
-    delete_marker_replication {
-      status = "Enabled"
-    }
-
-    status = "Enabled"
-  }
-}
+# resource "aws_s3_bucket_replication_configuration" "state_bucket" {
+#   depends_on = [
+#     aws_s3_bucket_versioning.state_bucket
+#   ]
+#
+#   bucket = aws_s3_bucket.state_bucket.id
+#   role   = aws_iam_role.tfstate_replication.arn
+#
+#   rule {
+#     id = "${lower(var.aws_region_name)}-to-${lower(var.backup_region_name)}-tfstate-backup"
+#
+#     filter {
+#       prefix = "${lower(var.aws_region_name)}-tfstate"
+#     }
+#
+#     destination {
+#       bucket        = "arn:aws:s3:::${lower(var.product_name)}-${lower(var.env_name)}-${lower(var.backup_region_name)}-tfstate"
+#       storage_class = "STANDARD_IA"
+#     }
+#
+#     delete_marker_replication {
+#       status = "Enabled"
+#     }
+#
+#     status = "Enabled"
+#   }
+# }
 
 resource "aws_s3_bucket_logging" "state_bucket" {
   bucket = aws_s3_bucket.state_bucket.id

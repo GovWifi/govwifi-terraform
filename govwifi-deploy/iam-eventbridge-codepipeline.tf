@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "codepipeline_eventbridge_policy" {
     ]
     resources = [
       for name in var.deployed_app_names :
-      "${aws_codepipeline.alpaca_deploy_apps_pipeline[name].arn}"
+      "${aws_codepipeline.development_deploy_apps_pipeline[name].arn}"
     ]
   }
 }

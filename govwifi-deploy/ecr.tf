@@ -1,59 +1,59 @@
-### Begin Alpaca
+### Begin Development
 
-resource "aws_ecr_repository" "govwifi_ecr_repo_deployed_apps_alpaca" {
+resource "aws_ecr_repository" "govwifi_ecr_repo_deployed_apps_development" {
   for_each = toset(var.deployed_app_names)
-  name     = "govwifi/${each.key}/alpaca"
+  name     = "govwifi/${each.key}/development"
 }
 
-resource "aws_ecr_repository_policy" "govwifi_ecr_repo_policy_deployed_apps_alpaca" {
+resource "aws_ecr_repository_policy" "govwifi_ecr_repo_policy_deployed_apps_development" {
   for_each   = toset(var.deployed_app_names)
-  repository = aws_ecr_repository.govwifi_ecr_repo_deployed_apps_alpaca[each.key].name
-  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_alpaca.json
+  repository = aws_ecr_repository.govwifi_ecr_repo_deployed_apps_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
 
-resource "aws_ecr_repository" "govwifi_frontend_alpaca" {
+resource "aws_ecr_repository" "govwifi_frontend_development" {
   for_each = toset(var.frontend_docker_images)
-  name     = "govwifi/alpaca/${each.key}"
+  name     = "govwifi/development/${each.key}"
 }
 
-resource "aws_ecr_repository_policy" "govwifi_frontend_policy_alpaca" {
+resource "aws_ecr_repository_policy" "govwifi_frontend_policy_development" {
   for_each   = toset(var.frontend_docker_images)
-  repository = aws_ecr_repository.govwifi_frontend_alpaca[each.key].name
-  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_alpaca.json
+  repository = aws_ecr_repository.govwifi_frontend_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
 
-resource "aws_ecr_repository" "govwifi_frontend_alpaca_ire" {
+resource "aws_ecr_repository" "govwifi_frontend_development_ire" {
   provider = aws.dublin
   for_each = toset(var.frontend_docker_images)
-  name     = "govwifi/alpaca/${each.key}"
+  name     = "govwifi/development/${each.key}"
 }
 
-resource "aws_ecr_repository_policy" "govwifi_frontend_policy_alpaca_ire" {
+resource "aws_ecr_repository_policy" "govwifi_frontend_policy_development_ire" {
   provider   = aws.dublin
   for_each   = toset(var.frontend_docker_images)
-  repository = aws_ecr_repository.govwifi_frontend_alpaca[each.key].name
-  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_alpaca.json
+  repository = aws_ecr_repository.govwifi_frontend_development[each.key].name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
 
-resource "aws_ecr_repository" "safe_restarter_ecr_alpaca" {
-  name = "govwifi/alpaca/safe-restarter"
+resource "aws_ecr_repository" "safe_restarter_ecr_development" {
+  name = "govwifi/development/safe-restarter"
 }
 
-resource "aws_ecr_repository_policy" "govwifi_ecr_saferestater_policy_alpaca" {
-  repository = aws_ecr_repository.safe_restarter_ecr_alpaca.name
-  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_alpaca.json
+resource "aws_ecr_repository_policy" "govwifi_ecr_saferestater_policy_development" {
+  repository = aws_ecr_repository.safe_restarter_ecr_development.name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
 
-resource "aws_ecr_repository" "database_backup_ecr_alpaca" {
-  name = "govwifi/alpaca/database-backup"
+resource "aws_ecr_repository" "database_backup_ecr_development" {
+  name = "govwifi/development/database-backup"
 }
 
-resource "aws_ecr_repository_policy" "govwifi_ecr_database_backup_policy_alpaca" {
-  repository = aws_ecr_repository.database_backup_ecr_alpaca.name
-  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_alpaca.json
+resource "aws_ecr_repository_policy" "govwifi_ecr_database_backup_policy_development" {
+  repository = aws_ecr_repository.database_backup_ecr_development.name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
 
-data "aws_iam_policy_document" "govwifi_ecr_repo_policy_alpaca" {
+data "aws_iam_policy_document" "govwifi_ecr_repo_policy_development" {
   statement {
     sid = "AllowPushPull"
 
@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "govwifi_ecr_repo_policy_alpaca" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.aws_alpaca_account_id}:root"]
+      identifiers = ["arn:aws:iam::${local.aws_development_account_id}:root"]
     }
 
   }
@@ -79,7 +79,11 @@ data "aws_iam_policy_document" "govwifi_ecr_repo_policy_alpaca" {
 }
 
 
-### End Alpaca
+### End Development
+
+
+
+
 
 
 ### Begin Staging

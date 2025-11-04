@@ -99,13 +99,13 @@ resource "random_password" "admin_username" {
 #   }
 # }
 
-## Once the admin database has been created update the secret with host etc:
+# ## Once the admin database has been created update the secret with host etc:
 
 # data "aws_secretsmanager_secret_version" "admin_creds_password_username" {
 #   secret_id = aws_secretsmanager_secret.admin_credentials.id
 # }
 
-#
+
 # resource "aws_secretsmanager_secret_version" "admin_creds_update_existing" {
 #   secret_id = aws_secretsmanager_secret.admin_credentials.id
 

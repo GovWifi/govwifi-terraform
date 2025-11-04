@@ -14,6 +14,9 @@ staging:
 alpaca:
 	$(eval export DEPLOY_ENV=alpaca)
 	$(eval export REPO=alpaca)
+development:
+	$(eval export DEPLOY_ENV=development)
+	$(eval export REPO=development)
 wifi-london:
 	$(eval export DEPLOY_ENV=wifi-london)
 	$(eval export REPO=latest)
@@ -34,8 +37,9 @@ apply_task: check-env
 apply: check-env unencrypt-secrets apply_task delete-secrets ## Run terraform apply after decrypting secrets. Must run in form make <env> apply
 .PHONY: terraform
 terraform_task: check-env
-terraform: check-env unencrypt-secrets delete-secrets
-	scripts/run-terraform.sh ${terraform_cmd}
+terraform: check-env unencrypt-secrets
+	# clean up after a job and remove the secrets, don't leave them behind
+	scripts/run-terraform.sh ${terraform_cmd} || true ; $(MAKE) delete-secrets
 terraform_target: check-env unencrypt-secrets
 	scripts/run-terraform.sh ${terraform_cmd}; scripts/unencrypt-secrets.sh delete-secrets
 destroy_task: check-env

@@ -69,7 +69,7 @@ resource "aws_cloudwatch_log_metric_filter" "radius_cannot_connect_to_api" {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "eap_too_many_sessions" {
-  name = "${var.env_name}-eap-max-open-sessions"
+  name           = "${var.env_name}-eap-max-open-sessions"
   log_group_name = aws_cloudwatch_log_group.frontend.name
   pattern        = "Too many open sessions"
   metric_transformation {

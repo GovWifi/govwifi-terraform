@@ -177,93 +177,6 @@ resource "aws_iam_role_policy_attachment" "lambda_service_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-resource "aws_iam_role" "crossaccount_tools" {
-  count              = var.create_wordlist_bucket ? 1 : 0
-  name               = "govwifi-crossaccount-tools-deploy"
-  assume_role_policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-										"arn:aws:iam::${data.aws_secretsmanager_secret_version.tools_account.secret_string}:role/govwifi-codepipeline-global-role"
-                ]
-            },
-            "Action": "sts:AssumeRole",
-            "Condition": {}
-        }
-    ]
-}
-POLICY
-}
-
-resource "aws_iam_role_policy_attachment" "crossaccount_tools" {
-  count      = var.create_wordlist_bucket ? 1 : 0
-  role       = aws_iam_role.crossaccount_tools[0].name
-  policy_arn = aws_iam_policy.crossaccount_tools[0].arn
-}
-
-resource "aws_iam_policy" "crossaccount_tools" {
-  count       = var.create_wordlist_bucket ? 1 : 0
-  name        = "govwifi-crossaccount-tools-deploy"
-  path        = "/"
-  description = "Allows AWS Tools account to deploy new ECS tasks"
-
-  policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject",
-                "s3:ListBucket"
-            ],
-            "Resource": [
-                "arn:aws:s3:::govwifi-codepipeline-bucket",
-                "arn:aws:s3:::govwifi-codepipeline-bucket/*",
-								"arn:aws:s3:::govwifi-codepipeline-bucket-ireland",
-								"arn:aws:s3:::govwifi-codepipeline-bucket-ireland/*"
-            ]
-        },
-        {
-            "Sid": "AllowUseOfKeyInAccountTools",
-            "Effect": "Allow",
-            "Action": [
-                "kms:Encrypt",
-                "kms:Decrypt",
-                "kms:ReEncrypt*",
-                "kms:GenerateDataKey*",
-                "kms:DescribeKey"
-            ],
-            "Resource": [
-                "arn:aws:kms:eu-west-2:${data.aws_secretsmanager_secret_version.tools_account.secret_string}:key/${data.aws_secretsmanager_secret_version.tools_kms_key.secret_string}",
-								"arn:aws:kms:eu-west-1:${data.aws_secretsmanager_secret_version.tools_account.secret_string}:key/${data.aws_secretsmanager_secret_version.tools_kms_key_ireland.secret_string}"
-            ]
-        },
-        {
-            "Sid": "ECRRepositoryPolicy",
-            "Effect": "Allow",
-            "Action": [
-                "ecr:DescribeImages",
-                "ecr:DescribeRepositories"
-            ],
-            "Resource": "arn:aws:ecr:eu-west-2:${data.aws_secretsmanager_secret_version.tools_account.secret_string}:govwifi/*"
-        }
-    ]
-}
-POLICY
-
-}
-
-resource "aws_iam_role_policy_attachment" "crossaccount_tools_ecs_access" {
-  count      = var.create_wordlist_bucket ? 1 : 0
-  role       = aws_iam_role.crossaccount_tools[0].name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
-}
-
 data "aws_iam_policy_document" "allow_ssm" {
   statement {
     actions = [
@@ -278,3 +191,88 @@ data "aws_iam_policy_document" "allow_ssm" {
     ]
   }
 }
+
+#Smoketest Cleanup
+
+resource "aws_iam_role" "govwifi_smoketest_cleanup" {
+  count      = var.aws_region == "eu-west-2" ? 1 : 0
+  name = "govwifi-smoketest-cleanup"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "codebuild.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "govwifi_smoketest_cleanup_permissions" {
+  count      = var.aws_region == "eu-west-2" ? 1 : 0
+  name        = "Govwifi-Smoketests-IAM-Policy-Clean"
+  description = "Permissions settings that allow codebuild to run the smoketest cleanup job"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:logs:eu-west-2:${var.aws_account_id}:log-group:/aws/codebuild/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}",
+                "arn:aws:logs:eu-west-2:${var.aws_account_id}:log-group:/aws/codebuild/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}:*"
+            ],
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::codepipeline-eu-west-2-*"
+            ],
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:GetBucketAcl",
+                "s3:GetBucketLocation"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "codebuild:CreateReportGroup",
+                "codebuild:CreateReport",
+                "codebuild:UpdateReport",
+                "codebuild:BatchPutTestCases",
+                "codebuild:BatchPutCodeCoverages"
+            ],
+            "Resource": [
+                "arn:aws:codebuild:eu-west-2:${var.aws_account_id}:report-group/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}-*"
+            ]
+        }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "govwifi_smoketest_cleanup_permissions_policy_attach" {
+  count      = var.aws_region == "eu-west-2" ? 1 : 0
+  policy_arn = aws_iam_policy.govwifi_smoketest_cleanup_permissions[0].arn
+  role       = aws_iam_role.govwifi_smoketest_cleanup[0].name
+}
+
+resource "aws_iam_role_policy_attachment" "govwifi_smoketest_cleanup_ecs_permissions_policy_attach" {
+  count      = var.aws_region == "eu-west-2" ? 1 : 0
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+  role       = aws_iam_role.govwifi_smoketest_cleanup[0].name
+}
+

@@ -476,7 +476,8 @@ resource "aws_service_discovery_service" "main" {
     routing_policy = "MULTIVALUE"
   }
 
-  health_check_custom_config {
-    failure_threshold = 10
+  lifecycle {
+    ignore_changes = [health_check_custom_config]
   }
+
 }

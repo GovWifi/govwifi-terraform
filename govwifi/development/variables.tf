@@ -1,6 +1,6 @@
 variable "ssh_key_name" {
   type    = string
-  default = "staging-bastion-20200717"
+  default = "govwifi-development-bastion-20250922"
 }
 
 variable "notify_ips" {

@@ -33,3 +33,9 @@ variable "default_security_group_id" {
 
 variable "environment" {
 }
+
+variable "govwifi_codebuild_role_name" {
+}
+
+variable "govwifi_codebuild_role_arn" {
+}

@@ -78,6 +78,17 @@ data "terraform_remote_state" "dublin" {
   }
 }
 
+module "london_deployment_roles" {
+  providers = {
+    aws = aws.main
+    aws.dublin = aws.dublin
+  }
+
+  source         = "../../govwifi-deployment-roles"
+  aws_account_id = local.aws_account_id
+
+}
+
 module "govwifi_keys" {
   providers = {
     aws = aws.main
@@ -85,13 +96,8 @@ module "govwifi_keys" {
 
   source = "../../govwifi-keys"
 
-  create_production_bastion_key = 1
-
   govwifi_bastion_key_name = "govwifi-bastion-key"
   govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDY/Q676Tp5CTpKWVksMPztERDdjWOrYFgVckF9IHGI2wC38ckWFiqawsEZBILUyNZgL/lnOtheN1UZtuGmUUkPxgtPw+YD6gMDcebhSX4wh9GM3JjXAIy9+V/WagQ84Pz10yIp+PlyzcQMu+RVRVzWyTYZUdgMsDt0tFdcgMgUc7FkC252CgtSZHpLXhnukG5KG69CoTO+kuak/k3vX5jwWjIgfMGZwIAq+F9XSIMAwylCmmdE5MetKl0Wx4EI/fm8WqSZXj+yeFRv9mQTus906AnNieOgOrgt4D24/JuRU1JTlZ35iNbOKcwlOTDSlTQrm4FA1sCllphhD/RQVYpMp6EV3xape626xwkucCC2gYnakxTZFHUIeWfC5aHGrqMOMtXRfW0xs+D+vzo3MCWepdIebWR5KVhqkbNUKHBG9e8oJbTYUkoyBZjC7LtI4fgB3+blXyFVuQoAzjf+poPzdPBfCC9eiUJrEHoOljO9yMcdkBfyW3c/o8Sd9PgNufc= bastion@govwifi"
-
-  govwifi_key_name     = var.ssh_key_name
-  govwifi_key_name_pub = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJmLa/tF941z6Dh/jiZCH6Mw/JoTXGkILim/bgDc3PSBKXFmBwkAFUVgnoOUWJDXvZWpuBJv+vUu+ZlmlszFM00BRXpb4ykRuJxWIjJiNzGlgXW69Satl2e9d37ZtLwlAdABgJyvj10QEiBtB1VS0DBRXK9J+CfwNPnwVnfppFGP86GoqE2Il86t+BB/VC//gKMTttIstyl2nqUwkK3Epq66+1ol3AelmUmBjPiyrmkwp+png9F4B86RqSNa/drfXmUGf1czE4+H+CXqOdje2bmnrwxLQ8GY3MYpz0zTVrB3T1IyXXF6dcdcF6ZId9B/10jMiTigvOeUvraFEf9fK7 govwifi@govwifi"
 }
 
 # Global ====================================================================
@@ -193,10 +199,10 @@ module "frontend" {
   backend_vpc_id = module.backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
-  radius_instance_count      = 3
-  radius_task_count          = 9
-  radius_task_count_min      = 9
-  radius_task_count_max      = 27
+  radius_instance_count = 3
+  radius_task_count     = 9
+  radius_task_count_min = 9
+  radius_task_count_max = 27
 
   enable_detailed_monitoring = true
 
@@ -550,38 +556,15 @@ module "smoke_tests" {
   govwifi_phone_number       = "+447537417417"
   notify_field               = "govwifi"
   smoke_tests_repo_name      = "govwifi-smoke-tests"
-
-
-  depends_on = [
-    module.frontend,
-    module.london_tests_vpc
-  ]
-}
-
-module "canary_tests" {
-  providers = {
-    aws        = aws.main
-    aws.dublin = aws.dublin
-  }
-
-  source = "../../govwifi-canary-tests"
-
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 1
-  canary_tests_repo_name     = "govwifi-canary-tests"
-
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
 
   depends_on = [
     module.frontend,
     module.london_tests_vpc
   ]
 }
+
 
 module "london_tests_vpc" {
   source                     = "../../govwifi_tests_vpc"
