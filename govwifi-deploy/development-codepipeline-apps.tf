@@ -94,26 +94,26 @@ resource "aws_codepipeline" "development_deploy_apps_pipeline" {
   }
 
   dynamic "stage" {
-      for_each = contains(local.integration_tests, each.key) ? [each.key] : []
-      content {
-        name = "Integration_Tests"
+    for_each = contains(local.integration_tests, each.key) ? [each.key] : []
+    content {
+      name = "Integration_Tests"
 
-        action {
+      action {
 
-          name            = "Integration-tests-${each.key}-DEV"
-          category        = "Test"
-          owner           = "AWS"
-          provider        = "CodeBuild"
-          input_artifacts = ["${each.key}-source-art"]
-          # This resource lives in the Dev, Staging & Production environments. It will always have to
-          # either be hardcoded or retrieved from the AWS secrets or parameter store
-          version   = 1
-          run_order = 1
-          configuration = {
-            ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
-          }
+        name            = "Integration-tests-${each.key}-DEV"
+        category        = "Test"
+        owner           = "AWS"
+        provider        = "CodeBuild"
+        input_artifacts = ["${each.key}-source-art"]
+        # This resource lives in the Dev, Staging & Production environments. It will always have to
+        # either be hardcoded or retrieved from the AWS secrets or parameter store
+        version   = 1
+        run_order = 1
+        configuration = {
+          ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
         }
       }
+    }
   }
 
   stage {

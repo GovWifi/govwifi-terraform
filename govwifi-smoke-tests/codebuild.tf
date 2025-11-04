@@ -63,7 +63,7 @@ resource "aws_codebuild_project" "smoke_tests" {
     }
 
     environment_variable {
-      name  = "GW_SUPER_ADMIN_PASS" 
+      name  = "GW_SUPER_ADMIN_PASS"
       value = "deploy/gw_super_admin_pass"
       type  = "SECRETS_MANAGER"
     }
@@ -75,13 +75,13 @@ resource "aws_codebuild_project" "smoke_tests" {
     }
 
 
-    environment_variable { 
+    environment_variable {
       name  = "GOOGLE_API_CREDENTIALS"
       value = "deploy/google_api_credentials"
       type  = "SECRETS_MANAGER"
     }
 
-    environment_variable { 
+    environment_variable {
       name  = "GOOGLE_API_TOKEN_DATA"
       value = "deploy/google_api_token_data"
       type  = "SECRETS_MANAGER"
