@@ -1,6 +1,6 @@
 variable "ssh_key_name" {
   type    = string
-  default = "govwifi-key-20180530"
+  default = "govwifi-bastion-key"
 }
 
 # Entries below should probably stay as is for different environments
