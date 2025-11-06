@@ -1,2 +1,0 @@
-variable "administrator_cidrs" {
-}
