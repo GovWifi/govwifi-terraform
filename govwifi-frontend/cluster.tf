@@ -2,11 +2,6 @@
 
 resource "aws_ecs_cluster" "frontend_fargate" {
   name = "frontend-fargate"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
 }
 
 resource "aws_ecs_cluster_capacity_providers" "frontend_fargate" {
