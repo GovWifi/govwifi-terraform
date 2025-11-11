@@ -22,6 +22,6 @@ resource "aws_cloudwatch_event_target" "S3_source_update_target" {
   for_each  = toset(var.deployed_app_names)
   rule      = aws_cloudwatch_event_rule.S3_source_update_rule[each.key].name
   target_id = "SendEventToCodePipeline_${each.key}"
-  arn       = aws_codepipeline.alpaca_deploy_apps_pipeline[each.key].arn
+  arn       = aws_codepipeline.development_deploy_apps_pipeline[each.key].arn
   role_arn  = aws_iam_role.govwifi_codepipeline_eventbridge_role.arn
 }

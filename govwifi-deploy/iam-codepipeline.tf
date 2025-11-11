@@ -52,8 +52,8 @@ resource "aws_iam_role_policy" "codepipeline_global_policy" {
             "Resource": [
 								"arn:aws:iam::${local.aws_staging_account_id}:role/govwifi-crossaccount-tools-deploy",
 								"arn:aws:iam::${local.aws_staging_account_id}:role/govwifi-codebuild-role",
-                "arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-crossaccount-tools-deploy",
-								"arn:aws:iam::${local.aws_alpaca_account_id}:role/govwifi-codebuild-role",
+                "arn:aws:iam::${local.aws_development_account_id}:role/govwifi-crossaccount-tools-deploy",
+								"arn:aws:iam::${local.aws_development_account_id}:role/govwifi-codebuild-role",
 								"arn:aws:iam::${local.aws_production_account_id}:role/govwifi-crossaccount-tools-deploy",
 								"arn:aws:iam::${local.aws_production_account_id}:role/govwifi-codebuild-role"
 							],

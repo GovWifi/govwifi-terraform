@@ -249,7 +249,7 @@ resource "aws_ecs_task_definition" "user_signup_api_scheduled_task" {
           "value": "${var.user_db_hostname}"
         },{
           "name": "RACK_ENV",
-          "value": "${var.rack_env}"
+          "value": "${var.app_env}"
         },{
           "name": "SENTRY_CURRENT_ENV",
           "value": "${var.sentry_current_env}"
@@ -264,7 +264,7 @@ resource "aws_ecs_task_definition" "user_signup_api_scheduled_task" {
           "value": "${var.metrics_bucket_name}"
         },{
           "name": "S3_NOTIFICATION_TEMPLATES_BUCKET",
-          "value": "govwifi-${var.rack_env}-notification-templates"
+          "value": "govwifi-${var.env}-notification-templates"
         }
       ],
       "secrets": [
