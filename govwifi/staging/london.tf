@@ -214,6 +214,7 @@ module "london_admin" {
   capacity_notifications_arn = module.london_notifications.topic_arn
 
   rds_monitoring_role = module.london_backend.rds_monitoring_role
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
 
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips

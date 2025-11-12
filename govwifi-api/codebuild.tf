@@ -1,7 +1,7 @@
 resource "aws_codebuild_project" "govwifi_codebuild_project_reset_smoke_tests" {
   count     = var.logging_enabled
-  name          = "govwifi-reset-smoke-tests"
-  description   = "Force reset of the smoke tests"
+  name          = "govwifi-reset-smoke-test-sessions"
+  description   = "Force reset of the smoke tests sessions."
   build_timeout = "30"
   service_role  = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
 
@@ -11,7 +11,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_reset_smoke_tests" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:6.0"
+    image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
