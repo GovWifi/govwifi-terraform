@@ -124,7 +124,7 @@ module "backend" {
   session_db_storage_gb    = 1000
   db_backup_retention_days = 7
   db_encrypt_at_rest       = true
-  db_maintenance_window    = "wed:01:42-wed:02:12"
+  db_maintenance_window    = "sun:02:42-sun:03:12"
   db_backup_window         = "04:42-05:42"
 
   db_replica_count      = 0
