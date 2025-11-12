@@ -192,87 +192,101 @@ data "aws_iam_policy_document" "allow_ssm" {
   }
 }
 
-#Smoketest Cleanup
+## Scheduled Tasks
+resource "aws_iam_role" "logging_scheduled_task_role" {
+  count = var.logging_enabled
+  name  = "${var.env_name}-logging-scheduled-task-role"
 
-resource "aws_iam_role" "govwifi_smoketest_cleanup" {
-  count      = var.aws_region == "eu-west-2" ? 1 : 0
-  name = "govwifi-smoketest-cleanup"
+  assume_role_policy = <<DOC
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "events.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+DOC
 
-  assume_role_policy = <<EOF
+}
+
+resource "aws_iam_role_policy" "logging_scheduled_task_policy" {
+  count = var.logging_enabled
+  name  = "${var.env_name}-logging-scheduled-task-policy"
+  role  = aws_iam_role.logging_scheduled_task_role[0].id
+
+  policy = <<DOC
 {
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
-            "Principal": {
-                "Service": "codebuild.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
+            "Action": "ecs:RunTask",
+            "Resource": "${replace(
+  aws_ecs_task_definition.logging_api_scheduled_task[0].arn,
+  "/:\\d+$/",
+  ":*",
+)}"
+        },
+        {
+          "Effect": "Allow",
+          "Action": "iam:PassRole",
+          "Resource": [
+            "*"
+          ],
+          "Condition": {
+            "StringLike": {
+              "iam:PassedToService": "ecs-tasks.amazonaws.com"
+            }
+          }
         }
     ]
+}
+DOC
+
+}
+
+resource "aws_cloudwatch_event_target" "logging_daily_session_deletion" {
+  count     = var.logging_enabled
+  target_id = "${var.env_name}-logging-daily-session-deletion"
+  arn       = aws_ecs_cluster.api_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_session_deletion_event[0].name
+  role_arn  = aws_iam_role.logging_scheduled_task_role[0].arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.logging_api_scheduled_task[0].arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.api_in.id],
+        [aws_security_group.api_out.id]
+      )
+
+      assign_public_ip = true
+    }
+  }
+
+  input = <<EOF
+{
+  "containerOverrides": [
+    {
+      "name": "logging-api",
+      "command": ["bundle", "exec", "rake", "daily_session_deletion"]
+    }
+  ]
 }
 EOF
+
 }
 
-resource "aws_iam_policy" "govwifi_smoketest_cleanup_permissions" {
-  count      = var.aws_region == "eu-west-2" ? 1 : 0
-  name        = "Govwifi-Smoketests-IAM-Policy-Clean"
-  description = "Permissions settings that allow codebuild to run the smoketest cleanup job"
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:logs:eu-west-2:${var.aws_account_id}:log-group:/aws/codebuild/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}",
-                "arn:aws:logs:eu-west-2:${var.aws_account_id}:log-group:/aws/codebuild/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}:*"
-            ],
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:s3:::codepipeline-eu-west-2-*"
-            ],
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:GetObjectVersion",
-                "s3:GetBucketAcl",
-                "s3:GetBucketLocation"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "codebuild:CreateReportGroup",
-                "codebuild:CreateReport",
-                "codebuild:UpdateReport",
-                "codebuild:BatchPutTestCases",
-                "codebuild:BatchPutCodeCoverages"
-            ],
-            "Resource": [
-                "arn:aws:codebuild:eu-west-2:${var.aws_account_id}:report-group/${aws_codebuild_project.govwifi_codebuild_project_reset_smoke_tests[0].name}-*"
-            ]
-        }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "govwifi_smoketest_cleanup_permissions_policy_attach" {
-  count      = var.aws_region == "eu-west-2" ? 1 : 0
-  policy_arn = aws_iam_policy.govwifi_smoketest_cleanup_permissions[0].arn
-  role       = aws_iam_role.govwifi_smoketest_cleanup[0].name
-}
-
-resource "aws_iam_role_policy_attachment" "govwifi_smoketest_cleanup_ecs_permissions_policy_attach" {
-  count      = var.aws_region == "eu-west-2" ? 1 : 0
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
-  role       = aws_iam_role.govwifi_smoketest_cleanup[0].name
-}
 

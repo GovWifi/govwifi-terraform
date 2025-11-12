@@ -1,8 +1,8 @@
 resource "aws_codebuild_project" "govwifi_codebuild_project_reset-smoke-tests" {
-  name          = "govwifi-reset-smoke-tests"
-  description   = "Force reset of the smoke tests"
+  name          = "govwifi-smoke-test-reset"
+  description   = "Force reset of the smoke test users passwords, login attempts and remove site IPs"
   build_timeout = "30"
-  service_role  = aws_iam_role.govwifi_codebuild.arn
+  service_role  = var.govwifi_codebuild_role_arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -10,14 +10,14 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_reset-smoke-tests" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:6.0"
+    image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
 
     environment_variable {
       name  = "SUBNETS"
-      value = "'${var.subnet_ids[0]}','${var.subnet_ids[1]}','${var.subnet_ids[2]}'"
+      value = "${join(",", var.subnet_ids)}"
     }
 
     environment_variable {
@@ -41,7 +41,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_reset-smoke-tests" {
 
     environment_variable {
       name  = "RAKE_TASK_NAME"
-      value = "smoke_tests_reset"
+      value = "reset:smoke_test_users"
     }
 
 environment_variable {
@@ -68,6 +68,10 @@ environment_variable {
       type  = "SECRETS_MANAGER"
     }
 
+    environment_variable  {
+      name =  "SMOKE_TEST_IPS"
+      value = "${join(",", var.smoke_test_ips)}"
+    }
   }
 
   logs_config {
