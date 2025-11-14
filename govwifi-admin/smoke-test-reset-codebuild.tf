@@ -68,6 +68,10 @@ environment_variable {
       type  = "SECRETS_MANAGER"
     }
 
+    environment_variable  {
+      name =  "SMOKE_TEST_IPS"
+      value = "${join(",", var.smoke_test_ips)}"
+    }
   }
 
   logs_config {

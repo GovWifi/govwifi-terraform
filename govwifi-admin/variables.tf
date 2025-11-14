@@ -148,3 +148,8 @@ variable "log_retention" {
 
 variable "govwifi_codebuild_role_arn" {
 }
+
+variable "smoke_test_ips" {
+  type    = list(string)
+  default = []
+}

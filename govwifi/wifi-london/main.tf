@@ -291,6 +291,7 @@ module "govwifi_admin" {
 
   london_radius_ip_addresses = var.london_radius_ip_addresses
   dublin_radius_ip_addresses = var.dublin_radius_ip_addresses
+  smoke_test_ips             = module.london_tests_vpc.eip_public_ips
   public_google_api_key      = var.public_google_api_key
 
   logging_api_search_url = "https://api-elb.london.${local.env_subdomain}.service.gov.uk:8443/logging/authentication/events/search/"

@@ -9,4 +9,4 @@ phases:
       --task-definition $TASK_DEF \
       --launch-type FARGATE \
       --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUPS],assignPublicIp='ENABLED'}" \
-      --overrides "{\"containerOverrides\":[{\"name\":\"$CONTAINER_NAME\", \"command\": [\"bundle\", \"exec\", \"rake\", \"$RAKE_TASK_NAME\"], \"environment\": [{\"name\": \"GW_USER\", \"value\": \"$GW_USER\"}, {\"name\": \"GW_PASS\", \"value\": \"$GW_PASS\"},{\"name\": \"GW_SUPER_ADMIN_USER\", \"value\": \"$GW_SUPER_ADMIN_USER\"}, {\"name\": \"GW_SUPER_ADMIN_PASS\", \"value\": \"$GW_SUPER_ADMIN_PASS\"}]}]}"
+      --overrides "{\"containerOverrides\":[{\"name\":\"$CONTAINER_NAME\", \"command\": [\"bundle\", \"exec\", \"rake\", \"$RAKE_TASK_NAME\"], \"environment\": [{\"name\": \"GW_USER\", \"value\": \"$GW_USER\"}, {\"name\": \"GW_PASS\", \"value\": \"$GW_PASS\"},{\"name\": \"GW_SUPER_ADMIN_USER\", \"value\": \"$GW_SUPER_ADMIN_USER\"}, {\"name\": \"GW_SUPER_ADMIN_PASS\", \"value\": \"$GW_SUPER_ADMIN_PASS\"}, {\"name\": \"SMOKE_TEST_IPS\", \"value\": \"$SMOKE_TEST_IPS\"}]}]}"

@@ -220,6 +220,7 @@ module "london_admin" {
 
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips
+  smoke_test_ips             = module.london_tests_vpc.eip_public_ips
   logging_api_search_url     = "https://api-elb.london.${local.env_subdomain}.service.gov.uk:8443/logging/authentication/events/search/"
   public_google_api_key      = var.public_google_api_key
 
