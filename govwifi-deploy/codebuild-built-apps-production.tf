@@ -42,6 +42,10 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app_production" {
       value = "production"
     }
 
+    environment_variable {
+      name  = "BUILT_APP_NAME"
+      value = each.key
+    }
   }
 
   source_version = "master"
