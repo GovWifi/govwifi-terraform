@@ -2,10 +2,15 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-    - git clone -b $BRANCH https://github.com/GovWifi/$REPO_NAME.git
+    - echo "Setting up ECR image URI"
+    - ECR_IMAGE_URI=$TOOLS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/govwifi/$ENVIRONMENT/$APP_NAME:latest
+    - echo "Logging in to ECR"
+    - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $TOOLS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    - echo "Setting up test environment variables"
+    - export TEST_ENV_VARS="-e DOCKER=docker -e GW_SUPER_ADMIN_USER -e GW_SUPER_ADMIN_PASS -e GW_SUPER_ADMIN_2FA_SECRET -e GW_USER -e GW_PASS -e GW_2FA_SECRET -e GOOGLE_API_CREDENTIALS -e GOOGLE_API_TOKEN_DATA -e RADIUS_KEY -e RADIUS_IPS -e SUBDOMAIN -e NOTIFY_SMOKETEST_API_KEY -e NOTIFY_GO_TEMPLATE_ID -e GOVWIFI_PHONE_NUMBER -e SMOKETEST_PHONE_NUMBER -e NOTIFY_FIELD -e EAP_TLS_CLIENT_CERT -e EAP_TLS_CLIENT_KEY -e ENVIRONMENT"
   build:
     commands:
-    - echo "Smoke-tests running"
-    - cd $REPO_NAME
-    - make test
+    - echo "Pull image from ECR"
+    - docker pull $ECR_IMAGE_URI
+    - echo "Running smoke tests inside the Docker container"
+    - docker run --rm $TEST_ENV_VARS $ECR_IMAGE_URI bundle exec rspec spec/system

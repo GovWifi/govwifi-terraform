@@ -146,6 +146,17 @@ resource "aws_codebuild_project" "smoke_tests" {
       value = var.environment
     }
 
+    environment_variable {
+      name  = "TOOLS_ACCOUNT_ID"
+      value = "tools/AccountID"
+      type  = "SECRETS_MANAGER"
+    }
+
+    environment_variable {
+      name  = "APP_NAME"
+      value = "smoke-tests"
+    }
+
   }
 
   source {
