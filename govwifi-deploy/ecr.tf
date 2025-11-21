@@ -52,6 +52,15 @@ resource "aws_ecr_repository_policy" "govwifi_ecr_database_backup_policy_develop
   repository = aws_ecr_repository.database_backup_ecr_development.name
   policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
 }
+### smoke tests ecr repo
+resource "aws_ecr_repository" "smoke_tests_ecr_development" {
+  name = "govwifi/development/smoke-tests"
+}
+
+resource "aws_ecr_repository_policy" "govwifi_ecr_smoke_tests_policy_development" {
+  repository = aws_ecr_repository.smoke_tests_ecr_development.name
+  policy     = data.aws_iam_policy_document.govwifi_ecr_repo_policy_development.json
+}
 
 data "aws_iam_policy_document" "govwifi_ecr_repo_policy_development" {
   statement {
