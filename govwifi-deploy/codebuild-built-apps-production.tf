@@ -12,7 +12,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app_production" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:6.0"
+    image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
@@ -48,7 +48,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app_production" {
     }
   }
 
-  source_version = "master"
+  source_version = each.key == "smoke-tests" ? "main" : "master"
 
   source {
     type            = "GITHUB"

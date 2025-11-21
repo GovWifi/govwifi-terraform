@@ -48,7 +48,7 @@ resource "aws_codebuild_project" "development_govwifi_codebuild_built_app" {
     }
   }
 
-  source_version = "master"
+  source_version = each.key == "smoke-tests" ? "main" : "master"
 
   source {
     type            = "GITHUB"
