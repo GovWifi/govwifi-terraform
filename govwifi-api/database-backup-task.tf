@@ -3,7 +3,7 @@ resource "aws_cloudwatch_event_rule" "backup_rds_to_s3" {
   name                = "${var.env_name}-backup-rds-to-s3"
   description         = "Triggers at 00:30 UTC Daily"
   schedule_expression = "cron(30 0 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_log_group" "backup_rds_to_s3_log_group" {

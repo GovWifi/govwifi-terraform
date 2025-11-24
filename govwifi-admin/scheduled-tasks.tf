@@ -60,7 +60,7 @@ resource "aws_cloudwatch_event_rule" "daily_cleanup_data" {
   name                = "${var.env_name}-daily-cleanup-data"
   description         = "Triggers daily 03:15 UTC"
   schedule_expression = "cron(15 3 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "cleanup_orphan_admin_users" {
@@ -143,7 +143,7 @@ resource "aws_cloudwatch_event_rule" "daily_median_metrics" {
   name                = "${var.env_name}-daily-median-metrics"
   description         = "Triggers daily 05:15 UTC"
   schedule_expression = "cron(15 5 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "daily_median_metrics" {
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_event_rule" "daily_backup_service_emails" {
   name                = "${var.env_name}-daily-backup-service-emails"
   description         = "Triggers daily 03:30 UTC"
   schedule_expression = "cron(30 3 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "admin_backup_service_emails" {
@@ -233,7 +233,7 @@ resource "aws_cloudwatch_event_rule" "daily_export_certificates" {
   name                = "${var.env_name}-daily-export-certificates"
   description         = "Triggers daily 22:00 UTC"
   schedule_expression = "cron(00 22 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "export_certificates" {
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_event_rule" "daily_publish_organisation_names" {
   name                = "${var.env_name}-daily-publish-organisation-names"
   description         = "Triggers daily 22:00 UTC"
   schedule_expression = "cron(00 22 * * ? *)"
-  is_enabled          = true
+  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "publish_organisation_names" {
