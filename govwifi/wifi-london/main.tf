@@ -80,7 +80,7 @@ data "terraform_remote_state" "dublin" {
 
 module "london_deployment_roles" {
   providers = {
-    aws = aws.main
+    aws        = aws.main
     aws.dublin = aws.dublin
   }
 
@@ -546,18 +546,18 @@ module "smoke_tests" {
 
   source = "../../govwifi-smoke-tests"
 
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  environment                = local.env
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 1
-  govwifi_phone_number       = "+447537417417"
-  notify_field               = "govwifi"
-  smoke_tests_repo_name      = "govwifi-smoke-tests"
+  aws_account_id              = local.aws_account_id
+  env_subdomain               = local.env_subdomain
+  env                         = local.env_name
+  environment                 = local.env
+  vpc_id                      = module.london_tests_vpc.vpc_id
+  default_security_group_id   = module.london_tests_vpc.default_security_group_id
+  smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
+  create_slack_alert          = 1
+  govwifi_phone_number        = "+447537417417"
+  notify_field                = "govwifi"
+  smoke_tests_repo_name       = "govwifi-smoke-tests"
   govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
   govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
 
