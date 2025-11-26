@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+REPO_ROOT := $(shell pwd)
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 check-env:
@@ -60,9 +61,16 @@ format: format-terraform
 
 .PHONY: lint-terraform
 lint-terraform:
+# set to error for now, but we should consider warning later
 	terraform fmt -recursive -diff -check .
-	find . -maxdepth 2 -name "*.tf" -printf "%h\n" | grep -v govwifi-account | uniq | xargs --verbose -i tflint {}
-	find govwifi -maxdepth 2 -name "*.tf" -printf "%h\n" | uniq | xargs --verbose -i tflint {}
+	find . -maxdepth 3 \
+		-path './.terraform' -prune -o \
+		-path './tools' -prune -o \
+		-name "*.tf" -printf "%h\n" | uniq | xargs --verbose -i tflint \
+		--minimum-failure-severity=error \
+		--config $(REPO_ROOT)/.tflint.hcl \
+		--chdir {}
+
 
 .PHONY: format-terraform
 format-terraform:
