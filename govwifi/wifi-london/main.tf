@@ -286,8 +286,8 @@ module "govwifi_admin" {
   capacity_notifications_arn  = module.london_capacity_notifications.topic_arn
   pagerduty_notifications_arn = module.region_pagerduty.topic_arn
 
-  rds_monitoring_role = module.backend.rds_monitoring_role
-  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  rds_monitoring_role        = module.backend.rds_monitoring_role
+  govwifi_codebuild_role_arn = module.london_deployment_roles.govwifi_codebuild_role_arn
 
   london_radius_ip_addresses = var.london_radius_ip_addresses
   dublin_radius_ip_addresses = var.dublin_radius_ip_addresses

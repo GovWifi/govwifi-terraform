@@ -17,7 +17,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_reset-smoke-tests" {
 
     environment_variable {
       name  = "SUBNETS"
-      value = "${join(",", var.subnet_ids)}"
+      value = join(",", var.subnet_ids)
     }
 
     environment_variable {
@@ -44,7 +44,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_reset-smoke-tests" {
       value = "reset:smoke_test_users"
     }
 
-environment_variable {
+    environment_variable {
       name  = "GW_USER"
       value = "deploy/gw_user"
       type  = "SECRETS_MANAGER"
@@ -68,9 +68,9 @@ environment_variable {
       type  = "SECRETS_MANAGER"
     }
 
-    environment_variable  {
-      name =  "SMOKE_TEST_IPS"
-      value = "${join(",", var.smoke_test_ips)}"
+    environment_variable {
+      name  = "SMOKE_TEST_IPS"
+      value = join(",", var.smoke_test_ips)
     }
   }
 
