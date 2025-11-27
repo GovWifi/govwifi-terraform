@@ -146,14 +146,12 @@ resource "aws_route_table_association" "smoke_tests_private_b" {
 }
 
 resource "aws_eip" "smoke_tests_a" {
-  vpc = true
   tags = {
     Name = "${var.env_subdomain}-smoke-tests-a"
   }
 }
 
 resource "aws_eip" "smoke_tests_b" {
-  vpc = true
   tags = {
     Name = "${var.env_subdomain}-smoke-tests-b"
   }

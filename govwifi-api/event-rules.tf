@@ -14,14 +14,6 @@ resource "aws_cloudwatch_event_rule" "daily_user_deletion_event" {
   state               = "ENABLED"
 }
 
-resource "aws_cloudwatch_event_rule" "daily_smoke_test_cleanup_event" {
-  count               = var.event_rule_count
-  name                = "${var.env_name}-smoke-test-cleanup"
-  description         = "Triggers daily 23:30 UTC"
-  schedule_expression = "cron(30 23 * * ? *)"
-  state               = "ENABLED"
-}
-
 resource "aws_cloudwatch_event_rule" "trim_sessions_database_table_event" {
   count               = var.event_rule_count
   name                = "${var.env_name}-trim-sessions-database-table"
