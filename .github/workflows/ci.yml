@@ -1,12 +1,18 @@
 name: govwifi-terraform-linting
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout source code
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
       - uses: Homebrew/actions/setup-homebrew@master
       - name: Install Required Packages
@@ -20,28 +26,39 @@ jobs:
         with:
           path: ~/.tflint.d/plugins
           key: ${{ runner.os  }}-tflint-${{ hashFiles('.tflint.hcl') }}
-  
-      - uses: terraform-linters/setup-tflint@v3
+
+      - uses: terraform-linters/setup-tflint@v6
         name: Setup TFLint
         with:
-          tflint_version: v0.48.0
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tflint_version: v0.60.0
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          cache: true
 
       - name: Show terraform version
         run: tfenv version-name
 
       - name: Show lint version
         run: tflint --version
-  
+
       - name: Init TFLint
-        run: tflint --init
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          run: PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH" make lint
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. Initialize TFLint (Downloads plugins, reads config)
+          tflint --init
+
+          # 2. Set the custom PATH variable for 'make' (if necessary)
+          export PATH="/usr/local/opt/findutils/libexec/gnubin:$PATH"
+
+          # 3. Execute the linter via 'make lint'
+          make lint
 
   validate:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
       - uses: Homebrew/actions/setup-homebrew@master
       - name: Install Required Packages
         run: |
@@ -49,8 +66,7 @@ jobs:
           tfenv install $(cat .terraform-version)
           tfenv use $(cat .terraform-version)
 
-      - uses: actions/checkout@v3
-      - name: validate
+      - name: Run Validator
         run: |
           for dir in govwifi/*;
           do

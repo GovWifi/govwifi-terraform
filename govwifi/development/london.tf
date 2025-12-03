@@ -1,8 +1,7 @@
 locals {
-  london_aws_region              = "eu-west-2"
-  london_aws_region_name         = "London"
-  london_backend_vpc_cidr_block  = "10.106.0.0/16"
-  london_frontend_vpc_cidr_block = "10.102.0.0/16"
+  london_aws_region             = "eu-west-2"
+  london_aws_region_name        = "London"
+  london_backend_vpc_cidr_block = "10.106.0.0/16"
 }
 
 provider "aws" {
@@ -20,6 +19,18 @@ provider "aws" {
   }
 }
 
+
+module "london_deployment_roles" {
+  providers = {
+    aws        = aws.london
+    aws.dublin = aws.dublin
+  }
+
+  source         = "../../govwifi-deployment-roles"
+  aws_account_id = local.aws_account_id
+
+}
+
 module "london_keys" {
   providers = {
     aws = aws.london
@@ -27,13 +38,8 @@ module "london_keys" {
 
   source = "../../govwifi-keys"
 
-  govwifi_bastion_key_name = "alpaca-bastion-20230120"
-  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/cSxMbS72i6FoirL80CP9GLU7fZ1mtwIg0hi8v8OuCKyR8JjYQejZpyCGSIb3KOXIQf51bUI2+GB8B+h+UpWwUIN5Ysepc4YKuTjped4Av7ybrHFsqkl+66/uQgDwGloU6UuksTiwLVK9sf2JcDztm8Bbef/5cunLfhR+yrvzebF9kK0tnZxORwS0gCXA0bdgoqCUfJHxogLaZV3A517bn60rHcdq55qgIjI4IxNxdKLcrWjwJPbgvqepX+YbeDWqXe6VoVkwCB+daM8SGMvmZyfu7fsJFkoga4D9ksGTKNFFlLPlp4RqEkYqHqZAX70XVg6z32yHZ99iP36wCYhw3AjhdUMDFpoXv2iPMkFNx+EyOC1DtQdrLa96QDPKk2FSmhE6kz0524TWogS/x/2zFtXZbyqhAfzoU36YgFm8RYeS6mSUkxP7IynKvHbjuMqsh34sWRRSl4OxDA8K2ps2Hu2O2lFM44Sr02TeKqnKJza07ZRcAl8AWjoyaarHZ6iHft7n4CjXHLy2CmstVCIsEfmv+aZvMe8qZ1tWSoE50/6XyDn9B1UMQNmSIX8InYvh0pXIA6q+Y7/PAROfOcT3rKLSUyFS6D/PGfbq/P8GbJIAImSGBhBs4GgawtR7+hIpjsQ2dWEXwzdWGFkvmWyai6SUkclBYJkQYd0VyQb61w== david.pye@GDS10381"
-
-  create_production_bastion_key = 0
-
-  govwifi_key_name     = var.ssh_key_name
-  govwifi_key_name_pub = var.ssh_key_name_pub
+  govwifi_bastion_key_name = "govwifi-development-bastion-20250922"
+  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFgOGlHTZTKAnwIC+/NOqfjZayz2v0h2mdSd9BXPkMrbWxoZQ9KBalxI4GlL8xItEQ3VMaVCM4SUx0+V7XMlBLFjG8hLneiHjnMFZqqvTJIVOjp3nreydWzRTcU6KxHCis/k5GUs85dQjtwrVp7QEfEvRNEaXmNf725MBO20GOMWOWbi30HNmMHTL1o3eZA876qPWcfigOQXX1auy+y4xnM4s0loMCksG+m3iaV4qr1WvEQxTvghXXZPhNWsBTxE4QGqX2S/OctpNHn7ycU7q/Oha+1dCEB/MfMhoE7a0qEDcPLWESwsbN6IcgAqdhq1GxEytadGenen1JGRBKEgwmK6wbY2o0e4XOyrCgZViv1l/oSaP7OT566dEikw6lo0spps8OO/LXZdIX0KfjlL64H92yyjaVQ4a7SzCPCiOQM40oNi1rSvZKMIW5vr4m3dxZOpQhkMXCoHtehggNduDvVGMMoFinFH+LQD3d4glGyqZ7g0tGUnL/H7bjs9MkdCPzCaNS+pe4rjU4Z2cqofbYwxObe1D9rzVrS10MtlmH9OvM/y5A5ympsWjFR7RChPtr1VgH7gOSHa30WSxA7c8m5xaynijl6uwvbeOgy7smMnJb82KlqfMeU8hWNlFo/xM6KVyu3QbPFVOIpSXr0C9vaGa0r09QYRYfxnZwTq8/IQ== govwifi-developers@digital.cabinet-office.gov.uk"
 
 }
 
@@ -43,7 +49,7 @@ module "london_backend" {
   }
 
   source        = "../../govwifi-backend"
-  env           = local.env
+  env           = "development"
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
 
@@ -57,12 +63,12 @@ module "london_backend" {
   frontend_radius_ips = local.frontend_radius_ips
 
   bastion_instance_type     = "t2.micro"
-  bastion_ssh_key_name      = "alpaca-bastion-20230120"
+  bastion_ssh_key_name      = "govwifi-development-bastion-20250922"
   enable_bastion_monitoring = false
   aws_account_id            = local.aws_account_id
   db_instance_count         = 1
   session_db_instance_type  = "db.t3.small"
-  session_db_storage_gb     = 30
+  session_db_storage_gb     = 20
   db_backup_retention_days  = 1
   db_encrypt_at_rest        = true
   db_maintenance_window     = "sat:01:42-sat:02:12"
@@ -98,6 +104,7 @@ module "london_frontend" {
   providers = {
     aws           = aws.london
     aws.us_east_1 = aws.us_east_1
+    aws.dublin    = aws.dublin
   }
 
   source         = "../../govwifi-frontend"
@@ -107,24 +114,24 @@ module "london_frontend" {
   aws_account_id = local.aws_account_id
   log_retention  = local.log_retention
 
-
   # AWS VPC setup -----------------------------------------
   # LONDON
   aws_region = local.london_aws_region
 
   aws_region_name    = local.london_aws_region_name
   route53_zone_id    = data.aws_route53_zone.main.zone_id
-  vpc_cidr_block     = local.london_frontend_vpc_cidr_block
-  rack_env           = local.env
-  sentry_current_env = local.env
+  vpc_cidr_block     = "10.102.0.0/16"
+  rack_env           = "development"
+  sentry_current_env = "development"
 
   backend_vpc_id = module.london_backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
-  radius_instance_count      = 3
-  radius_task_count          = 3
-  radius_task_count_max       = 3
-  radius_task_count_min       = 3
+  radius_instance_count = 3
+  radius_task_count     = 3
+  radius_task_count_max = 3
+  radius_task_count_min = 3
+
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -133,8 +140,8 @@ module "london_frontend" {
 
   ami                   = "ami-2218f945"
   ssh_key_name          = var.ssh_key_name
-  frontend_docker_image = format("%s/frontend:alpaca", local.docker_image_path)
-  raddb_docker_image    = format("%s/raddb:alpaca", local.docker_image_path)
+  frontend_docker_image = format("%s/frontend:development", local.docker_image_path)
+  raddb_docker_image    = format("%s/raddb:development", local.docker_image_path)
   create_ecr            = 1
 
   admin_app_data_s3_bucket_name = module.london_admin.app_data_s3_bucket_name
@@ -144,9 +151,10 @@ module "london_frontend" {
 
   authentication_api_internal_dns_name = module.london_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
-  capacity_notifications_arn           = module.london_notifications.topic_arn
-  pagerduty_notifications_arn          = module.london_notifications.topic_arn
-  critical_notifications_arn           = module.london_critical_notifications.topic_arn
+
+  pagerduty_notifications_arn = module.london_notifications.topic_arn
+  critical_notifications_arn  = module.london_critical_notifications.topic_arn
+  capacity_notifications_arn  = module.london_notifications.topic_arn
 
   bastion_server_ip = module.london_backend.bastion_public_ip
 
@@ -170,22 +178,22 @@ module "london_admin" {
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
   env           = local.env
-  log_retention = local.log_retention
 
   aws_region      = local.london_aws_region
   aws_region_name = local.london_aws_region_name
   vpc_id          = module.london_backend.backend_vpc_id
   instance_count  = 1
+  log_retention   = local.log_retention
 
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
   route53_zone_id  = data.aws_route53_zone.main.zone_id
   route53_zone_arn = data.aws_route53_zone.main.arn
 
-  admin_docker_image   = format("%s/admin:alpaca", local.docker_image_path)
+  admin_docker_image   = format("%s/admin:development", local.docker_image_path)
   rails_env            = "production"
-  app_env              = "alpaca" ## used for db name.
-  sentry_current_env   = local.env
+  app_env              = "development"
+  sentry_current_env   = "development"
   ecr_repository_count = 1
 
   subnet_ids = module.london_backend.backend_subnet_ids
@@ -198,19 +206,21 @@ module "london_admin" {
   db_backup_window         = "03:42-04:42"
   db_monitoring_interval   = 60
 
-  rr_db_host = "db.london.alpaca.wifi.service.gov.uk"
-  rr_db_name = "govwifi_alpaca"
+  rr_db_host = "db.london.development.wifi.service.gov.uk"
+  rr_db_name = "govwifi_development"
 
   user_db_host = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
-  user_db_name = "govwifi_alpaca_users"
+  user_db_name = "govwifi_development_users"
 
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_notifications.topic_arn
 
-  rds_monitoring_role = module.london_backend.rds_monitoring_role
+  rds_monitoring_role        = module.london_backend.rds_monitoring_role
+  govwifi_codebuild_role_arn = module.london_deployment_roles.govwifi_codebuild_role_arn
 
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips
+  smoke_test_ips             = module.london_tests_vpc.eip_public_ips
   logging_api_search_url     = "https://api-elb.london.${local.env_subdomain}.service.gov.uk:8443/logging/authentication/events/search/"
   public_google_api_key      = var.public_google_api_key
 
@@ -233,11 +243,10 @@ module "london_api" {
   }
 
   source        = "../../govwifi-api"
-  env           = local.env
-  env_name      = local.env_name
+  env           = "development"
+  env_name      = "development"
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
-
 
   backend_elb_count      = 1
   backend_instance_count = 2
@@ -255,12 +264,12 @@ module "london_api" {
   pagerduty_notifications_arn = module.london_notifications.topic_arn
   critical_notifications_arn  = module.london_critical_notifications.topic_arn
 
-  user_signup_docker_image      = format("%s/user-signup-api:alpaca", local.docker_image_path)
-  logging_docker_image          = format("%s/logging-api:alpaca", local.docker_image_path)
-  safe_restart_docker_image     = format("%s/safe-restarter:alpaca", local.docker_image_path)
-  backup_rds_to_s3_docker_image = format("%s/database-backup:alpaca", local.docker_image_path)
+  user_signup_docker_image      = format("%s/user-signup-api:development", local.docker_image_path)
+  logging_docker_image          = format("%s/logging-api:development", local.docker_image_path)
+  safe_restart_docker_image     = format("%s/safe-restarter:development", local.docker_image_path)
+  backup_rds_to_s3_docker_image = format("%s/database-backup:development", local.docker_image_path)
 
-  create_wordlist_bucket = true
+  create_wordlist_bucket = false
   wordlist_file_path     = "../wordlist-short"
   ecr_repository_count   = 1
 
@@ -269,9 +278,9 @@ module "london_api" {
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
-  rack_env                  = "alpaca"
-  app_env                   = local.env
-  sentry_current_env        = local.env
+  rack_env                  = "staging"
+  app_env                   = "development"
+  sentry_current_env        = "development"
   radius_server_ips         = local.frontend_radius_ips
   subnet_ids                = module.london_backend.backend_subnet_ids
   private_subnet_ids        = module.london_backend.backend_private_subnet_ids
@@ -308,7 +317,7 @@ module "london_route53_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-london"
+  topic_name = "govwifi-development-london"
   emails     = [var.notification_email]
 }
 
@@ -319,7 +328,7 @@ module "london_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-london-capacity"
+  topic_name = "govwifi-development-london-capacity"
   emails     = [var.notification_email]
 }
 
@@ -330,8 +339,25 @@ module "london_critical_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-london-critical"
+  topic_name = "govwifi-development-london-critical"
   emails     = [var.notification_email]
+}
+
+module "govwifi_slack_alerts" {
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../govwifi-slack-alerts"
+
+  london_critical_notifications_topic_arn = module.london_critical_notifications.topic_arn
+  london_capacity_notifications_topic_arn = module.london_notifications.topic_arn
+  dublin_critical_notifications_topic_arn = module.dublin_critical_notifications.topic_arn
+  dublin_capacity_notifications_topic_arn = module.dublin_notifications.topic_arn
+
+  route53_critical_notifications_topic_arn = module.london_route53_notifications.topic_arn
+  # set to 1 to create config for slack chat bot.
+  create_slack_alert = 0
 }
 
 module "london_dashboard" {
@@ -355,7 +381,6 @@ module "london_prometheus" {
   aws_account_id  = local.aws_account_id
   log_retention   = local.log_retention
 
-
   ssh_key_name = var.ssh_key_name
 
   frontend_vpc_id = module.london_frontend.frontend_vpc_id
@@ -377,7 +402,6 @@ module "london_grafana" {
   env_subdomain              = local.env_subdomain
   aws_region                 = local.london_aws_region
   aws_region_name            = local.london_aws_region_name
-  aws_account_id             = local.aws_account_id
   capacity_notifications_arn = module.london_notifications.topic_arn
 
   route53_zone_id = data.aws_route53_zone.main.zone_id
@@ -396,28 +420,11 @@ module "london_grafana" {
     module.london_prometheus.eip_public_ip,
     module.dublin_prometheus.eip_public_ip
   ]
-
+  aws_account_id    = local.aws_account_id
   vpc_be_cidr_block = local.london_backend_vpc_cidr_block
 }
 
-module "govwifi_slack_alerts" {
-  providers = {
-    aws = aws.london
-  }
-
-  source = "../../govwifi-slack-alerts"
-
-  london_critical_notifications_topic_arn = module.london_critical_notifications.topic_arn
-  london_capacity_notifications_topic_arn = module.london_notifications.topic_arn
-  dublin_critical_notifications_topic_arn = module.dublin_critical_notifications.topic_arn
-  dublin_capacity_notifications_topic_arn = module.dublin_notifications.topic_arn
-
-  route53_critical_notifications_topic_arn = module.london_route53_notifications.topic_arn
-  # set to 1 to create config for slack chat bot.
-  create_slack_alert = 0
-}
-
-module "london-govwifi-ecs-update-service" {
+module "london_govwifi-ecs-update-service" {
   providers = {
     aws = aws.london
   }
@@ -426,11 +433,14 @@ module "london-govwifi-ecs-update-service" {
 
   deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
 
-  env_name = local.env_name
+  env_name = "development"
 
   aws_account_id = local.aws_account_id
-}
 
+  depends_on = [
+    module.london_smoke_tests
+  ]
+}
 
 module "london_elasticsearch" {
   providers = {
@@ -456,50 +466,54 @@ module "london_smoke_tests" {
 
   source = "../../govwifi-smoke-tests"
 
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  environment                = local.env
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 0
-  govwifi_phone_number       = "+447860003687"
-  notify_field               = "govwifidevelopment"
-  smoke_tests_repo_name      = "govwifi-smoke-tests"
+  aws_account_id              = local.aws_account_id
+  env_subdomain               = local.env_subdomain
+  env                         = local.env_name
+  environment                 = local.env
+  vpc_id                      = module.london_tests_vpc.vpc_id
+  default_security_group_id   = module.london_tests_vpc.default_security_group_id
+  smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
+  smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
+  create_slack_alert          = 0
+  govwifi_phone_number        = "+447860003687"
+  notify_field                = "govwifidevelopment"
+  smoke_tests_repo_name       = "govwifi-smoke-tests"
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
 
-
-  depends_on = [
-    module.london_frontend,
-    module.london_tests_vpc
-  ]
-}
-
-module "london_canary_tests" {
-  providers = {
-    aws        = aws.london
-    aws.dublin = aws.dublin
-  }
-
-  source = "../../govwifi-canary-tests"
-
-  aws_account_id             = local.aws_account_id
-  env_subdomain              = local.env_subdomain
-  env                        = local.env_name
-  vpc_id                     = module.london_tests_vpc.vpc_id
-  default_security_group_id  = module.london_tests_vpc.default_security_group_id
-  smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
-  smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert         = 0
-  canary_tests_repo_name     = "govwifi-canary-tests"
 
 
   depends_on = [
     module.london_frontend,
-    module.london_tests_vpc
+    module.london_tests_vpc,
+    module.london_deployment_roles
   ]
 }
+
+# module "london_canary_tests" {
+#   providers = {
+#     aws        = aws.london
+#     aws.dublin = aws.dublin
+#   }
+
+#   source = "../../govwifi-canary-tests"
+
+#   aws_account_id             = local.aws_account_id
+#   env_subdomain              = local.env_subdomain
+#   env                        = local.env_name
+#   vpc_id                     = module.london_tests_vpc.vpc_id
+#   default_security_group_id  = module.london_tests_vpc.default_security_group_id
+#   smoketest_subnet_private_a = module.london_tests_vpc.subnet_private_a_id
+#   smoketest_subnet_private_b = module.london_tests_vpc.subnet_private_b_id
+#   create_slack_alert         = 0
+#   canary_tests_repo_name     = "govwifi-canary-tests"
+
+
+#   depends_on = [
+#     module.london_frontend,
+#     module.london_tests_vpc
+#   ]
+# }
 
 module "london_tests_vpc" {
   source                     = "../../govwifi_tests_vpc"

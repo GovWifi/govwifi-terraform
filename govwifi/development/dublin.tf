@@ -1,7 +1,7 @@
 locals {
-  dublin_aws_region              = "eu-west-1"
-  dublin_aws_region_name         = "Dublin"
-  dublin_backend_vpc_cidr_block  = "10.104.0.0/16"
+  dublin_aws_region      = "eu-west-1"
+  dublin_aws_region_name = "Dublin"
+
   dublin_frontend_vpc_cidr_block = "10.105.0.0/16"
 }
 
@@ -87,7 +87,7 @@ module "dublin_backend" {
   }
 
   source        = "../../govwifi-backend"
-  env           = local.env
+  env           = "development"
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
 
@@ -105,7 +105,7 @@ module "dublin_backend" {
 
   bastion_instance_type     = "t2.micro"
   bastion_server_ip         = module.london_backend.bastion_public_ip
-  bastion_ssh_key_name      = "alpaca-bastion-20230120"
+  bastion_ssh_key_name      = "govwifi-development-bastion-20250922"
   enable_bastion_monitoring = false
   aws_account_id            = local.aws_account_id
 
@@ -123,7 +123,7 @@ module "dublin_backend" {
   rr_storage_gb    = 0
 
   user_db_replica_count  = 1
-  user_replica_source_db = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-alpaca-user-db"
+  user_replica_source_db = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-development-user-db"
   user_rr_instance_type  = "db.t3.small"
 
   # TODO This should happen inside the module
@@ -143,7 +143,7 @@ module "dublin_backend" {
   grafana_ip            = module.london_grafana.eip_public_ip
 
   db_storage_alarm_threshold = 19327342936
-  recovery_backups_enabled   = false
+  recovery_backups_enabled   = local.recovery_backups_enabled
 
 }
 
@@ -173,13 +173,8 @@ module "dublin_keys" {
 
   source = "../../govwifi-keys"
 
-  govwifi_bastion_key_name = "alpaca-bastion-20230120"
-  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/cSxMbS72i6FoirL80CP9GLU7fZ1mtwIg0hi8v8OuCKyR8JjYQejZpyCGSIb3KOXIQf51bUI2+GB8B+h+UpWwUIN5Ysepc4YKuTjped4Av7ybrHFsqkl+66/uQgDwGloU6UuksTiwLVK9sf2JcDztm8Bbef/5cunLfhR+yrvzebF9kK0tnZxORwS0gCXA0bdgoqCUfJHxogLaZV3A517bn60rHcdq55qgIjI4IxNxdKLcrWjwJPbgvqepX+YbeDWqXe6VoVkwCB+daM8SGMvmZyfu7fsJFkoga4D9ksGTKNFFlLPlp4RqEkYqHqZAX70XVg6z32yHZ99iP36wCYhw3AjhdUMDFpoXv2iPMkFNx+EyOC1DtQdrLa96QDPKk2FSmhE6kz0524TWogS/x/2zFtXZbyqhAfzoU36YgFm8RYeS6mSUkxP7IynKvHbjuMqsh34sWRRSl4OxDA8K2ps2Hu2O2lFM44Sr02TeKqnKJza07ZRcAl8AWjoyaarHZ6iHft7n4CjXHLy2CmstVCIsEfmv+aZvMe8qZ1tWSoE50/6XyDn9B1UMQNmSIX8InYvh0pXIA6q+Y7/PAROfOcT3rKLSUyFS6D/PGfbq/P8GbJIAImSGBhBs4GgawtR7+hIpjsQ2dWEXwzdWGFkvmWyai6SUkclBYJkQYd0VyQb61w== david.pye@GDS10381"
-
-  create_production_bastion_key = 0
-
-  govwifi_key_name     = var.ssh_key_name
-  govwifi_key_name_pub = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4q8NhyH2wtEj8CiqOn+4OFgrB6wZgdzB/qjEh1t7ATQwgkFii0vtsJIzTfOVyxLr0rF79TQCdy7RcVidnZJOoa6QYJRDUx61f2bSacDsiI04/6QSAzqYe0x12fDoRMZqU6GWN1tRY3HYGdLCSMo8QaYonpdiyuS2q+gzFl1V1pk2c3/VT0KhZMWPV1qh6y6uCV13CkiFEgRpqhWTxfagv38lCRFvgJVmNxXtwBME8lqAs7DRoxfD5WZ4oGWO+wCaw+3QgD6gGDMUxpLk1CtL0BVpZ73OGB1XW2atTf2Ugma1jLMvP5IIrEDhMfOEX4iFexRVZBTqIqmsFaHjTH6BRp0J5FJ4suDVIv9eMblgZEGomDmP/T3ZIUq+96Z5BcOLpW1dEdCswbXtzuw7F+hIceSbnYMefSJ/8mhjxTcvBrJK4pv/BKEx/1UBOYtcwu3PZ52oiQaFFxElJiFTa/SUTLAks50e90o7kIZo2z4eal2e5mvWLSNwjA5kCniATfTs= govwifi-developers@digital.cabinet-office.gov.uk"
+  govwifi_bastion_key_name = "govwifi-development-bastion-20250922"
+  govwifi_bastion_key_pub  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFgOGlHTZTKAnwIC+/NOqfjZayz2v0h2mdSd9BXPkMrbWxoZQ9KBalxI4GlL8xItEQ3VMaVCM4SUx0+V7XMlBLFjG8hLneiHjnMFZqqvTJIVOjp3nreydWzRTcU6KxHCis/k5GUs85dQjtwrVp7QEfEvRNEaXmNf725MBO20GOMWOWbi30HNmMHTL1o3eZA876qPWcfigOQXX1auy+y4xnM4s0loMCksG+m3iaV4qr1WvEQxTvghXXZPhNWsBTxE4QGqX2S/OctpNHn7ycU7q/Oha+1dCEB/MfMhoE7a0qEDcPLWESwsbN6IcgAqdhq1GxEytadGenen1JGRBKEgwmK6wbY2o0e4XOyrCgZViv1l/oSaP7OT566dEikw6lo0spps8OO/LXZdIX0KfjlL64H92yyjaVQ4a7SzCPCiOQM40oNi1rSvZKMIW5vr4m3dxZOpQhkMXCoHtehggNduDvVGMMoFinFH+LQD3d4glGyqZ7g0tGUnL/H7bjs9MkdCPzCaNS+pe4rjU4Z2cqofbYwxObe1D9rzVrS10MtlmH9OvM/y5A5ympsWjFR7RChPtr1VgH7gOSHa30WSxA7c8m5xaynijl6uwvbeOgy7smMnJb82KlqfMeU8hWNlFo/xM6KVyu3QbPFVOIpSXr0C9vaGa0r09QYRYfxnZwTq8/IQ== govwifi-developers@digital.cabinet-office.gov.uk"
 
 }
 
@@ -190,28 +185,30 @@ module "dublin_frontend" {
     aws.us_east_1 = aws.us_east_1
   }
 
-  source         = "../../govwifi-frontend"
-  env_name       = local.env_name
-  env_subdomain  = local.env_subdomain
-  env            = local.env
   aws_account_id = local.aws_account_id
-  log_retention  = local.log_retention
+
+  source        = "../../govwifi-frontend"
+  env_name      = local.env_name
+  env_subdomain = local.env_subdomain
+  env           = local.env
+  log_retention = local.log_retention
+
 
   # AWS VPC setup -----------------------------------------
   aws_region         = local.dublin_aws_region
   aws_region_name    = local.dublin_aws_region_name
   route53_zone_id    = data.aws_route53_zone.main.zone_id
   vpc_cidr_block     = local.dublin_frontend_vpc_cidr_block
-  rack_env           = "alpaca"
-  sentry_current_env = local.env
+  rack_env           = "development"
+  sentry_current_env = "development"
 
   backend_vpc_id = module.dublin_backend.backend_vpc_id
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3
   radius_task_count          = 3
-  radius_task_count_max       = 3
-  radius_task_count_min       = 3
+  radius_task_count_max      = 3
+  radius_task_count_min      = 3
   enable_detailed_monitoring = false
 
   # eg. dns records are generated for radius(N).x.service.gov.uk
@@ -222,12 +219,12 @@ module "dublin_frontend" {
   ssh_key_name = var.ssh_key_name
 
   frontend_docker_image = format(
-    "%s/frontend:alpaca",
+    "%s/frontend:development",
     replace(local.docker_image_path, local.london_aws_region, local.dublin_aws_region)
   )
 
   raddb_docker_image = format(
-    "%s/raddb:alpaca",
+    "%s/raddb:development",
     replace(local.docker_image_path, local.london_aws_region, local.dublin_aws_region)
   )
 
@@ -261,8 +258,8 @@ module "dublin_api" {
   }
 
   source        = "../../govwifi-api"
-  env           = local.env
-  env_name      = local.env_name
+  env           = "development"
+  env_name      = "development"
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
@@ -298,9 +295,9 @@ module "dublin_api" {
   ## TODO This should depend on the resource
   user_rr_hostname = "users-rr.${lower(local.dublin_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
-  rack_env                = "alpaca"
-  app_env                 = local.env
-  sentry_current_env      = local.env
+  rack_env                = "staging"
+  app_env                 = "development"
+  sentry_current_env      = "development"
   radius_server_ips       = local.frontend_radius_ips
   subnet_ids              = module.dublin_backend.backend_subnet_ids
   private_subnet_ids      = module.dublin_backend.backend_private_subnet_ids
@@ -328,6 +325,7 @@ module "dublin_prometheus" {
   aws_account_id  = local.aws_account_id
   log_retention   = local.log_retention
 
+
   ssh_key_name = var.ssh_key_name
 
   frontend_vpc_id = module.dublin_frontend.frontend_vpc_id
@@ -346,7 +344,7 @@ module "dublin_route53_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-dublin"
+  topic_name = "govwifi-development-dublin"
   emails     = [var.notification_email]
 }
 
@@ -357,7 +355,7 @@ module "dublin_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-dublin-capacity"
+  topic_name = "govwifi-development-dublin-capacity"
   emails     = [var.notification_email]
 }
 
@@ -368,7 +366,7 @@ module "dublin_critical_notifications" {
 
   source = "../../sns-notification"
 
-  topic_name = "govwifi-alpaca-dublin-critical"
+  topic_name = "govwifi-development-dublin-critical"
   emails     = [var.notification_email]
 }
 
@@ -381,9 +379,13 @@ module "dublin_govwifi-ecs-update-service" {
 
   deployed_app_names = ["authentication-api"]
 
-  env_name = local.env_name
+  env_name = "development"
 
   aws_account_id = local.aws_account_id
+
+  depends_on = [
+    module.london_smoke_tests
+  ]
 }
 
 module "dublin_sync_certs" {
