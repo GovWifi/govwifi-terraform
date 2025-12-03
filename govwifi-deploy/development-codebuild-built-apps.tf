@@ -1,6 +1,6 @@
-resource "aws_codebuild_project" "govwifi_codebuild_built_app" {
+resource "aws_codebuild_project" "development_govwifi_codebuild_built_app" {
   for_each       = toset(var.built_app_names)
-  name           = "${each.key}-push-docker-image-to-staging-ECR"
+  name           = "${each.key}-push-docker-image-to-development-ECR"
   description    = "This project builds the ${each.key} image and pushes it to ECR"
   build_timeout  = "20"
   service_role   = aws_iam_role.govwifi_codebuild.arn
@@ -33,13 +33,13 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app" {
     }
 
     environment_variable {
-      name  = "ACCEPTANCE_TESTS_PROJECT_NAME"
-      value = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
+      name  = "STAGE"
+      value = "development"
     }
 
     environment_variable {
-      name  = "STAGE"
-      value = "staging"
+      name  = "ACCEPTANCE_TESTS_PROJECT_NAME"
+      value = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
     }
 
     environment_variable {
@@ -69,21 +69,4 @@ resource "aws_codebuild_project" "govwifi_codebuild_built_app" {
     }
   }
 
-}
-
-resource "aws_codebuild_webhook" "govwifi_built_app_webhook_staging" {
-  for_each     = toset(var.built_app_names)
-  project_name = "${each.key}-push-docker-image-to-staging-ECR"
-
-  build_type = "BUILD"
-
-  filter_group {
-    filter {
-      type    = "EVENT"
-      pattern = "PULL_REQUEST_MERGED"
-    }
-  }
-  depends_on = [
-    aws_codebuild_project.govwifi_codebuild_built_app
-  ]
 }

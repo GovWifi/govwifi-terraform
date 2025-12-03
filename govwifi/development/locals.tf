@@ -1,10 +1,10 @@
 locals {
-  env_name      = "staging"
-  env_subdomain = "staging.wifi" # Environment specific subdomain to use under the service domain
-  env           = "staging"
+  env_name      = "development"
+  env_subdomain = "development.wifi" # Environment specific subdomain to use under the service domain
+  env           = "development"
   product_name  = "GovWifi"
 
-  backup_mysql_rds         = true
+  backup_mysql_rds         = false
   log_retention            = 30
   recovery_backups_enabled = false
 }

@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+REPO_ROOT := $(shell pwd)
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 check-env:
@@ -14,6 +15,9 @@ staging:
 alpaca:
 	$(eval export DEPLOY_ENV=alpaca)
 	$(eval export REPO=alpaca)
+development:
+	$(eval export DEPLOY_ENV=development)
+	$(eval export REPO=development)
 wifi-london:
 	$(eval export DEPLOY_ENV=wifi-london)
 	$(eval export REPO=latest)
@@ -34,8 +38,9 @@ apply_task: check-env
 apply: check-env unencrypt-secrets apply_task delete-secrets ## Run terraform apply after decrypting secrets. Must run in form make <env> apply
 .PHONY: terraform
 terraform_task: check-env
-terraform: check-env unencrypt-secrets delete-secrets
-	scripts/run-terraform.sh ${terraform_cmd}
+terraform: check-env unencrypt-secrets
+	# clean up after a job and remove the secrets, don't leave them behind
+	scripts/run-terraform.sh ${terraform_cmd} || true ; $(MAKE) delete-secrets
 terraform_target: check-env unencrypt-secrets
 	scripts/run-terraform.sh ${terraform_cmd}; scripts/unencrypt-secrets.sh delete-secrets
 destroy_task: check-env
@@ -56,9 +61,16 @@ format: format-terraform
 
 .PHONY: lint-terraform
 lint-terraform:
+# set to error for now, but we should consider warning later
 	terraform fmt -recursive -diff -check .
-	find . -maxdepth 2 -name "*.tf" -printf "%h\n" | grep -v govwifi-account | uniq | xargs --verbose -i tflint {}
-	find govwifi -maxdepth 2 -name "*.tf" -printf "%h\n" | uniq | xargs --verbose -i tflint {}
+	find . -maxdepth 3 \
+		-path './.terraform' -prune -o \
+		-path './tools' -prune -o \
+		-name "*.tf" -printf "%h\n" | uniq | xargs --verbose -i tflint \
+		--minimum-failure-severity=error \
+		--config $(REPO_ROOT)/.tflint.hcl \
+		--chdir {}
+
 
 .PHONY: format-terraform
 format-terraform:

@@ -2,7 +2,7 @@ resource "aws_codebuild_project" "smoke_tests" {
   name          = "govwifi-smoke-tests"
   description   = "This project runs the govwifi tests at regular intervals"
   build_timeout = "15"
-  service_role  = aws_iam_role.govwifi_codebuild.arn
+  service_role  = var.govwifi_codebuild_role_arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -28,59 +28,69 @@ resource "aws_codebuild_project" "smoke_tests" {
 
     environment_variable {
       name  = "DOCKER_HUB_AUTHTOKEN_ENV"
-      value = data.aws_secretsmanager_secret_version.docker_hub_authtoken.secret_string
+      value = "deploy/docker_hub_authtoken"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "DOCKER_HUB_USERNAME_ENV"
-      value = data.aws_secretsmanager_secret_version.docker_hub_username.secret_string
+      value = "deploy/docker_hub_username"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_USER"
-      value = data.aws_secretsmanager_secret_version.gw_user.secret_string
+      value = "deploy/gw_user"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_PASS"
-      value = data.aws_secretsmanager_secret_version.gw_pass.secret_string
+      value = "deploy/gw_pass"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_2FA_SECRET"
-      value = data.aws_secretsmanager_secret_version.gw_2fa_secret.secret_string
+      value = "deploy/gw_2fa_secret"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_SUPER_ADMIN_USER"
-      value = data.aws_secretsmanager_secret_version.gw_super_admin_user.secret_string
+      value = "deploy/gw_super_admin_user"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_SUPER_ADMIN_PASS"
-      value = data.aws_secretsmanager_secret_version.gw_super_admin_pass.secret_string
+      value = "deploy/gw_super_admin_pass"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GW_SUPER_ADMIN_2FA_SECRET"
-      value = data.aws_secretsmanager_secret_version.gw_super_admin_2fa_secret.secret_string
+      value = "deploy/gw_super_admin_2fa_secret"
+      type  = "SECRETS_MANAGER"
     }
 
 
     environment_variable {
       name  = "GOOGLE_API_CREDENTIALS"
-      value = data.aws_secretsmanager_secret_version.google_api_credentials.secret_string
+      value = "deploy/google_api_credentials"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "GOOGLE_API_TOKEN_DATA"
-      value = data.aws_secretsmanager_secret_version.google_api_token_data.secret_string
+      value = "deploy/google_api_token_data"
+      type  = "SECRETS_MANAGER"
     }
-
 
     environment_variable {
       name  = "RADIUS_KEY"
-      value = data.aws_secretsmanager_secret_version.radius_key.secret_string
+      value = "deploy/radius_key"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
@@ -110,7 +120,8 @@ resource "aws_codebuild_project" "smoke_tests" {
 
     environment_variable {
       name  = "NOTIFY_SMOKETEST_API_KEY"
-      value = data.aws_secretsmanager_secret_version.notify_smoketest_api_key.secret_string
+      value = "smoketests/notify_smoketest_api_key"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
@@ -120,17 +131,30 @@ resource "aws_codebuild_project" "smoke_tests" {
 
     environment_variable {
       name  = "EAP_TLS_CLIENT_CERT"
-      value = data.aws_secretsmanager_secret_version.eap_tls_client_cert.secret_string
+      value = "smoke_tests/certificates/public"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "EAP_TLS_CLIENT_KEY"
-      value = data.aws_secretsmanager_secret_version.eap_tls_client_key.secret_string
+      value = "smoke_tests/certificates/private"
+      type  = "SECRETS_MANAGER"
     }
 
     environment_variable {
       name  = "ENVIRONMENT"
       value = var.environment
+    }
+
+    environment_variable {
+      name  = "TOOLS_ACCOUNT_ID"
+      value = "tools/AccountID"
+      type  = "SECRETS_MANAGER"
+    }
+
+    environment_variable {
+      name  = "APP_NAME"
+      value = "smoke-tests"
     }
 
   }
@@ -174,7 +198,7 @@ resource "aws_cloudwatch_event_target" "trigger_smoke_tests" {
   rule = aws_cloudwatch_event_rule.smoke_tests_schedule_rule.name
   arn  = aws_codebuild_project.smoke_tests.id
 
-  role_arn = aws_iam_role.govwifi_codebuild.arn
+  role_arn = var.govwifi_codebuild_role_arn
 }
 
 # Enable scheduled smoke tests in production environment only

@@ -90,33 +90,33 @@ resource "aws_s3_bucket_public_access_block" "accesslogs_bucket" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_replication_configuration" "accesslogs_bucket" {
-  depends_on = [
-    aws_s3_bucket_versioning.accesslogs_bucket
-  ]
-
-  bucket = aws_s3_bucket.accesslogs_bucket.id
-  role   = aws_iam_role.accesslogs_replication.arn
-
-  rule {
-    id = "${lower(var.aws_region_name)}-to-${lower(var.backup_region_name)}-accesslogs-backup"
-
-    filter {
-      prefix = "${lower(var.aws_region_name)}-accesslogs-backup"
-    }
-
-    destination {
-      bucket        = "arn:aws:s3:::${lower(var.product_name)}-${lower(var.env_name)}-${lower(var.backup_region_name)}-accesslogs"
-      storage_class = "STANDARD"
-    }
-
-    delete_marker_replication {
-      status = "Enabled"
-    }
-
-    status = "Enabled"
-  }
-}
+# resource "aws_s3_bucket_replication_configuration" "accesslogs_bucket" {
+#   depends_on = [
+#     aws_s3_bucket_versioning.accesslogs_bucket
+#   ]
+#
+#   bucket = aws_s3_bucket.accesslogs_bucket.id
+#   role   = aws_iam_role.accesslogs_replication.arn
+#
+#   rule {
+#     id = "${lower(var.aws_region_name)}-to-${lower(var.backup_region_name)}-accesslogs-backup"
+#
+#     filter {
+#       prefix = "${lower(var.aws_region_name)}-accesslogs-backup"
+#     }
+#
+#     destination {
+#       bucket        = "arn:aws:s3:::${lower(var.product_name)}-${lower(var.env_name)}-${lower(var.backup_region_name)}-accesslogs"
+#       storage_class = "STANDARD"
+#     }
+#
+#     delete_marker_replication {
+#       status = "Enabled"
+#     }
+#
+#     status = "Enabled"
+#   }
+# }
 
 resource "aws_s3_bucket_ownership_controls" "accesslogs_bucket" {
   bucket = aws_s3_bucket.accesslogs_bucket.id
