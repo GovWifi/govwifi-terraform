@@ -7,7 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_hosts_warning" {
   namespace           = "AWS/NetworkELB"
   period              = 60
   statistic           = "Maximum"
-  threshold           = var.radius_task_count/2
+  threshold           = var.radius_task_count / 2
   datapoints_to_alarm = 1
 
   dimensions = {
