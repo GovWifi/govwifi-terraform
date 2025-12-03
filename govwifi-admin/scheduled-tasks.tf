@@ -55,14 +55,6 @@ DOC
 }
 
 # rake cleanup:orphans
-
-resource "aws_cloudwatch_event_rule" "daily_cleanup_data" {
-  name                = "${var.env_name}-daily-cleanup-data"
-  description         = "Triggers daily 03:15 UTC"
-  schedule_expression = "cron(15 3 * * ? *)"
-  state               = "ENABLED"
-}
-
 resource "aws_cloudwatch_event_target" "cleanup_orphan_admin_users" {
   target_id = "${var.env_name}-cleanup-orphan-admin-users"
   arn       = aws_ecs_cluster.admin_cluster.arn
@@ -88,15 +80,15 @@ resource "aws_cloudwatch_event_target" "cleanup_orphan_admin_users" {
   }
 
   input = <<EOF
-{
-  "containerOverrides": [
-    {
-      "name": "admin",
-      "command": ["bundle", "exec", "rake", "cleanup:orphans"]
-    }
-  ]
-}
-EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "cleanup:orphans"]
+      }
+    ]
+  }
+  EOF
 
 }
 
@@ -125,26 +117,19 @@ resource "aws_cloudwatch_event_target" "cleanup_unconfirmed_users" {
   }
 
   input = <<EOF
-{
-  "containerOverrides": [
-    {
-      "name": "admin",
-      "command": ["bundle", "exec", "rake", "cleanup:unconfirmed"]
-    }
-  ]
-}
-EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "cleanup:unconfirmed"]
+      }
+    ]
+  }
+  EOF
 
 }
 
 # rake cleanup:organisation_usage
-
-resource "aws_cloudwatch_event_rule" "daily_median_metrics" {
-  name                = "${var.env_name}-daily-median-metrics"
-  description         = "Triggers daily 05:15 UTC"
-  schedule_expression = "cron(15 5 * * ? *)"
-  state               = "ENABLED"
-}
 
 resource "aws_cloudwatch_event_target" "daily_median_metrics" {
   target_id = "${var.env_name}-daily-median-metrics"
@@ -171,26 +156,19 @@ resource "aws_cloudwatch_event_target" "daily_median_metrics" {
   }
 
   input = <<EOF
- {
-   "containerOverrides": [
-     {
-       "name": "admin",
-       "command": ["bundle", "exec", "rake", "opensearch:publish_metrics"]
-     }
-   ]
- }
- EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "opensearch:publish_metrics"]
+      }
+    ]
+  }
+  EOF
 
 }
 
 # rake backup:service_emails
-
-resource "aws_cloudwatch_event_rule" "daily_backup_service_emails" {
-  name                = "${var.env_name}-daily-backup-service-emails"
-  description         = "Triggers daily 03:30 UTC"
-  schedule_expression = "cron(30 3 * * ? *)"
-  state               = "ENABLED"
-}
 
 resource "aws_cloudwatch_event_target" "admin_backup_service_emails" {
   target_id = "${var.env_name}-admin-backup-service-emails"
@@ -217,23 +195,16 @@ resource "aws_cloudwatch_event_target" "admin_backup_service_emails" {
   }
 
   input = <<EOF
-{
-  "containerOverrides": [
-    {
-      "name": "admin",
-      "command": ["bundle", "exec", "rake", "backup:service_emails"]
-    }
-  ]
-}
-EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "backup:service_emails"]
+      }
+    ]
+  }
+  EOF
 
-}
-
-resource "aws_cloudwatch_event_rule" "daily_export_certificates" {
-  name                = "${var.env_name}-daily-export-certificates"
-  description         = "Triggers daily 22:00 UTC"
-  schedule_expression = "cron(00 22 * * ? *)"
-  state               = "ENABLED"
 }
 
 resource "aws_cloudwatch_event_target" "export_certificates" {
@@ -261,27 +232,19 @@ resource "aws_cloudwatch_event_target" "export_certificates" {
   }
 
   input = <<EOF
-{
-  "containerOverrides": [
-    {
-      "name": "admin",
-      "command": ["bundle", "exec", "rake", "export_certificates"]
-    }
-  ]
-}
-EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "export_certificates"]
+      }
+    ]
+  }
+  EOF
 
 }
 
 # rake publish_organisation_names
-
-resource "aws_cloudwatch_event_rule" "daily_publish_organisation_names" {
-  name                = "${var.env_name}-daily-publish-organisation-names"
-  description         = "Triggers daily 22:00 UTC"
-  schedule_expression = "cron(00 22 * * ? *)"
-  state               = "ENABLED"
-}
-
 resource "aws_cloudwatch_event_target" "publish_organisation_names" {
   target_id = "${var.env_name}-publish-organisation-names"
   arn       = aws_ecs_cluster.admin_cluster.arn
@@ -307,14 +270,52 @@ resource "aws_cloudwatch_event_target" "publish_organisation_names" {
   }
 
   input = <<EOF
-{
-  "containerOverrides": [
-    {
-      "name": "admin",
-      "command": ["bundle", "exec", "rake", "publish_organisation_names"]
-    }
-  ]
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "publish_organisation_names"]
+      }
+    ]
+  }
+  EOF
+
 }
-EOF
+
+# Resets the GW and Super user creds used in smoke tests
+resource "aws_cloudwatch_event_target" "smoke_test_reset" {
+  target_id = "${var.env_name}-smoke-test-reset"
+  arn       = aws_ecs_cluster.admin_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_smoke_test_reset_event.name
+  role_arn  = aws_iam_role.scheduled_task.arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.admin_task.arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.admin_ec2_in.id],
+        [aws_security_group.admin_ec2_out.id]
+      )
+
+      assign_public_ip = true
+    }
+  }
+
+  input = <<EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "smoke_tests_cleanup"]
+      }
+    ]
+  }
+  EOF
 
 }
