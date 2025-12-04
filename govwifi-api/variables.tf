@@ -52,6 +52,10 @@ variable "safe_restart_enabled" {
 variable "user_db_hostname" {
 }
 
+variable "db_read_replica_hostname" {
+  description = "The read replica hostname to query for statistics from."
+}
+
 variable "user_rr_hostname" {
 }
 
