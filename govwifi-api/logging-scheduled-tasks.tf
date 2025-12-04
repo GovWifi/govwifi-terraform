@@ -400,11 +400,11 @@ resource "aws_ecs_task_definition" "logging_api_scheduled_task" {
           "name": "DB_NAME",
           "value": "govwifi_${var.env_name}"
         },{
-          "name": "DB_READ_REPLICA_HOSTNAME",
-          "value": "${var.db_read_replica_hostname}"
+          "name": "DB_HOSTNAME",
+          "value": "${var.db_hostname}"
         },{
           "name": "DB_READ_REPLICA_HOSTNAME",
-          "value": "${var.db_hostname}"
+          "value": "${var.db_read_replica_hostname}"
         },{
           "name": "USER_DB_NAME",
           "value": "govwifi_${var.env}_users"
