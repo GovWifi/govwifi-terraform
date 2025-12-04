@@ -274,6 +274,10 @@ module "london_api" {
   ecr_repository_count   = 1
 
   db_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # TODO: need a Route53 record for read replica like db-rr.london.wifi.service.gov.uk
+  # See https://788375279931-xinahcdw.us-east-1.console.aws.amazon.com/route53/v2/hostedzones?region=eu-west-2#ListRecordSets/Z1VHGR4MLZLL12
+  # Using the RDS endpoint directly for now:
+  db_read_replica_hostname = "wifi-db-rr.cs3igencwx07.eu-west-2.rds.amazonaws.com"
 
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
