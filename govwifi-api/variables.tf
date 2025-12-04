@@ -58,6 +58,10 @@ variable "user_rr_hostname" {
 variable "db_hostname" {
 }
 
+variable "db_read_replica_hostname" {
+  description = "The read replica hostname to query for statistics from."
+}
+
 variable "rack_env" {
 }
 
