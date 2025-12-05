@@ -1,19 +1,24 @@
 variable "env" {
+  type = string
 }
 
 variable "env_name" {
+  type = string
 }
 
 variable "env_subdomain" {
+  type = string
 }
 
 variable "route53_zone_id" {
 }
 
 variable "aws_region" {
+  type = string
 }
 
 variable "aws_region_name" {
+  type = string
 }
 
 variable "alarm_count" {
@@ -25,6 +30,7 @@ variable "event_rule_count" {
 }
 
 variable "backend_instance_count" {
+  type = number
 }
 
 variable "authentication_api_count" {
@@ -32,24 +38,30 @@ variable "authentication_api_count" {
 }
 
 variable "backend_elb_count" {
+  type = number
 }
 
 variable "aws_account_id" {
+  type = string
 }
 
 variable "user_signup_enabled" {
   default = 1
+  type    = number
 }
 
 variable "logging_enabled" {
   default = 1
+  type    = number
 }
 
 variable "safe_restart_enabled" {
   default = 1
+  type    = number
 }
 
 variable "user_db_hostname" {
+  type = string
 }
 
 variable "db_read_replica_hostname" {
@@ -58,15 +70,19 @@ variable "db_read_replica_hostname" {
 }
 
 variable "user_rr_hostname" {
+  type = string
 }
 
 variable "db_hostname" {
+  type = string
 }
 
 variable "rack_env" {
+  type = string
 }
 
 variable "sentry_current_env" {
+  type = string
 }
 
 variable "radius_server_ips" {
@@ -74,12 +90,15 @@ variable "radius_server_ips" {
 }
 
 variable "critical_notifications_arn" {
+  type = string
 }
 
 variable "capacity_notifications_arn" {
+  type = string
 }
 
 variable "devops_notifications_arn" {
+  type = string
 }
 
 variable "pagerduty_notifications_arn" {
@@ -96,15 +115,19 @@ variable "private_subnet_ids" {
 }
 
 variable "user_signup_docker_image" {
+  type = string
 }
 
 variable "logging_docker_image" {
+  type = string
 }
 
 variable "safe_restart_docker_image" {
+  type = string
 }
 
 variable "backup_rds_to_s3_docker_image" {
+  type = string
 }
 
 variable "ecr_repository_count" {
@@ -123,9 +146,11 @@ variable "wordlist_file_path" {
 }
 
 variable "vpc_id" {
+  type = string
 }
 
 variable "vpc_endpoints_security_group_id" {
+  type = string
 }
 
 variable "admin_app_data_s3_bucket_name" {
@@ -141,6 +166,7 @@ variable "firetext_token" {
 
 variable "user_signup_api_is_public" {
   default = 0
+  type    = number
 }
 
 variable "metrics_bucket_name" {
@@ -167,6 +193,7 @@ variable "low_cpu_threshold" {
 }
 
 variable "rds_mysql_backup_bucket" {
+  type = string
 }
 
 variable "elasticsearch_endpoint" {
@@ -194,6 +221,7 @@ variable "alb_permitted_cidr_blocks" {
 }
 
 variable "app_env" {
+  type = string
 }
 
 variable "smoke_test_ips" {
@@ -202,4 +230,5 @@ variable "smoke_test_ips" {
 }
 
 variable "log_retention" {
+  type = number
 }
