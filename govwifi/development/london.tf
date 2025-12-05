@@ -62,12 +62,12 @@ module "london_backend" {
   administrator_cidrs = var.administrator_cidrs
   frontend_radius_ips = local.frontend_radius_ips
 
-  bastion_instance_type     = "t2.micro"
+  bastion_instance_type     = "t3.micro"
   bastion_ssh_key_name      = "govwifi-development-bastion-20250922"
   enable_bastion_monitoring = false
   aws_account_id            = local.aws_account_id
   db_instance_count         = 1
-  session_db_instance_type  = "db.t3.small"
+  session_db_instance_type  = "db.t3.micro"
   session_db_storage_gb     = 20
   session_db_iops           = null # can't be set for storage < 400 GiB
   session_db_throughput     = null # can't be set for storage < 400 GiB
@@ -76,7 +76,7 @@ module "london_backend" {
   db_maintenance_window     = "sat:01:42-sat:02:12"
   db_backup_window          = "04:42-05:42"
   db_replica_count          = 0
-  rr_instance_type          = "db.t3.small"
+  rr_instance_type          = "db.t3.micro"
   rr_storage_gb             = 20
   # TODO This should happen inside the module
   user_rr_hostname           = "users-rr.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
@@ -89,7 +89,7 @@ module "london_backend" {
   # Passed to application
   # TODO This should happen inside the module
   user_db_hostname      = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
-  user_db_instance_type = "db.t3.small"
+  user_db_instance_type = "db.t3.micro"
   user_db_storage_gb    = 20
 
   prometheus_ip_london  = module.london_prometheus.eip_public_ip
@@ -200,8 +200,8 @@ module "london_admin" {
 
   subnet_ids = module.london_backend.backend_subnet_ids
 
-  db_instance_type         = "db.t3.medium"
-  db_storage_gb            = 120
+  db_instance_type         = "db.t3.micro"
+  db_storage_gb            = 20
   db_backup_retention_days = 1
   db_encrypt_at_rest       = true
   db_maintenance_window    = "sat:00:42-sat:01:12"
