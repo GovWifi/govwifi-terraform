@@ -69,13 +69,15 @@ module "london_backend" {
   db_instance_count         = 1
   session_db_instance_type  = "db.t3.small"
   session_db_storage_gb     = 20
+  session_db_iops           = null # can't be set for storage < 400 GiB
+  session_db_throughput     = null # can't be set for storage < 400 GiB
   db_backup_retention_days  = 1
   db_encrypt_at_rest        = true
   db_maintenance_window     = "sat:01:42-sat:02:12"
   db_backup_window          = "04:42-05:42"
   db_replica_count          = 0
-  rr_instance_type          = "db.t3.large"
-  rr_storage_gb             = 200
+  rr_instance_type          = "db.t3.small"
+  rr_storage_gb             = 20
   # TODO This should happen inside the module
   user_rr_hostname           = "users-rr.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   critical_notifications_arn = module.london_critical_notifications.topic_arn

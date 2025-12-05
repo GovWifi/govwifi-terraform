@@ -117,6 +117,8 @@ module "dublin_backend" {
   db_instance_count        = 0
   session_db_instance_type = ""
   session_db_storage_gb    = 0
+  session_db_iops           = null # can't be set for storage < 400 GiB
+  session_db_throughput     = null # can't be set for storage < 400 GiB
 
   db_replica_count = 0
   rr_instance_type = ""
