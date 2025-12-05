@@ -78,7 +78,7 @@ resource "aws_cloudwatch_metric_alarm" "sessions_db_burst_balance" {
   treat_missing_data = "missing"
 }
 
-# Triggers if the DB instance uses ANY swap space consistently (indicates RAM pressure)
+# Triggers if the DB instance uses excessing swap space consistently (indicates RAM pressure)
 resource "aws_cloudwatch_metric_alarm" "db_swap_usage_alarm" {
   count               = var.db_instance_count
   alarm_name          = "${var.env_name}-sessions-db-SwapUsage-Alert"
@@ -88,7 +88,7 @@ resource "aws_cloudwatch_metric_alarm" "db_swap_usage_alarm" {
   namespace           = "AWS/RDS"
   period              = 60 # 5 minutes total (5 periods * 60 seconds)
   statistic           = "Average"
-  threshold           = 0
+  threshold           = 10485760 # 10 MB
   unit                = "Bytes"
   alarm_description   = "Triggers when the DB instance uses any swap space (memory is insufficient)."
   treat_missing_data  = "notBreaching"

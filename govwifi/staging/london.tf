@@ -98,7 +98,7 @@ module "london_backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 19327342936
+  db_storage_alarm_threshold = 10737418240
 }
 
 module "london_frontend" {
