@@ -273,6 +273,8 @@ module "london_api" {
   ecr_repository_count   = 1
 
   db_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # staging doesn't have a read replica, just use the master:
+  db_read_replica_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
@@ -520,4 +522,3 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
-
