@@ -95,18 +95,6 @@ variable "session_db_storage_gb" {
   type        = number
 }
 
-variable "session_db_iops" {
-  description = "The amount of provisioned IOPS for the session database (only applicable for gp3 storage type)."
-  type        = number
-  default     = 3000
-}
-
-variable "session_db_throughput" {
-  description = "The amount of provisioned throughput in MiB/s for the session database (only applicable for gp3 storage type)."
-  type        = number
-  default     = 125
-}
-
 variable "user_db_storage_gb" {
   type = number
 }

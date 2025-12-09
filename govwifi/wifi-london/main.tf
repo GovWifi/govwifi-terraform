@@ -139,17 +139,14 @@ module "backend" {
   aws_account_id            = local.aws_account_id
   db_instance_count         = 1
   session_db_instance_type  = "db.m5.xlarge"
-  session_db_storage_gb     = 500
-  # New parameters for gp3:
-  session_db_iops            = 5000 # Set your desired guaranteed IOPS (e.g., 5000)
-  session_db_throughput      = 250  # Set your desired throughput in MiB/s (optional, default is 125 MiB/s for 3k IOPS)
+  session_db_storage_gb     = 1000 ## reduce later if we can, we don't use 10% of this
   db_backup_retention_days   = 7
   db_encrypt_at_rest         = true
   db_maintenance_window      = "sun:04:35-sun:05:05"
   db_backup_window           = "03:05-04:05"
   db_replica_count           = 1
   rr_instance_type           = "db.m5.xlarge"
-  rr_storage_gb              = 500
+  rr_storage_gb              = 1000
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
   user_replica_source_db     = "wifi-production-user-db"

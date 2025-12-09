@@ -121,9 +121,7 @@ module "backend" {
 
   db_instance_count        = 0
   session_db_instance_type = "db.m5.xlarge"
-  session_db_storage_gb    = 500
-  session_db_iops          = 0
-  session_db_throughput    = 0
+  session_db_storage_gb    = 1000
   db_backup_retention_days = 7
   db_encrypt_at_rest       = true
   db_maintenance_window    = "sun:02:42-sun:03:12"

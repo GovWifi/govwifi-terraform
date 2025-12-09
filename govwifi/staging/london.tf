@@ -68,8 +68,6 @@ module "london_backend" {
   db_instance_count         = 1
   session_db_instance_type  = "db.t3.small"
   session_db_storage_gb     = 20
-  session_db_iops           = null # can't be set for storage < 400 GiB
-  session_db_throughput     = null # can't be set for storage < 400 GiB
   db_backup_retention_days  = 1
   db_encrypt_at_rest        = true
   db_maintenance_window     = "sat:01:42-sat:02:12"
