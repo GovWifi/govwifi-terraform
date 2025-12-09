@@ -1,7 +1,7 @@
 resource "aws_db_instance" "users_db" {
   count                       = var.db_instance_count
   allocated_storage           = var.user_db_storage_gb
-  storage_type                = "gp2"
+  storage_type                = "gp3"
   engine                      = "mysql"
   engine_version              = "8.0"
   auto_minor_version_upgrade  = true
@@ -47,7 +47,7 @@ resource "aws_db_instance" "users_read_replica" {
   replicate_source_db         = var.user_replica_source_db
   kms_key_id                  = data.aws_kms_key.rds_kms_key.arn
   storage_encrypted           = var.db_encrypt_at_rest
-  storage_type                = "gp2"
+  storage_type                = "gp3"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
   apply_immediately           = true
