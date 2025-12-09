@@ -291,7 +291,8 @@ module "dublin_api" {
   safe_restart_docker_image     = ""
   backup_rds_to_s3_docker_image = ""
 
-  db_hostname = ""
+  db_hostname              = ""
+  db_read_replica_hostname = ""
 
   user_db_hostname = ""
   ## TODO This should depend on the resource
