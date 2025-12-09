@@ -133,13 +133,13 @@ module "backend" {
   administrator_cidrs = var.administrator_cidrs
   frontend_radius_ips = local.frontend_radius_ips
 
-  bastion_instance_type     = "t2.micro"
-  bastion_ssh_key_name      = "govwifi-bastion-key"
-  enable_bastion_monitoring = true
-  aws_account_id            = local.aws_account_id
-  db_instance_count         = 1
-  session_db_instance_type  = "db.m5.xlarge"
-  session_db_storage_gb     = 1000 ## reduce later if we can, we don't use 10% of this
+  bastion_instance_type      = "t2.micro"
+  bastion_ssh_key_name       = "govwifi-bastion-key"
+  enable_bastion_monitoring  = true
+  aws_account_id             = local.aws_account_id
+  db_instance_count          = 1
+  session_db_instance_type   = "db.m5.xlarge"
+  session_db_storage_gb      = 1000 ## reduce later if we can, we don't use 10% of this
   db_backup_retention_days   = 7
   db_encrypt_at_rest         = true
   db_maintenance_window      = "sun:04:35-sun:05:05"

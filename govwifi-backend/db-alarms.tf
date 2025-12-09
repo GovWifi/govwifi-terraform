@@ -88,7 +88,7 @@ resource "aws_cloudwatch_metric_alarm" "db_swap_usage_alarm" {
   namespace           = "AWS/RDS"
   period              = 60 # 5 minutes total (5 periods * 60 seconds)
   statistic           = "Average"
-  threshold           = 10485760 # 10 MB
+  threshold           = 52428800 # 50 MB
   unit                = "Bytes"
   alarm_description   = "Triggers when the DB instance uses any swap space (memory is insufficient)."
   treat_missing_data  = "notBreaching"
