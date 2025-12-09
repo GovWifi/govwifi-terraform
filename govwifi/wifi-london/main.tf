@@ -139,7 +139,7 @@ module "backend" {
   aws_account_id             = local.aws_account_id
   db_instance_count          = 1
   session_db_instance_type   = "db.m5.xlarge"
-  session_db_storage_gb      = 1000
+  session_db_storage_gb      = 1000 ## reduce later if we can, we don't use 10% of this
   db_backup_retention_days   = 7
   db_encrypt_at_rest         = true
   db_maintenance_window      = "sun:04:35-sun:05:05"
@@ -168,7 +168,7 @@ module "backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 32212254720
+  db_storage_alarm_threshold = 268435456000
 }
 
 # London Frontend ======DIFFERENT AWS REGION===================================
