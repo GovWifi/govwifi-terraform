@@ -74,8 +74,8 @@ module "london_backend" {
   db_maintenance_window     = "sat:01:42-sat:02:12"
   db_backup_window          = "04:42-05:42"
   db_replica_count          = 0
-  rr_instance_type          = "db.t3.large"
-  rr_storage_gb             = 200
+  rr_instance_type          = "db.t3.small"
+  rr_storage_gb             = 20
   # TODO This should happen inside the module
   user_rr_hostname           = "users-rr.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   critical_notifications_arn = module.london_critical_notifications.topic_arn
@@ -97,7 +97,7 @@ module "london_backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 19327342936
+  db_storage_alarm_threshold = 10737418240
 }
 
 module "london_frontend" {
@@ -274,6 +274,8 @@ module "london_api" {
   ecr_repository_count   = 1
 
   db_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # development doesn't have a read replica, just use the master:
+  db_read_replica_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"

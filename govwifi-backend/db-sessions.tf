@@ -1,7 +1,7 @@
 resource "aws_db_instance" "db" {
   count                       = var.db_instance_count
   allocated_storage           = var.session_db_storage_gb
-  storage_type                = "gp2"
+  storage_type                = "gp3"
   engine                      = "mysql"
   engine_version              = "8.0"
   auto_minor_version_upgrade  = true
@@ -45,7 +45,7 @@ resource "aws_db_instance" "read_replica" {
   count                       = var.db_replica_count
   allocated_storage           = var.rr_storage_gb
   replicate_source_db         = aws_db_instance.db[0].identifier
-  storage_type                = "gp2"
+  storage_type                = "gp3"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
   apply_immediately           = true

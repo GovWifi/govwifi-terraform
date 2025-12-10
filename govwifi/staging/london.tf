@@ -96,7 +96,7 @@ module "london_backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 19327342936
+  db_storage_alarm_threshold = 10737418240
 }
 
 module "london_frontend" {
@@ -273,6 +273,8 @@ module "london_api" {
   ecr_repository_count   = 1
 
   db_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # staging doesn't have a read replica, just use the master:
+  db_read_replica_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
@@ -520,4 +522,3 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
-

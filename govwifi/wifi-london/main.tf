@@ -139,7 +139,7 @@ module "backend" {
   aws_account_id             = local.aws_account_id
   db_instance_count          = 1
   session_db_instance_type   = "db.m5.xlarge"
-  session_db_storage_gb      = 1000
+  session_db_storage_gb      = 1000 ## reduce later if we can, we don't use 10% of this
   db_backup_retention_days   = 7
   db_encrypt_at_rest         = true
   db_maintenance_window      = "sun:04:35-sun:05:05"
@@ -168,7 +168,7 @@ module "backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 32212254720
+  db_storage_alarm_threshold = 268435456000
 }
 
 # London Frontend ======DIFFERENT AWS REGION===================================
@@ -343,7 +343,11 @@ module "api" {
   wordlist_file_path     = "../wordlist-short"
   ecr_repository_count   = 1
 
-  db_hostname               = "db.${lower(var.aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  db_hostname = "db.${lower(var.aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # TODO: need a Route53 record for read replica like db-rr.london.wifi.service.gov.uk
+  # See https://788375279931-xinahcdw.us-east-1.console.aws.amazon.com/route53/v2/hostedzones?region=eu-west-2#ListRecordSets/Z1VHGR4MLZLL12
+  # Using the RDS endpoint directly for now:
+  db_read_replica_hostname  = "wifi-db-rr.cs3igencwx07.eu-west-2.rds.amazonaws.com"
   rack_env                  = "production"
   app_env                   = local.env
   sentry_current_env        = local.env
