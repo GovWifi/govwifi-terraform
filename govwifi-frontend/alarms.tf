@@ -95,3 +95,22 @@ resource "aws_cloudwatch_metric_alarm" "eap_too_many_sessions_high" {
 }
 
 /* As it's not possible to determine when the error event will be over, the scale down will be a manual codebuild job */
+
+resource "aws_cloudwatch_metric_alarm" "radius_cluster_high_cpu_utilization" {
+  alarm_name          = "${var.env_name}-${var.aws_region_name}-radius-high-cpu-80-percent"
+  alarm_description   = "Triggers when Radius Service average CPU exceeds 80% for 15 minutes across the cluster, indicating high load. Investigate and consider scaling up."
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 3
+  datapoints_to_alarm = 3 # Require all 3 periods to be breaching.
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ECS"
+  period              = 300 # 5 minutes (300 seconds)
+  statistic           = "Average"
+  threshold           = 80 # The 80% CPU threshold
+  treat_missing_data  = "notBreaching"
+  dimensions = {
+    ClusterName = aws_ecs_cluster.frontend_fargate.name
+    ServiceName = aws_ecs_service.load_balanced_frontend_service.name
+  }
+  alarm_actions = [var.critical_notifications_arn]
+}
