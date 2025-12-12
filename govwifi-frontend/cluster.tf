@@ -66,8 +66,8 @@ resource "aws_ecs_task_definition" "radius_task" {
   {
     "name": "frontend-radius",
     "image": "${local.frontend_image_new}",
-    "cpu": 1536,
-    "memory": 2048,
+    "cpu": 1000,
+    "memory": 1500,
     "expanded": true,
     "essential": true,
     "portMappings": [
@@ -200,8 +200,8 @@ resource "aws_ecs_task_definition" "frontend_fargate" {
 
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 1024
-  memory                   = 2048
+  cpu                      = 2048
+  memory                   = 4096
 
   volume {
     name = "raddb-certs"
