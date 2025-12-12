@@ -190,8 +190,8 @@ resource "aws_cloudwatch_metric_alarm" "user_db_connections_high_alarm" {
   statistic           = "Average"
 
   # Set the threshold based on 80% of your instance's max_connections value.
-  # If max_connections for m5-xlarge is 1365, 80% of that is 1092 so set to 1092
-  threshold          = 1092
+  # If max_connections for T3 medium 341, 80% of 341 that is 273 so set to 273
+  threshold          = 273
   unit               = "Count"
   alarm_description  = "Triggers when database connections exceed 80% of the maximum limit. Log into the database to check active connections and queries. If this is exceeded often consider increasing instance size."
   treat_missing_data = "notBreaching"
