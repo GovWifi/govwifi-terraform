@@ -84,11 +84,9 @@ module "london_backend" {
   # Seconds. Set to zero to disable monitoring
   db_monitoring_interval = 60
 
-  # Passed to application
-  # TODO This should happen inside the module
-  user_db_hostname      = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  user_db_hostname      = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk" # Passed to application
   user_db_instance_type = "db.t3.small"
-  user_db_storage_gb    = 20
+  user_db_storage_gb    = 100
 
   prometheus_ip_london  = module.london_prometheus.eip_public_ip
   prometheus_ip_ireland = module.dublin_prometheus.eip_public_ip
