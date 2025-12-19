@@ -57,16 +57,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     id     = "log_lifecycle"
     status = "Enabled"
 
-    # Transition to IA after 90 days
+    # Transition to IA after 30 days
     transition {
-      days          = 90
+      days          = 30
       storage_class = "STANDARD_IA"
-    }
-
-    # Transition to Glacier after 90 days
-    transition {
-      days          = 180
-      storage_class = "GLACIER"
     }
 
     # Delete after 1 year (365 days)

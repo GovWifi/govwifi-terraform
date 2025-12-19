@@ -95,7 +95,7 @@ resource "aws_iam_role_policy" "cloudwatch_logs_firehose_policy" {
           "firehose:PutRecord",
           "firehose:PutRecordBatch"
         ]
-        Resource = "${aws_kinesis_firehose_delivery_stream.cloudwatch_to_s3.arn}"
+        Resource = values(aws_kinesis_firehose_delivery_stream.cloudwatch_to_s3)[*].arn
       }
     ]
   })

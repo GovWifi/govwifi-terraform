@@ -1,3 +1,8 @@
+resource "aws_cloudwatch_log_group" "ecs_frontend_reset" {
+  name = "govwifi-codebuild-ecs-frontend-reset-service-log-group"
+  retention_in_days = 30
+}
+
 resource "aws_codebuild_project" "ecs_service_radius_frontend_task_reset" {
   name          = "${var.env_name}-${var.aws_region_name}-frontend-radius-task-scale-down"
   description   = "After a scale up event, use this Codebuild Job to reset the desired tasks back to desired levels"
@@ -39,7 +44,7 @@ resource "aws_codebuild_project" "ecs_service_radius_frontend_task_reset" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = "govwifi-codebuild-ecs-frontend-reset-service-log-group"
+      group_name  = aws_cloudwatch_log_group.ecs_frontend_reset.name
       stream_name = "govwifi-codebuild-ecs-frontend-reset-service-log-stream"
     }
 

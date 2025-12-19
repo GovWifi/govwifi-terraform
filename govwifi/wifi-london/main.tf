@@ -508,6 +508,7 @@ module "govwifi_grafana" {
     var.prometheus_ip_ireland
   ]
   vpc_be_cidr_block = local.london_backend_vpc_cidr_block
+  log_retention   = local.log_retention
 }
 
 module "govwifi_slack_alerts" {

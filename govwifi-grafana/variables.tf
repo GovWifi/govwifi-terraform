@@ -76,7 +76,13 @@ variable "capacity_notifications_arn" {
 }
 
 variable "aws_account_id" {
+  type = string
 }
 
 variable "vpc_be_cidr_block" {
+  type = string
+}
+
+variable "log_retention" {
+  type = number
 }
