@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "canary_tests" {
-  name = "govwifi-canary-tests-group"
+  name              = "govwifi-canary-tests-group"
   retention_in_days = 90
 }
 

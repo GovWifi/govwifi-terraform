@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "log_archive_bucket" {
-  bucket = "govwifi-${var.env_name}-log-archive"
+  bucket        = "govwifi-${var.env_name}-log-archive"
   force_destroy = true
 
   tags = {

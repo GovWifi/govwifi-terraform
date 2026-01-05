@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "ecs_frontend_reset" {
-  name = "govwifi-codebuild-ecs-frontend-reset-service-log-group"
+  name              = "govwifi-codebuild-ecs-frontend-reset-service-log-group"
   retention_in_days = 30
 }
 
@@ -53,7 +53,7 @@ resource "aws_codebuild_project" "ecs_service_radius_frontend_task_reset" {
     }
   }
   tags = {
-    Purpose     = "manual-ecs-radius-scale-down"
+    Purpose = "manual-ecs-radius-scale-down"
   }
 
 }

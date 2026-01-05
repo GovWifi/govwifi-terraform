@@ -27,7 +27,7 @@ resource "aws_cloudwatch_log_group" "firehose_error_log_group" {
   retention_in_days = var.log_retention
 
   tags = {
-    Name        = "Firehose Error Logs"
+    Name = "Firehose Error Logs"
   }
 }
 
@@ -43,7 +43,7 @@ resource "aws_cloudwatch_log_subscription_filter" "log_subscription" {
 
   name            = "${each.key}-firehose-subscription"
   log_group_name  = each.value
-  filter_pattern  = ""  # Empty pattern means all logs
+  filter_pattern  = "" # Empty pattern means all logs
   destination_arn = aws_kinesis_firehose_delivery_stream.cloudwatch_to_s3[each.key].arn
   role_arn        = aws_iam_role.logs_to_firehose_role.arn
 

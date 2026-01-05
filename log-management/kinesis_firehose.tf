@@ -15,9 +15,9 @@ resource "aws_kinesis_firehose_delivery_stream" "cloudwatch_to_s3" {
     error_output_prefix = "errors/${each.key}/!{firehose:error-output-type}/!{timestamp:yyyy}/!{timestamp:MM}/!{timestamp:dd}/"
 
     # Buffering hints for delivery to S3 (5 MB or 5 minutes)
-    buffering_size      = 5
-    buffering_interval  = 300
-    compression_format  = "GZIP"
+    buffering_size     = 5
+    buffering_interval = 300
+    compression_format = "GZIP"
 
     # DISABLE Dynamic Partitioning
     dynamic_partitioning_configuration {

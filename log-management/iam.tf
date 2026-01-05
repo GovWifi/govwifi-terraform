@@ -16,7 +16,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
   })
 
   tags = {
-    Name        = "Firehose Delivery Role"
+    Name = "Firehose Delivery Role"
   }
 }
 
@@ -75,7 +75,7 @@ resource "aws_iam_role" "logs_to_firehose_role" {
   })
 
   tags = {
-    Name        = "CloudWatch Logs Firehose Role"
+    Name = "CloudWatch Logs Firehose Role"
   }
 }
 

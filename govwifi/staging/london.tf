@@ -423,7 +423,7 @@ module "london_grafana" {
   ]
   aws_account_id    = local.aws_account_id
   vpc_be_cidr_block = local.london_backend_vpc_cidr_block
-  log_retention   = local.log_retention
+  log_retention     = local.log_retention
 }
 
 module "london_govwifi-ecs-update-service" {

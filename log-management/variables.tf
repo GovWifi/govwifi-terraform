@@ -1,25 +1,25 @@
 variable "env" {
-    type = string
+  type = string
 }
 
 variable "env_name" {
-    type = string
+  type = string
 }
 
 variable "region" {
-    type = string
+  type = string
 }
 
 variable "region_name" {
-    type = string
+  type = string
 }
 
 variable "aws_account_id" {
-    type = string
+  type = string
 }
 
 variable "log_retention" {
-    type    = number
-    default = 30
+  type    = number
+  default = 30
 }
 
