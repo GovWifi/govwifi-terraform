@@ -47,13 +47,14 @@ resource "aws_kinesis_firehose_delivery_stream" "cloudwatch_to_s3" {
       }
 
       # Step 3. Add Newline Delimiter to each record for proper S3 storage
-      processors {
-        type = "AppendDelimiterToRecord"
-        parameters {
-          parameter_name  = "Delimiter"
-          parameter_value = "\\n"
-        }
-      }
+      # However New line is default and if you add this it will show as an update each and every time!
+      # processors {
+      #   type = "AppendDelimiterToRecord"
+      #   parameters {
+      #     parameter_name  = "Delimiter"
+      #     parameter_value = "\\n"
+      #   }
+      # }
     }
 
     # Enable logging for Firehose delivery errors

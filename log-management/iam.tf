@@ -17,7 +17,6 @@ resource "aws_iam_role" "firehose_delivery_role" {
 
   tags = {
     Name        = "Firehose Delivery Role"
-    Environment = var.env_name
   }
 }
 
@@ -77,7 +76,6 @@ resource "aws_iam_role" "logs_to_firehose_role" {
 
   tags = {
     Name        = "CloudWatch Logs Firehose Role"
-    Environment = var.env_name
   }
 }
 

@@ -18,4 +18,8 @@ variable "aws_account_id" {
     type = string
 }
 
+variable "log_retention" {
+    type    = number
+    default = 30
+}
 

@@ -15,7 +15,7 @@ provider "aws" {
   }
   /* As tags are computed, terraform always thinks have checked, re: issue https://github.com/hashicorp/terraform-provider-aws/issues/18311#issuecomment-1544330448 */
   ignore_tags {
-    keys = ["Environment", "Staging"]
+    keys = ["Environment", "Development"]
   }
 }
 
@@ -564,4 +564,5 @@ module "london_log_management" {
   aws_account_id  = local.aws_account_id
   region          = local.london_aws_region
   region_name     = local.london_aws_region_name
+  log_retention   = local.log_retention
 }

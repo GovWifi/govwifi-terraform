@@ -18,18 +18,16 @@
 
 #   tags = {
 #     Name        = "Firehose Delivery Errors"
-#     Environment = var.env_name
 #   }
 # }
 
 # CloudWatch Log Group for Firehose errors
 resource "aws_cloudwatch_log_group" "firehose_error_log_group" {
   name              = "${var.env_name}-firehose-to-S3-Archive"
-  retention_in_days = 30 ## replace with variable.
+  retention_in_days = var.log_retention
 
   tags = {
     Name        = "Firehose Error Logs"
-    Environment = var.env_name
   }
 }
 

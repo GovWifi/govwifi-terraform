@@ -53,7 +53,6 @@ resource "aws_codebuild_project" "ecs_service_radius_frontend_task_reset" {
     }
   }
   tags = {
-    Environment = var.env_name
     Purpose     = "manual-ecs-radius-scale-down"
   }
 
