@@ -553,16 +553,3 @@ module "london_account_policy" {
 
 }
 
-module "london_log_management" {
-  providers = {
-    aws = aws.london
-  }
-
-  source         = "../../log-management"
-  env            = local.env
-  env_name       = local.env_name
-  aws_account_id = local.aws_account_id
-  region         = local.london_aws_region
-  region_name    = local.london_aws_region_name
-  log_retention  = local.log_retention
-}
