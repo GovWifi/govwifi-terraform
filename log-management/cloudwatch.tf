@@ -1,26 +1,3 @@
-# # CloudWatch Alarms for monitoring
-# resource "aws_cloudwatch_metric_alarm" "firehose_delivery_errors" {
-#   for_each            = local.log_groups
-#   alarm_name          = "${var.env_name}-firehose-delivery-errors"
-#   comparison_operator = "GreaterThanThreshold"
-#   evaluation_periods  = "2"
-#   metric_name         = "DeliveryToS3.Success"
-#   namespace           = "AWS/Kinesis/Firehose"
-#   period              = "300"
-#   statistic           = "Average"
-#   threshold           = "0.95"
-#   alarm_description   = "This metric monitors firehose delivery success rate"
-#   alarm_actions       = [] # Add SNS capacity (notification) topic ARN here for notifications
-
-#   dimensions = {
-#     DeliveryStreamName = aws_kinesis_firehose_delivery_stream.cloudwatch_to_s3[each.key].arn
-#   }
-
-#   tags = {
-#     Name        = "Firehose Delivery Errors"
-#   }
-# }
-
 # CloudWatch Log Group for Firehose errors
 resource "aws_cloudwatch_log_group" "firehose_error_log_group" {
   name              = "${var.env_name}-firehose-to-S3-Archive"
