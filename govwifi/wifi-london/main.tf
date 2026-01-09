@@ -157,9 +157,10 @@ module "backend" {
   # Passed to application
   user_db_hostname      = var.user_db_hostname
   user_rr_hostname      = var.user_rr_hostname
-  user_db_instance_type = "db.t3.medium"
+  user_db_instance_type = "db.m7g.large"
   user_db_storage_gb    = 1000
   user_db_replica_count = 1
+  user_rr_instance_type = "db.m7g.large"
 
   prometheus_ip_london  = var.prometheus_ip_london
   prometheus_ip_ireland = var.prometheus_ip_ireland

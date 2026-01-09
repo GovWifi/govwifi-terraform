@@ -131,6 +131,7 @@ module "backend" {
   user_db_replica_count = 1
   rr_instance_type      = "db.m5.medium"
   rr_storage_gb         = 1000
+  user_rr_instance_type = "db.m7g.large"
 
   critical_notifications_arn = module.dublin_critical_notifications.topic_arn
   capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
