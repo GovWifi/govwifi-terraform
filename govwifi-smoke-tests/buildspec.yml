@@ -2,15 +2,28 @@ version: 0.2
 phases:
   pre_build:
     commands:
+    - |
+      if [ "$USE_MOCK" = "true" ]; then
+        echo "use_mock is true: Starting NotifyPit..."
+        git clone https://github.com/leonaAtkins/notify-pit.git notify-pit
+        cd notify-pit && make serve && cd ..
+        export NOTIFY_BASE_URL=http://localhost:4567
+        # Use host networking to reach the mock on localhost
+        export DOCKER_NETWORK_MODE="--network host"
+      else
+        echo "use_mock is false: Running tests against real Notify API..."
+        export NOTIFY_BASE_URL="https://api.notifications.service.gov.uk"
+        export DOCKER_NETWORK_MODE=""
+      fi
     - echo "Setting up ECR image URI"
     - ECR_IMAGE_URI=$TOOLS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/govwifi/$ENVIRONMENT/$APP_NAME:latest
     - echo "Logging in to ECR"
     - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $TOOLS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
     - echo "Setting up test environment variables"
-    - export TEST_ENV_VARS="-e DOCKER=docker -e GW_SUPER_ADMIN_USER -e GW_SUPER_ADMIN_PASS -e GW_SUPER_ADMIN_2FA_SECRET -e GW_USER -e GW_PASS -e GW_2FA_SECRET -e GOOGLE_API_CREDENTIALS -e GOOGLE_API_TOKEN_DATA -e RADIUS_KEY -e RADIUS_IPS -e SUBDOMAIN -e NOTIFY_SMOKETEST_API_KEY -e NOTIFY_GO_TEMPLATE_ID -e GOVWIFI_PHONE_NUMBER -e SMOKETEST_PHONE_NUMBER -e NOTIFY_FIELD -e EAP_TLS_CLIENT_CERT -e EAP_TLS_CLIENT_KEY -e ENVIRONMENT"
+    - export TEST_ENV_VARS="-e DOCKER=docker -e GW_SUPER_ADMIN_USER -e GW_SUPER_ADMIN_PASS -e GW_SUPER_ADMIN_2FA_SECRET -e GW_USER -e GW_PASS -e GW_2FA_SECRET -e GOOGLE_API_CREDENTIALS -e GOOGLE_API_TOKEN_DATA -e RADIUS_KEY -e RADIUS_IPS -e SUBDOMAIN -e NOTIFY_SMOKETEST_API_KEY -e NOTIFY_BASE_URL -e NOTIFY_GO_TEMPLATE_ID -e GOVWIFI_PHONE_NUMBER -e SMOKETEST_PHONE_NUMBER -e NOTIFY_FIELD -e EAP_TLS_CLIENT_CERT -e EAP_TLS_CLIENT_KEY -e ENVIRONMENT"
   build:
     commands:
     - echo "Pull image from ECR"
     - docker pull $ECR_IMAGE_URI
     - echo "Running smoke tests inside the Docker container"
-    - docker run --rm $TEST_ENV_VARS $ECR_IMAGE_URI bundle exec rspec spec/system
+    - docker run --rm $DOCKER_NETWORK_MODE $TEST_ENV_VARS $ECR_IMAGE_URI bundle exec rspec spec/system
