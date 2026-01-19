@@ -5,11 +5,47 @@ phases:
     - |
       if [ "$USE_MOCK" = "true" ]; then
         echo "use_mock is true: Starting NotifyPit..."
+        echo "Phase 1: Creating Docker Network"
+        docker network create smoke-test-net || echo "Network might already exist, continuing..."
+        # VERIFICATION: If this fails, we know exactly where the issue is
+        docker network inspect smoke-test-net > /dev/null || (echo "CRITICAL: Network smoke-test-net was NOT created!" && exit 1)
+        echo "Phase 2: Pull from NotifyPit GIT Hub"
         git clone https://github.com/leonaAtkins/notify-pit.git notify-pit
-        cd notify-pit && make serve && cd ..
-        export NOTIFY_BASE_URL=http://localhost:4567
-        # Use host networking to reach the mock on localhost
-        export DOCKER_NETWORK_MODE="--network host"
+        cd notify-pit
+        make serve
+        echo "Phase 3: Connecting Container to Network"
+        CONTAINER_ID=$(docker ps -q --filter "label=com.docker.compose.service=notifypit")
+        if [ -z "$CONTAINER_ID" ]; then
+          echo "Error: NotifyPit container not found!"
+          docker compose logs
+          exit 1
+        fi
+        docker network connect smoke-test-net $CONTAINER_ID --alias notifypit
+        echo "Phase 4: Waiting for NotifyPit to respond on notifypit:4567..."
+        TIMEOUT=30
+        echo "Container Health Check"
+        while ! curl -s -f http://localhost:4567/health > /dev/null; do
+          TIMEOUT=$((TIMEOUT-1))
+          if [ $TIMEOUT -le 0 ]; then
+            echo "Timed out waiting for NotifyPit!"
+            docker compose logs
+            exit 1
+          fi
+          printf '.'
+          sleep 5
+        done
+        echo "Container-to-Container Check"
+        # We run a tiny curl container on the SAME network the tests will use
+        docker run --rm --network smoke-test-net curlimages/curl \
+          curl -s -f --connect-timeout 5 http://notifypit:4567/health \
+          || (echo "CRITICAL ERROR: Smoke test network cannot reach 'notifypit' alias!" && exit 1)
+        echo "\n NotifyPit is up!"
+        export NOTIFY_BASE_URL=http://notifypit:4567
+        export DOCKER_NETWORK_MODE="--network smoke-test-net"
+        export NOTIFY_GO_TEMPLATE_ID="go_template_id"
+        echo "Running tests on govwifi-net against $NOTIFY_BASE_URL"
+        cd ..
+        echo "Phase 5: Running Tests"
       else
         echo "use_mock is false: Running tests against real Notify API..."
         export NOTIFY_BASE_URL="https://api.notifications.service.gov.uk"
@@ -27,3 +63,18 @@ phases:
     - docker pull $ECR_IMAGE_URI
     - echo "Running smoke tests inside the Docker container"
     - docker run --rm $DOCKER_NETWORK_MODE $TEST_ENV_VARS $ECR_IMAGE_URI bundle exec rspec spec/system
+  post_build:
+    commands:
+    - |
+      echo "--- 📜 DUMPING NOTIFYPIT LOGS ---"
+      # 1. Find the ID dynamically (just like we did in Phase 3)
+      CONTAINER_ID=$(docker ps -q --filter "label=com.docker.compose.service=notifypit")
+
+      if [ ! -z "$CONTAINER_ID" ]; then
+        echo "Found Container ID: $CONTAINER_ID"
+        docker logs $CONTAINER_ID
+      else
+        echo "⚠️ Could not find a running container for 'notifypit'"
+        # List all containers just in case it crashed and disappeared
+        docker ps -a
+      fi
