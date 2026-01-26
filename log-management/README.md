@@ -61,12 +61,41 @@ You **must** select the following Workgroup in the Athena Console (top-right dro
 > **Why?** This workgroup enforces a **1GB Data Scan Limit** per query. If you write a "lazy" query (like `SELECT * FROM logs`), it will fail instantly before costly charges apply.
 
 ### 📝 Step 2: Write Your Query
-The table is named `production_logs`. You **must** filter by `app_name` and `date_path`.
+There are two tables available for query in Athena:
+
+1. production_logs (Active)
+   * Use for: Dates **AFTER** Jan 2026.
+   * Format: Optimized, clean text logs.
+   * Partitioning: Day-based.
+   * Query Syntax: Uses a single date_path string column.
+```SQL
+WHERE date_path = '2026/01/27'
+```
+
+2. historical_logs (Legacy Archive)
+  * Use for: Dates **BEFORE** Jan 2026.
+  * Format: Raw CloudWatch export (includes Timestamp prefix).
+  * Partitioning: Month-based.
+  * Query Syntax: Uses separate integer columns for year and month.
+
+```SQL
+WHERE year = 2025 AND month = 12
+```
+Note: In Jan 2027, the Historical table will be retired.
+
+You **must** filter by `app_name` and `date_path`.
 
 **Columns:**
+production_logs:
 * `message`: The raw log line text.
 * `app_name`: The short reference name defined in `locals.tf`.
 * `date_path`: The date in format `YYYY/MM/DD`.
+
+historical_logs: The column is named log_data (Timestamp + Text).
+* `log_data`: The log line text in the format of Timestamp + Text
+* `app_name`: The short reference name defined in `locals.tf`.
+* `year` and `month` The date is split over 2 columns year = 2025 and month = 12
+
 
 #### Example: Specific Day
 ```sql
@@ -75,6 +104,16 @@ FROM production_logs
 WHERE app_name = 'admin'
   AND date_path = '2025/12/19'
 LIMIT 100;
+```
+for historical logs that would look like this
+```sql
+SELECT log_data
+FROM historical_logs
+WHERE app_name = 'admin'
+  AND year = 2025
+  AND month = 12
+  -- Scan the log content for the timestamp string
+  AND log_data LIKE '2025-12-19%'
 ```
 
 #### Example: Date Range
@@ -87,7 +126,35 @@ WHERE app_name = 'api-gateway'
 LIMIT 100;
 ```
 
+## Example scanning both Current and historical logs
+```sql
+/* Query 1: NEW Logs (Clean) */
+SELECT
+    date_path AS log_date,
+    app_name,
+    message,
+    'production' AS source
+FROM production_logs
+WHERE message LIKE '%error%'
+  AND date_path > '2025/12/19'
+
+UNION ALL
+
+/* Query 2: OLD Logs (Legacy) */
+SELECT
+    format('%04d/%02d', year, month) AS log_date, -- Approximate date (Month only)
+    app_name,
+    log_data AS message,
+    'historical' AS source
+FROM historical_logs
+WHERE
+  AND year = 2025
+  AND month = 12
+  log_data LIKE '%error%'
+```
+
 > **Note:** If you get an error saying *“Partition constraint violation”* or zero results, check that you included the `app_name` and `date_path` in your `WHERE` clause.
+
 
 ---
 
@@ -103,7 +170,7 @@ When you first add an app to Firehose, S3 will only contain *new* logs. To fill 
 
 Run the provided script locally:
 ```bash
-./scripts/archive_logs.sh <log-group-name> <short-app-name>
+/scripts/log_migration.sh <log-group-name> <short-app-name>
 ```
 
 ### 3. Reducing CloudWatch Costs
@@ -113,4 +180,10 @@ Run the provided script locally:
     ```hcl
     retention_in_days = 90
     ```
+    or, preferably us a module variable
+    ```hcl
+    retention_in_days = var.log_retention
+    ```
+
 3.  Apply the change. This creates the cost savings.
+
