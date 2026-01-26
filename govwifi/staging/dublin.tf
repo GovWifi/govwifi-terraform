@@ -124,7 +124,7 @@ module "dublin_backend" {
 
   user_db_replica_count  = 1
   user_replica_source_db = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-staging-user-db"
-  user_rr_instance_type  = "db.t3.small"
+  user_rr_instance_type  = "db.m7g.large"
 
   # TODO This should happen inside the module
   user_rr_hostname           = "users-rr.${lower(local.dublin_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
@@ -288,7 +288,8 @@ module "dublin_api" {
   safe_restart_docker_image     = ""
   backup_rds_to_s3_docker_image = ""
 
-  db_hostname = ""
+  db_hostname              = ""
+  db_read_replica_hostname = ""
 
   user_db_hostname = ""
   ## TODO This should depend on the resource

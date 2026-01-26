@@ -86,8 +86,8 @@ module "london_backend" {
   # Passed to application
   # TODO This should happen inside the module
   user_db_hostname      = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
-  user_db_instance_type = "db.t3.small"
-  user_db_storage_gb    = 20
+  user_db_instance_type = "db.m7g.large"
+  user_db_storage_gb    = 100
 
   prometheus_ip_london  = module.london_prometheus.eip_public_ip
   prometheus_ip_ireland = module.dublin_prometheus.eip_public_ip
@@ -96,7 +96,7 @@ module "london_backend" {
   backup_mysql_rds         = local.backup_mysql_rds
   recovery_backups_enabled = local.recovery_backups_enabled
 
-  db_storage_alarm_threshold = 19327342936
+  db_storage_alarm_threshold = 10737418240
 }
 
 module "london_frontend" {
@@ -213,12 +213,15 @@ module "london_admin" {
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_notifications.topic_arn
 
-  rds_monitoring_role = module.london_backend.rds_monitoring_role
+  rds_monitoring_role        = module.london_backend.rds_monitoring_role
+  govwifi_codebuild_role_arn = module.london_deployment_roles.govwifi_codebuild_role_arn
 
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips
-  logging_api_search_url     = "https://api-elb.london.${local.env_subdomain}.service.gov.uk:8443/logging/authentication/events/search/"
-  public_google_api_key      = var.public_google_api_key
+  smoke_test_ips             = module.london_tests_vpc.eip_public_ips
+
+  logging_api_search_url = "https://api-elb.london.${local.env_subdomain}.service.gov.uk:8443/logging/authentication/events/search/"
+  public_google_api_key  = var.public_google_api_key
 
   zendesk_api_endpoint = "https://govuk.zendesk.com/api/v2/"
   zendesk_api_user     = var.zendesk_api_user
@@ -270,6 +273,8 @@ module "london_api" {
   ecr_repository_count   = 1
 
   db_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # staging doesn't have a read replica, just use the master:
+  db_read_replica_hostname = "db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
 
   user_db_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
   user_rr_hostname = "users-db.${lower(local.london_aws_region_name)}.${local.env_subdomain}.service.gov.uk"
@@ -517,4 +522,3 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
-

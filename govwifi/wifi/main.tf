@@ -124,13 +124,14 @@ module "backend" {
   session_db_storage_gb    = 1000
   db_backup_retention_days = 7
   db_encrypt_at_rest       = true
-  db_maintenance_window    = "wed:01:42-wed:02:12"
+  db_maintenance_window    = "sun:02:42-sun:03:12"
   db_backup_window         = "04:42-05:42"
 
   db_replica_count      = 0
   user_db_replica_count = 1
   rr_instance_type      = "db.m5.medium"
   rr_storage_gb         = 1000
+  user_rr_instance_type = "db.m7g.large"
 
   critical_notifications_arn = module.dublin_critical_notifications.topic_arn
   capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
@@ -293,7 +294,11 @@ module "api" {
   safe_restart_docker_image     = format("%s/safe-restarter:production", local.docker_image_path)
   backup_rds_to_s3_docker_image = ""
 
-  db_hostname              = "db.${lower(var.aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  db_hostname = "db.${lower(var.aws_region_name)}.${local.env_subdomain}.service.gov.uk"
+  # TODO: need a Route53 record for read replica like db-rr.london.wifi.service.gov.uk
+  # See https://788375279931-xinahcdw.us-east-1.console.aws.amazon.com/route53/v2/hostedzones?region=eu-west-2#ListRecordSets/Z1VHGR4MLZLL12
+  # Using the RDS endpoint directly for now:
+  db_read_replica_hostname = "wifi-db-rr.cs3igencwx07.eu-west-2.rds.amazonaws.com"
   rack_env                 = "production"
   app_env                  = local.env
   sentry_current_env       = local.env

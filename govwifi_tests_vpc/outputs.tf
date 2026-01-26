@@ -23,5 +23,5 @@ output "subnet_public_b_id" {
 }
 
 output "eip_public_ips" {
-  value = [aws_subnet.smoke_tests_public_a.id, aws_subnet.smoke_tests_public_b.id]
+  value = [aws_eip.smoke_tests_a.public_ip, aws_eip.smoke_tests_b.public_ip]
 }
