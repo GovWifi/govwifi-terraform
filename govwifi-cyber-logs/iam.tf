@@ -36,7 +36,7 @@ resource "aws_iam_policy" "cribl_kinesis" {
         "kinesis:GetShardIterator",
         "kinesis:ListShards"
       ]
-      Resource = "*"
+      Resource = aws_kinesis_stream.log_stream.arn
     }]
   })
 }
