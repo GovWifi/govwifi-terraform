@@ -18,11 +18,11 @@ variable "account_access_arns" {
 
 variable "env" {
   type = string
-  description = "The environment to be deployed to (alpaca, staging, prod)"
+  description = "The environment to be deployed to (development, staging, prod)"
 
   validation {
-    condition     = contains(["alpaca", "staging", "prod"], var.env)
-    error_message = "Environment must be one of: alpaca, staging or prod"
+    condition     = contains(["development", "staging", "prod"], var.env)
+    error_message = "Environment must be one of: development, staging or prod"
   }
 }
 
