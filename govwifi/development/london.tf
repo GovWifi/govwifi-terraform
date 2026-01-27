@@ -127,7 +127,7 @@ module "london_frontend" {
   # Instance-specific setup -------------------------------
   radius_instance_count = 3
   radius_task_count     = 3
-  radius_task_count_max = 3
+  radius_task_count_max = 6
   radius_task_count_min = 3
 
   enable_detailed_monitoring = false
@@ -594,4 +594,18 @@ module "london_metrics" {
   tags = {
     Name = "london-metrics-development"
   }
+}
+
+module "london_capacity_testing" {
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../govwifi-capacity-testing"
+
+  env                 = local.env
+  aws_account_id      = local.aws_account_id
+  aws_region          = local.london_aws_region
+  # administrator_cidrs = var.administrator_cidrs
+
 }
