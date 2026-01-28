@@ -15,7 +15,7 @@ provider "aws" {
   }
   /* As tags are computed, terraform always thinks have checked, re: issue https://github.com/hashicorp/terraform-provider-aws/issues/18311#issuecomment-1544330448 */
   ignore_tags {
-    keys = ["Environment", "Staging"]
+    keys = ["Environment", "Development"]
   }
 }
 
@@ -422,6 +422,7 @@ module "london_grafana" {
   ]
   aws_account_id    = local.aws_account_id
   vpc_be_cidr_block = local.london_backend_vpc_cidr_block
+  log_retention     = local.log_retention
 }
 
 module "london_govwifi-ecs-update-service" {
@@ -551,3 +552,4 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
+

@@ -1,3 +1,8 @@
+resource "aws_cloudwatch_log_group" "canary_tests" {
+  name              = "govwifi-canary-tests-group"
+  retention_in_days = 90
+}
+
 resource "aws_codebuild_project" "canary_tests" {
   name          = "govwifi-canary-tests"
   description   = "This project runs the govwifi canary tests at regular intervals"
@@ -85,7 +90,7 @@ resource "aws_codebuild_project" "canary_tests" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = "govwifi-canary-tests-group"
+      group_name  = aws_cloudwatch_log_group.canary_tests.name
       stream_name = "govwifi-canary-tests-stream"
     }
 
