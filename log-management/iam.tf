@@ -1,6 +1,6 @@
 # IAM role for Firehose
 resource "aws_iam_role" "firehose_delivery_role" {
-  name = "${var.env_name}-firehose-delivery-role"
+  name = "${var.env_name}-${var.region_name}-firehose-delivery-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,7 @@ resource "aws_iam_role" "firehose_delivery_role" {
 
 # IAM policy for Firehose to access S3
 resource "aws_iam_role_policy" "firehose_delivery_policy" {
-  name = "${var.env_name}-firehose-delivery-policy"
+  name = "${var.env}-firehose-delivery-policy"
   role = aws_iam_role.firehose_delivery_role.id
 
   policy = jsonencode({
@@ -39,8 +39,8 @@ resource "aws_iam_role_policy" "firehose_delivery_policy" {
           "s3:PutObject"
         ]
         Resource = [
-          "${aws_s3_bucket.log_archive_bucket.arn}",
-          "${aws_s3_bucket.log_archive_bucket.arn}/*"
+          "${local.log_archive_bucket_arn}",
+          "${local.log_archive_bucket_arn}/*"
         ]
       },
       {
@@ -59,7 +59,7 @@ resource "aws_iam_role_policy" "firehose_delivery_policy" {
 
 # IAM role for CloudWatch Logs to access Firehose
 resource "aws_iam_role" "logs_to_firehose_role" {
-  name = "${var.env_name}-cloudwatch-logs-firehose-role"
+  name = "${var.env}-${var.region_name}-cloudwatch-logs-firehose-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -81,7 +81,7 @@ resource "aws_iam_role" "logs_to_firehose_role" {
 
 # IAM policy for CloudWatch Logs to put records to Firehose
 resource "aws_iam_role_policy" "cloudwatch_logs_firehose_policy" {
-  name = "${var.env_name}-cloudwatch-logs-firehose-policy"
+  name = "${var.env}-cloudwatch-logs-firehose-policy"
   role = aws_iam_role.logs_to_firehose_role.id
 
   policy = jsonencode({

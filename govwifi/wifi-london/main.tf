@@ -663,6 +663,6 @@ module "london_log_management" {
   env_name       = local.env_name
   aws_account_id = local.aws_account_id
   region         = var.aws_region
-  region_name    = var.aws_region_name
+  region_name    = lower(var.aws_region_name)
   log_retention  = local.log_retention
 }

@@ -483,3 +483,17 @@ module "govwifi_sync_certs" {
   region_name    = var.aws_region_name
 
 }
+
+module "dublin_log_management" {
+  providers = {
+    aws = aws.main
+  }
+
+  source         = "../../log-management"
+  env            = local.env
+  env_name       = local.env_name
+  aws_account_id = local.aws_account_id
+  region         = var.aws_region
+  region_name    = lower(var.aws_region_name)
+  log_retention  = local.log_retention
+}
