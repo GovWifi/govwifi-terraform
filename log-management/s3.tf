@@ -81,3 +81,44 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     }
   }
 }
+
+#### --- S3 bucket Policy, remove after export ---- ######
+
+# --- BUCKET POLICY (For CloudWatch Export Script) ---
+resource "aws_s3_bucket_policy" "allow_cloudwatch_exports" {
+  # Only create this policy in the Primary Region (London)
+  count = var.region == "eu-est-2" ? 1 : 0
+
+  bucket = aws_s3_bucket.log_archive_bucket[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudWatchLogsExports"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.amazonaws.com"
+        }
+        Action = [
+          "s3:GetBucketAcl",
+          "s3:PutObject"
+        ]
+        Resource = [
+          aws_s3_bucket.log_archive_bucket[0].arn,
+          "${aws_s3_bucket.log_archive_bucket[0].arn}/*"
+        ]
+        Condition = {
+          # Security: Only allow logs from YOUR account ID
+          StringEquals = {
+            "aws:SourceAccount" = var.aws_account_id
+          }
+          # Flexible: Allow logs from ANY region (eu-west-1 or 2) in your account
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:logs:*:${var.aws_account_id}:log-group:*"
+          }
+        }
+      }
+    ]
+  })
+}
