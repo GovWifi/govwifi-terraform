@@ -13,11 +13,11 @@ variable "cribl_worker_arn" {
 variable "account_access_arns" {
   type        = list(string)
   description = "A list of all account ARNs that need to send logs to kinesis stream (note - include the account containing the kinesis stream). The format is (arn:aws:logs:eu-west-2:account_number:*)"
-  default = ["arn:aws:logs:eu-west-2:269352317959:*"]
+  default     = ["arn:aws:logs:eu-west-2:269352317959:*"]
 }
 
 variable "env" {
-  type = string
+  type        = string
   description = "The environment to be deployed to (development, staging, prod)"
 
   validation {
@@ -27,7 +27,7 @@ variable "env" {
 }
 
 variable "region" {
-  type = string
+  type    = string
   default = "eu-west-2"
 }
 

@@ -556,7 +556,7 @@ module "london_account_policy" {
 module "london_admin_portal_cyber_logs" {
   source = "../../govwifi-cyber-logs"
 
-  region = local.london_aws_region
-  env = local.env
+  region              = local.london_aws_region
+  env                 = local.env
   account_access_arns = ["arn:aws:logs:${local.london_aws_region}:${local.aws_account_id}:*"]
 }

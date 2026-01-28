@@ -407,7 +407,7 @@ module "dublin_sync_certs" {
 module "dublin_admin_portal_cyber_logs" {
   source = "../../govwifi-cyber-logs"
 
-  region = local.dublin_aws_region
-  env = local.env
+  region              = local.dublin_aws_region
+  env                 = local.env
   account_access_arns = ["arn:aws:logs:${local.dublin_aws_region}:${local.aws_account_id}:*"]
 }

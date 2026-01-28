@@ -2,8 +2,8 @@ resource "aws_kinesis_stream" "log_stream" {
   name             = "cribl-cloudwatch-kinesis-stream"
   shard_count      = var.shard_count
   retention_period = 24
-  encryption_type = "KMS"
-  kms_key_id = "alias/aws/kinesis"
+  encryption_type  = "KMS"
+  kms_key_id       = "alias/aws/kinesis"
 
   tags = {
     Name = "CloudWatchToKinesis"
@@ -89,6 +89,6 @@ resource "aws_cloudwatch_log_subscription_filter" "cloudwatch_subscription_filte
   log_group_name  = "${var.env}-admin-log-group"
   filter_pattern  = ""
   destination_arn = aws_kinesis_stream.log_stream.arn
-  distribution    = "ByLogStream"      # or "Random"
+  distribution    = "ByLogStream" # or "Random"
   role_arn        = aws_iam_role.logs_kinesis_role.arn
 }
