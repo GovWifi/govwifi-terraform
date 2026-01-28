@@ -20,6 +20,6 @@ locals {
   ## S3 Bucket details for log archive
   ## Bucket created only in London (eu-west-2) for both regions to use, London can reference directly but Dublin needs the ARN.
   log_archive_bucket_name = "govwifi-${var.env}-log-archive"
-  log_archive_bucket_id = var.region == "eu-west-2"  ? aws_s3_bucket.log_archive_bucket[0].id : local.log_archive_bucket_name
-  log_archive_bucket_arn = var.region == "eu-west-2" ? aws_s3_bucket.log_archive_bucket[0].arn : "arn:aws:s3:::${local.log_archive_bucket_name}"
+  log_archive_bucket_id   = var.region == "eu-west-2" ? aws_s3_bucket.log_archive_bucket[0].id : local.log_archive_bucket_name
+  log_archive_bucket_arn  = var.region == "eu-west-2" ? aws_s3_bucket.log_archive_bucket[0].arn : "arn:aws:s3:::${local.log_archive_bucket_name}"
 }

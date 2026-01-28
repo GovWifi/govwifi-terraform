@@ -15,7 +15,7 @@ resource "aws_kinesis_firehose_delivery_stream" "cloudwatch_to_s3" {
     error_output_prefix = "errors/${var.region}/${each.key}/!{firehose:error-output-type}/!{timestamp:yyyy}/!{timestamp:MM}/!{timestamp:dd}/"
 
     # Buffering hints for delivery to S3 (64 MB or 15 minutes)
-    buffering_size     = 64 # 64 MB ensure the files are of reasonable size for compression
+    buffering_size     = 64  # 64 MB ensure the files are of reasonable size for compression
     buffering_interval = 900 # 15 minutes (900 seconds)
     compression_format = "GZIP"
 

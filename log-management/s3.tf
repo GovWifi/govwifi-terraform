@@ -1,6 +1,6 @@
 ## S3 Bucket for log archive, created only in London (eu-west-2)
 resource "aws_s3_bucket" "log_archive_bucket" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count         = var.region == "eu-west-2" ? 1 : 0
   bucket        = local.log_archive_bucket_name
   force_destroy = true
 
@@ -13,7 +13,7 @@ resource "aws_s3_bucket" "log_archive_bucket" {
 
 ## using object_ownership to secure bucket access and disable ACLs
 resource "aws_s3_bucket_ownership_controls" "log_archive_ownership" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
   rule {
     # Set to 'BucketOwnerPreferred' or 'ObjectWriter' to disable ACLs
@@ -24,7 +24,7 @@ resource "aws_s3_bucket_ownership_controls" "log_archive_ownership" {
 
 # S3 Bucket server-side encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket_encryption" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
 
   rule {
@@ -37,7 +37,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket_encryp
 
 ## versioning enable to protect against accidental deletions
 resource "aws_s3_bucket_versioning" "log_archive_bucket_versioning" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
   versioning_configuration {
     status = "Enabled"
@@ -46,7 +46,7 @@ resource "aws_s3_bucket_versioning" "log_archive_bucket_versioning" {
 
 # S3 Bucket public access block
 resource "aws_s3_bucket_public_access_block" "log_bucket_block_public_access" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
 
   block_public_acls       = true
@@ -57,7 +57,7 @@ resource "aws_s3_bucket_public_access_block" "log_bucket_block_public_access" {
 
 # S3 Lifecycle configuration for cost optimization
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
-  count = var.region == "eu-west-2" ? 1 : 0
+  count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
 
   rule {
