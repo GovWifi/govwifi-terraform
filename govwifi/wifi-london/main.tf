@@ -509,6 +509,7 @@ module "govwifi_grafana" {
     var.prometheus_ip_ireland
   ]
   vpc_be_cidr_block = local.london_backend_vpc_cidr_block
+  log_retention     = local.log_retention
 }
 
 module "govwifi_slack_alerts" {
@@ -650,7 +651,18 @@ module "govwifi_docs" {
 
   route53_zone_id            = data.aws_route53_zone.main.zone_id
   critical_notifications_arn = module.route53_critical_notifications.topic_arn
+}
 
+module "london_log_management" {
+  providers = {
+    aws = aws.main
+  }
 
-
+  source         = "../../log-management"
+  env            = local.env
+  env_name       = local.env_name
+  aws_account_id = local.aws_account_id
+  region         = var.aws_region
+  region_name    = lower(var.aws_region_name)
+  log_retention  = local.log_retention
 }
