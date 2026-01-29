@@ -7,7 +7,7 @@ Follow the steps below to create a brand new GovWifi environment:
 Edit, then run the following command from the root of the govwifi-terraform directory to copy all the files you need for a new environment (replace `<NEW-ENV-NAME>` with the name of your new environment e.g. `foo`):
 
 ```
-cp -Rp govwifi/staging govwifi/<NEW-ENV-NAME>
+cp -Rp ./govwifi/staging govwifi/<NEW-ENV-NAME>
 
 ```
 
