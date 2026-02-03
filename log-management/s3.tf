@@ -59,16 +59,10 @@ resource "aws_s3_bucket_public_access_block" "log_bucket_block_public_access" {
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
   count  = var.region == "eu-west-2" ? 1 : 0
   bucket = aws_s3_bucket.log_archive_bucket[0].id
-  # -----------------------------------------------------------
-  # RULE 1: Firehose Logs (Big files, Safe for IA)
-  # -----------------------------------------------------------
   rule {
     id     = "log_lifecycle"
     status = "Enabled"
-    # only for logs folder, as Historical Logs are < 128kb and thus would cost more to store in IA than standard
-    filter {
-      prefix = "logs/"
-    }
+
     # Transition to IA after 30 days
     transition {
       days          = 30
@@ -81,31 +75,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     }
 
     # Clean up incomplete multipart uploads
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-  }
-  # -----------------------------------------------------------
-  # RULE 2: Historical Exports (Small files, Stay in Standard)
-  # files < 128KB cost more in IA than Standard
-  # -----------------------------------------------------------
-  rule {
-    id     = "historical_exports_lifecycle"
-    status = "Enabled"
-
-    filter {
-      prefix = "cloudwatch-export/" # Only applies to the script data
-    }
-
-    # NO TRANSITION block here.
-    # We keep these in 'Standard' to avoid the 128KB minimum charge
-    # because CloudWatch creates thousands of tiny files.
-
-    # Still Delete after 1 year (Compliance)
-    expiration {
-      days = 365
-    }
-
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
