@@ -49,7 +49,8 @@ echo "---------------------------------------------------"
 if [ -n "$SPECIFIC_MONTH" ]; then
   MONTHS_TO_RUN="$SPECIFIC_MONTH"
 else
-  MONTHS_TO_RUN=$(seq -f "%02g" 1 12)
+  #MONTHS_TO_RUN=$(seq -f "%02g" 1 12)
+  MONTHS_TO_RUN=$(seq -f "%02g" 5 12)
 fi
 
 # 6. The Loop
