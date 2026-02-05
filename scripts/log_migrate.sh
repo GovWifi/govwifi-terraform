@@ -31,7 +31,18 @@ YEAR=$5
 SPECIFIC_MONTH=$6 # Optional
 
 # 4. Configuration
-BUCKET="govwifi-production-log-archive"
+#BUCKET="govwifi-production-log-archive"
+
+BUCKET_IRELAND="govwifi-migration-temp-eu-west-1"
+BUCKET_LONDON="govwifi-production-log-archive"
+if [ "$REGION" == "eu-west-1" ]; then
+  BUCKET="$BUCKET_IRELAND"
+elif [ "$REGION" == "eu-west-2" ]; then
+  BUCKET="$BUCKET_LONDON"
+else
+  echo "    ❌ Unsupported region: $REGION"
+  exit 1
+fi
 # Note: Using 'cloudwatch-export'
 DEST_PREFIX_ROOT="cloudwatch-export/$REGION/$APP_NAME/$YEAR"
 
@@ -41,8 +52,9 @@ echo "  Region:        $REGION"
 echo "  Log Group:     $LOG_GROUP_NAME"
 echo "  App Name:      $APP_NAME"
 echo "  Year:          $YEAR"
+echo "  Bucket:        $BUCKET"
 if [ -n "$SPECIFIC_MONTH" ]; then echo "  Month:         $SPECIFIC_MONTH (Single month only)"; fi
-echo "  S3 Destination: s3://$BUCKET/$DEST_PREFIX_ROOT"
+echo "  S3 Dest:       s3://$BUCKET/$DEST_PREFIX_ROOT"
 echo "---------------------------------------------------"
 
 # 5. Determine loop range
@@ -50,7 +62,7 @@ if [ -n "$SPECIFIC_MONTH" ]; then
   MONTHS_TO_RUN="$SPECIFIC_MONTH"
 else
   #MONTHS_TO_RUN=$(seq -f "%02g" 1 12)
-  MONTHS_TO_RUN=$(seq -f "%02g" 5 12)
+  MONTHS_TO_RUN=$(seq -f "%02g" 9 12)
 fi
 
 # 6. The Loop
@@ -67,7 +79,7 @@ for MONTH in $MONTHS_TO_RUN; do
 
   PREFIX="${DEST_PREFIX_ROOT}/${MONTH}"
 
-  echo "➡️  Processing Month $MONTH..."
+  echo "   ➡️ Processing Month $MONTH..."
 
   if [ "$DRY_RUN" = true ]; then
     echo "   [DRY RUN] Would run: aws logs create-export-task --profile $PROFILE --region $REGION --destination-prefix $PREFIX ..."
@@ -98,7 +110,7 @@ for MONTH in $MONTHS_TO_RUN; do
         --output text)
 
       if [ "$STATUS" == "COMPLETED" ]; then
-        echo "   🎉 Month $MONTH Completed."
+        echo -e "\n   🎉 Month $MONTH Completed."
         break
       elif [ "$STATUS" == "FAILED" ] || [ "$STATUS" == "CANCELLED" ]; then
         echo "   ❌ Export failed for $MONTH! Check AWS Console."
