@@ -121,3 +121,48 @@ resource "aws_s3_bucket_policy" "allow_cloudwatch_exports" {
     ]
   })
 }
+# ---------------------------------------------------------
+# TEMP MIGRATION BUCKET (IRELAND)
+# Only needed for the migration, can be destroyed later.
+# ---------------------------------------------------------
+
+resource "aws_s3_bucket" "ireland_temp_bucket" {
+  # If you are using a provider alias for ireland:
+  # provider = aws.ireland
+  count         = var.region == "eu-west-1" ? 1 : 0
+  # Ensure this bucket is created in EU-WEST-1
+  bucket = "govwifi-migration-temp-eu-west-1"
+  force_destroy = true # Allows deleting it later even if it has files
+}
+
+# --- POLICY FOR CLOUDWATCH IRELAND TO WRITE HERE ---
+resource "aws_s3_bucket_policy" "ireland_temp_policy" {
+  # provider = aws.ireland # Uncomment if using alias
+  bucket = aws_s3_bucket.ireland_temp_bucket[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowIrelandCloudWatch"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-1.amazonaws.com" # Specific endpoint for Ireland
+        }
+        Action = [
+          "s3:GetBucketAcl",
+          "s3:PutObject"
+        ]
+        Resource = [
+          aws_s3_bucket.ireland_temp_bucket[0].arn,
+          "${aws_s3_bucket.ireland_temp_bucket[0].arn}/*"
+        ]
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = var.aws_account_id
+          }
+        }
+      }
+    ]
+  })
+}
