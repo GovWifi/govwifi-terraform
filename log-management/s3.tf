@@ -129,9 +129,9 @@ resource "aws_s3_bucket_policy" "allow_cloudwatch_exports" {
 resource "aws_s3_bucket" "ireland_temp_bucket" {
   # If you are using a provider alias for ireland:
   # provider = aws.ireland
-  count         = var.region == "eu-west-1" ? 1 : 0
+  count = var.region == "eu-west-1" ? 1 : 0
   # Ensure this bucket is created in EU-WEST-1
-  bucket = "govwifi-migration-temp-eu-west-1"
+  bucket        = "govwifi-migration-temp-eu-west-1"
   force_destroy = true # Allows deleting it later even if it has files
 }
 
