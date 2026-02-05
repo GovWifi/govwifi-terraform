@@ -135,6 +135,18 @@ resource "aws_s3_bucket" "ireland_temp_bucket" {
   force_destroy = true # Allows deleting it later even if it has files
 }
 
+# S3 Bucket public access block
+resource "aws_s3_bucket_public_access_block" "log_bucket_ireland_block_public_access" {
+  count  = var.region == "eu-west-1" ? 1 : 0
+  bucket = aws_s3_bucket.ireland_temp_bucket[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
 # --- POLICY FOR CLOUDWATCH IRELAND TO WRITE HERE ---
 resource "aws_s3_bucket_policy" "ireland_temp_policy" {
   # provider = aws.ireland # Uncomment if using alias
