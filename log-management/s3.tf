@@ -127,8 +127,6 @@ resource "aws_s3_bucket_policy" "allow_cloudwatch_exports" {
 # ---------------------------------------------------------
 
 resource "aws_s3_bucket" "ireland_temp_bucket" {
-  # If you are using a provider alias for ireland:
-  # provider = aws.ireland
   count = var.region == "eu-west-1" ? 1 : 0
   # Ensure this bucket is created in EU-WEST-1
   bucket        = "govwifi-migration-temp-eu-west-1"
@@ -149,7 +147,7 @@ resource "aws_s3_bucket_public_access_block" "log_bucket_ireland_block_public_ac
 
 # --- POLICY FOR CLOUDWATCH IRELAND TO WRITE HERE ---
 resource "aws_s3_bucket_policy" "ireland_temp_policy" {
-  # provider = aws.ireland # Uncomment if using alias
+  count  = var.region == "eu-west-1" ? 1 : 0
   bucket = aws_s3_bucket.ireland_temp_bucket[0].id
 
   policy = jsonencode({
