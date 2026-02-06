@@ -47,6 +47,16 @@ resource "aws_codebuild_project" "govwifi_codebuild_acceptance_tests" {
       name  = "LOGGING_API_BRANCH"
       value = "master"
     }
+
+    environment_variable {
+      name  = "USER_SIGNUP_API_BRANCH"
+      value = "master"
+    }
+
+    environment_variable {
+      name  = "ADMIN_BRANCH"
+      value = "master"
+    }
   }
 
   source {
