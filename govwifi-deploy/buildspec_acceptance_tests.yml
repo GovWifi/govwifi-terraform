@@ -2,15 +2,17 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-    - echo "Acceptance tests clone repos"
-    - git clone -b $BRANCH https://github.com/GovWifi/govwifi-acceptance-tests.git
-    - git clone -b $FRONTEND_BRANCH https://github.com/govwifi/govwifi-frontend.git govwifi-acceptance-tests/.frontend
-    - git clone -b $AUTH_API_BRANCH https://github.com/govwifi/govwifi-authentication-api.git govwifi-acceptance-tests/.authentication-api
-    - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git govwifi-acceptance-tests/.logging-api
+      - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
+      - echo "Acceptance tests clone repos"
+      - git clone -b $BRANCH https://github.com/GovWifi/govwifi-acceptance-tests.git
+      - git clone -b $FRONTEND_BRANCH https://github.com/govwifi/govwifi-frontend.git govwifi-acceptance-tests/.frontend
+      - git clone -b $AUTH_API_BRANCH https://github.com/govwifi/govwifi-authentication-api.git govwifi-acceptance-tests/.authentication-api
+      - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git govwifi-acceptance-tests/.logging-api
+      - git clone -b $USER_SIGNUP_API_BRANCH https://github.com/govwifi/govwifi-user-signup-api.git .user-signup-api
+      - git clone -b $ADMIN_BRANCH https://github.com/govwifi/govwifi-admin.git .admin
 
   build:
     commands:
-    - echo "Acceptance tests running"
-    - cd govwifi-acceptance-tests
-    - make test-ci
+      - echo "Acceptance tests running"
+      - cd govwifi-acceptance-tests
+      - make test-ci
