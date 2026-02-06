@@ -8,8 +8,8 @@ phases:
       - git clone -b $FRONTEND_BRANCH https://github.com/govwifi/govwifi-frontend.git govwifi-acceptance-tests/.frontend
       - git clone -b $AUTH_API_BRANCH https://github.com/govwifi/govwifi-authentication-api.git govwifi-acceptance-tests/.authentication-api
       - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git govwifi-acceptance-tests/.logging-api
-      - git clone -b $USER_SIGNUP_API_BRANCH https://github.com/govwifi/govwifi-user-signup-api.git .user-signup-api
-      - git clone -b $ADMIN_BRANCH https://github.com/govwifi/govwifi-admin.git .admin
+      - git clone -b $ADMIN_BRANCH https://github.com/govwifi/govwifi-admin.git govwifi-acceptance-tests/.admin
+      - git clone -b $USER_SIGNUP_API_BRANCH https://github.com/govwifi/govwifi-user-signup-api.git govwifi-acceptance-tests/.user-signup-api
 
   build:
     commands:
