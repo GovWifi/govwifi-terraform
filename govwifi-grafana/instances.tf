@@ -3,7 +3,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu-pro-server/images/hvm-ssd/ubuntu-jammy-22.04-amd64-pro-server-20250530"]
+    values = ["ubuntu-pro-server/images/hvm-ssd/ubuntu-jammy-22.04-amd64-pro-server-*"]
   }
 
   filter {
@@ -57,8 +57,7 @@ resource "aws_instance" "grafana_instance" {
 
   lifecycle {
     create_before_destroy = true
-
-    ignore_changes = [volume_tags]
+    ignore_changes        = [volume_tags, ami] ## comment out ami from ignore_changes and run terraform apply to update, then add it back to ignore_changes to prevent future updates when a new AMI is released.
   }
 }
 
