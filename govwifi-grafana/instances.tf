@@ -57,7 +57,7 @@ resource "aws_instance" "grafana_instance" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [volume_tags, ami] ## comment out ami from ignore_changes and run terraform apply to update, then add it back to ignore_changes to prevent future updates when a new AMI is released.
+    ignore_changes        = [volume_tags, ami] ## comment out ami from ignore_changes and run terraform apply to update, then add it back to ignore_changes to prevent future updates when a new AMI is released.
   }
 }
 
