@@ -3,7 +3,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu-pro-server/images/hvm-ssd/ubuntu-jammy-22.04-amd64-pro-server-20250530"]
+    values = ["ubuntu-pro-server/images/hvm-ssd/ubuntu-jammy-22.04-amd64-pro-server-*"]
   }
 
   filter {
@@ -150,6 +150,9 @@ DATA
 
   tags = {
     Name = "${title(var.env_name)} Bastion - backend (${aws_vpc.wifi_backend.id})"
+  }
+  lifecycle {
+    ignore_changes = [ami] ## comment out ami from ignore_changes and run terraform apply to update, then add it back to ignore_changes to prevent future updates when a new AMI is released.
   }
 }
 
