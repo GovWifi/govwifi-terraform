@@ -27,22 +27,11 @@ resource "aws_kinesis_firehose_delivery_stream" "cloudwatch_to_s3" {
     processing_configuration {
       enabled = true
 
-      # NATIVE PROCESSOR CHAIN
-      # Step 1. Decompress the GZIP from CloudWatch
       processors {
         type = "Decompression"
         parameters {
           parameter_name  = "CompressionFormat"
           parameter_value = "GZIP"
-        }
-      }
-
-      # Step 2. Extract the raw message text (This works natively now because we don't need to save the metadata!)
-      processors {
-        type = "CloudWatchLogProcessing"
-        parameters {
-          parameter_name  = "DataMessageExtraction"
-          parameter_value = "true"
         }
       }
     }
