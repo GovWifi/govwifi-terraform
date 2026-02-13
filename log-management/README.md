@@ -56,50 +56,60 @@ Once applied, logs will begin flowing to S3 within 15 minutes.
 * for logs > 90 days use Amazon Athena as described below.
 
 ## 🔍 How to Query Logs (Athena > 90 days)
-### Not yet Implemented, subject to change !
-
 We use **Athena Partition Projection** to map the S3 folder structure to a SQL table. This allows for fast, cost-effective queries without needing to run "crawlers."
 
-### 🛡️ Step 1: Select the Safety Workgroup
-You **must** select the following Workgroup in the Athena Console (top-right dropdown):
-* **Workgroup:** `log-investigation-safety`
+In the AWS console, search for Athena, then click the left hand hamburger menu to expand it. \
+From the expanded left menu select **Query Editor**,
+
+### 🛡️ Step 1: Select the log Workgroup and database
+#### WorkGroup
+Then select the workgroup **govwifi_logs_workgroup** from the menu on the top-right dropdown, **<< Very Important**
+This will then switch you into that workgroup, which as some saved queries to get you started, select the saved queries tab to see them.
+
+You **must** select the following Workgroup in the Athena query editor Console (top-right dropdown):
+* **Workgroup:** `govwifi_logs_workgroup`
 
 > **Why?** This workgroup enforces a **1GB Data Scan Limit** per query. If you write a "lazy" query (like `SELECT * FROM logs`), it will fail instantly before costly charges apply.
 
-### 📝 Step 2: Write Your Query
-There are two tables available for query in Athena:
+#### Database
+From the left hand menu under databases select **govwifi_logs**, if you don't do this, the queries will not work as the tables will not be found.
 
-1. production_logs (Active)
-   * Use for: Dates **AFTER** Feb 2026.
-   * Format: Optimized, clean text logs.
-   * Partitioning: Day-based.
-   * Query Syntax: Uses a single date_path string column.
+### 📝 Step 2: Write Your Query
+There are two tables and 1 view available for query in Athena: (if the tables show 0, you've not selected the database, see step 1)
+
+A 'view' has been created for the app_logs table to simply the querying of the data, to look at current logs, use the **app_logs_view** view instead of teh table.
+
+1. app_logs_view (Active / current logs)
+   * Use for: Dates **AFTER** Mar 2026.
+   * Format: Optimized, clean Json logs.
+   * Partitioning: Region, App and date, Day-based.
+   * Query Syntax: Uses a single date string column.
 ```SQL
-WHERE date_path = '2026/01/27'
+WHERE date = '2026-01-27'
 ```
 
 2. historical_logs (Legacy Archive)
-  * Use for: Dates **BEFORE** Feb 2026.
+  * Use for: Dates **BEFORE** Mar 2026.
   * Format: Raw CloudWatch export (includes Timestamp prefix).
-  * Partitioning: Month-based.
+  * Partitioning: Region, App and date, Month-based.
   * Query Syntax: Uses separate integer columns for year and month.
 
 ```SQL
 WHERE year = 2025 AND month = 12
 ```
-Note: In Jan 2027, the Historical table will be retired.
+Note: In Jan 2027, the Historical table will be retired as the logs will expire.
 
-You **must** filter by `app_name`, `region` and `date_path`.
+You **must** filter by `app_name`, `region` and `date`.
 
 **Columns:**
-production_logs:
+app_logs_view:
 * `message`: The raw log line text.
 * `region`: The region the logs were created from
 * `app_name`: The short reference name defined in `locals.tf`.
-* `date_path`: The date in format `YYYY/MM/DD`.
+* `date`: The date in format `YYYY-MM-DD`.
 
 historical_logs: The column is named log_data (Timestamp + Text).
-* `log_data`: The log line text in the format of Timestamp + Text
+* `message`: The log line text in the format of Timestamp + Text
 * `region`: The region the logs were created from
 * `app_name`: The short reference name defined in `locals.tf`.
 * `year` and `month` The date is split over 2 columns year = 2025 and month = 12
@@ -108,69 +118,68 @@ historical_logs: The column is named log_data (Timestamp + Text).
 #### Example: Specific Day
 ```sql
 SELECT message
-FROM production_logs
+FROM app_logs
 WHERE region = 'eu-west-2'
   AND app_name = 'admin'
-  AND date_path = '2025/12/19'
+  AND date = DATE '2025-12-19'
 LIMIT 100;
 ```
 for historical logs that would look like this
+Scans the log content for the timestamp string
 ```sql
-SELECT log_data
+SELECT message
 FROM historical_logs
 WHERE region = 'eu-west-2'
   AND app_name = 'admin'
-  AND year = 2025
-  AND month = 12
-  -- Scan the log content for the timestamp string
-  AND log_data LIKE '2025-12-19%'
+  AND year = '2025'
+  AND month = '12'
+  AND message LIKE '2025-12-19%'
 ```
 
 #### Example: Date Range
 ```sql
 SELECT message
-FROM production_logs
+FROM app_logs_view
 WHERE region = 'eu-west-2'
-  AND app_name = 'api-gateway'
-  AND date_path BETWEEN '2025/12/01' AND '2025/12/31'
+  AND app_name = 'logging-api'
+  AND date BETWEEN DATE '2025-12-01' AND DATE '2025-12-31'
   AND message LIKE '%error%'
 LIMIT 100;
 ```
 
 ## Example scanning both Current and historical logs
 ```sql
-/* Query 1: NEW Logs (Clean) */
 SELECT
-    date_path AS log_date,
+    'Live-' || region AS source,
+    "timestamp",
     app_name,
-    message,
-    'production' AS source
-FROM production_logs
-WHERE region = 'eu-west-2'
-  AND message LIKE '%error%'
-  AND date_path > '2025/12/19'
-
+    message
+FROM app_logs_view
+WHERE message LIKE '%healthcheck%'
+  AND date >= DATE '2026-03-01'
+  AND app_name = 'admin'
 UNION ALL
 
-/* Query 2: OLD Logs (Legacy) */
 SELECT
-    format('%04d/%02d', year, month) AS log_date, -- Approximate date (Month only)
+    'Archive-' || region AS source,
+    from_iso8601_timestamp(log_timestamp) AS "timestamp",
     app_name,
-    log_data AS message,
-    'historical' AS source
+    message
 FROM historical_logs
-WHERE region = 'eu-west-2'
-  AND year = 2025
-  AND month = 12
-  log_data LIKE '%error%'
+WHERE message LIKE '%healthcheck%'
+  AND year = '2026'
+  AND app_name = 'admin'
+ORDER BY timestamp DESC
+LIMIT 50;
+
 ```
 
-> **Note:** If you get an error saying *“Partition constraint violation”* or zero results, check that you included the `app_name` and `date_path` in your `WHERE` clause.
+> **Note 1:** If you see an error like  *“Partition constraint violation”* or zero results, check that you included the `app_name` and `date_path` in your `WHERE` clause.
 
+> **Note 2:** if you see an error like **COLUMN_NOT_FOUND: line 4:18: Column 'xxx' cannot be resolved or requester is not authorized to access requested resources ** ensure the use of single quotes, there is no syntax correction it would seem.
 
 ---
 
-# Can be removed once archiving is complete.
 ## 🔄 Retention & Migration Workflow
 
 ### 1. Daily Workflow
