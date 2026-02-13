@@ -143,32 +143,11 @@ resource "aws_glue_catalog_table" "modern_logs" {
 # ---------------------------------------------------------
 # 2a. SIMPLIFIED VIEW of 'app_logs' table.
 #    Makes it simpler to query the logs without having to remember complex sql
-# ---------------------------------------------------------
-# resource "aws_athena_named_query" "create_view" {
-#   count   = var.region == "eu-west-2" ? 1 : 0
-#   name      = "create_flat_logs_view"
-#   workgroup = aws_athena_workgroup.govwifi_logs_workgroup[0].id
-#   database  = aws_athena_database.govwifi_logs[0].name
-#   query     = <<EOF
-# CREATE OR REPLACE VIEW "app_logs_view" AS
-# SELECT
-#   region,
-#   app_name,
-#   date_parse(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar), '%Y-%m-%d') AS date,
-#   from_unixtime(log_event.timestamp / 1000) AS event_time,
-#   log_event.message AS message
-# FROM "app_logs_json"
-# CROSS JOIN UNNEST(logevents) AS t(log_event)
-# EOF
-# }
-# ---------------------------------------------------------
-# 2a. SIMPLIFIED VIEW of 'app_logs' table.
-#    Makes it simpler to query the logs without having to remember complex sql
 #    Programmatically Create the View linked to table, work around for running sql to create the view.
 #   Views are a special type of Glue Table wrapped in a Presto-specific envelope, handle with care!
 # ---------------------------------------------------------
 
-resource "aws_glue_catalog_table" "app_logs_view" {
+resource "aws_glue_catalog_table" "active_logs_view" {
   count         = var.region == "eu-west-2" ? 1 : 0
   name          = "app_logs_view"
   database_name = aws_athena_database.govwifi_logs[0].name
