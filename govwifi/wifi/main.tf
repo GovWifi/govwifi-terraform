@@ -496,5 +496,5 @@ module "dublin_log_management" {
   region         = var.aws_region
   region_name    = lower(var.aws_region_name)
   log_retention  = local.log_retention
-  capacity_notifications_arn = module.london_capacity_notifications.topic_arn
+  capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
 }
