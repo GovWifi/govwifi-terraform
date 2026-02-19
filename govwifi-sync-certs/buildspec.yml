@@ -12,16 +12,10 @@ phases:
 
   build:
     commands:
-    # 1. Setup GPG (The necessary evil for now)
     - echo "$GPG_KEY" | gpg --import
-    # Trust the key ultimately to avoid interactive prompts
     - 'echo "$(gpg --list-keys --with-colons | grep fpr | head -n 1 | cut -d: -f10):6:" | gpg --import-ownertrust'
-
-    # 2. Get the Bucket Name
     - BUCKET=$(aws ssm get-parameter --name "$BUCKET_PARAMETER" --query "Parameter.Value" --output text)
     - echo "Bucket- $BUCKET"
-    # 3. Decrypt and Upload in one go (Secure Loop)
-    # We assume the private repo is checked out to ./passwords
     - |
       for file in $CERT_FILES; do
         echo "Processing $file..."
