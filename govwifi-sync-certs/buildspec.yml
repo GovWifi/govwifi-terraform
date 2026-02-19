@@ -7,7 +7,7 @@ env:
 phases:
   pre_build:
     commands:
-    - git clone https://$GIT_USER:$GIT_TOKEN@github.com/GovWifi/govwifi-build.git
+    - git clone -b $BRANCH https://$GIT_USER:$GIT_TOKEN@github.com/GovWifi/govwifi-build.git
     - cd govwifi-build/
 
   build:
