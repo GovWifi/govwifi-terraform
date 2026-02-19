@@ -16,11 +16,6 @@ resource "aws_codebuild_project" "govwifi_codebuild_sync_certs" {
     privileged_mode             = true
 
     environment_variable {
-      name  = "BRANCH"
-      value = "master"
-    }
-
-    environment_variable {
       name  = "DOCKER_HUB_AUTHTOKEN_ENV"
       value = data.aws_secretsmanager_secret_version.docker_hub_authtoken.secret_string
     }
@@ -56,6 +51,10 @@ resource "aws_codebuild_project" "govwifi_codebuild_sync_certs" {
       value = var.env
     }
 
+    environment_variable {
+      name  = "BRANCH"
+      value = "master"
+    }
   }
 
   source {
