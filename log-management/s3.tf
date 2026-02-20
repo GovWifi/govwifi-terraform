@@ -80,3 +80,64 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_lifecycle" {
     }
   }
 }
+
+## Athena policy to access the log archive bucket
+resource "aws_s3_bucket_policy" "log_archive_policy" {
+  # Logic: Only apply if we created the bucket (London Only)
+  count = var.region == "eu-west-2" ? 1 : 0
+
+  bucket = aws_s3_bucket.log_archive_bucket[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowAthenaReads"
+        Effect = "Allow"
+        Principal = {
+          "AWS" : "arn:aws:iam::${var.aws_account_id}:root"
+        }
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket",
+          "s3:GetObject"
+        ]
+        Resource = [
+          aws_s3_bucket.log_archive_bucket[0].arn,
+          "${aws_s3_bucket.log_archive_bucket[0].arn}/logs/*",
+          "${aws_s3_bucket.log_archive_bucket[0].arn}/cloudwatch-export/*"
+        ]
+      },
+      {
+        Sid    = "AllowAthenaResultWrites"
+        Effect = "Allow"
+        Principal = {
+          "AWS" : "arn:aws:iam::${var.aws_account_id}:root"
+        }
+        Action = [
+          "s3:PutObject",
+          "s3:AbortMultipartUpload"
+        ]
+        Resource = [
+          "${aws_s3_bucket.log_archive_bucket[0].arn}/athena-results/*"
+        ]
+      },
+      # (Optional) Ensure SSL is required (Security Best Practice)
+      {
+        Sid       = "EnforceTLS"
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.log_archive_bucket[0].arn,
+          "${aws_s3_bucket.log_archive_bucket[0].arn}/*"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "false"
+          }
+        }
+      }
+    ]
+  })
+}
