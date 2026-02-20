@@ -1,18 +1,28 @@
 version: 0.2
+env:
+  variables:
+    CERT_FILES: "server.key server.pem"
+    BUCKET_PARAMETER: "/govwifi-terraform/frontend-certs-bucket"
+
 phases:
   pre_build:
     commands:
-      - echo "$DOCKER_HUB_AUTHTOKEN_ENV" | docker login -u $(echo $DOCKER_HUB_USERNAME_ENV) --password-stdin
-      - apt-get update -y
-      - apt-get install pass -y
-      - git clone https://$GIT_USER:$GIT_TOKEN@github.com/GovWifi/govwifi-build.git
-      - cd govwifi-build
-      - echo "Set params"
+    - git clone -b $BRANCH https://$GIT_USER:$GIT_TOKEN@github.com/GovWifi/govwifi-build.git
+    - cd govwifi-build/
 
   build:
     commands:
-      - echo "Synching certificates for $GOVWIFI_ENV"
-      - REGION=$AWS_REGION
-      - echo "Syncing certs. REGION is set to $REGION"
-      - CERTSDIR="$GOVWIFI_ENV"
-      - ci/tasks/scripts/sync-certs.sh #run script
+    - echo "$GPG_KEY" | gpg --import
+    - 'echo "$(gpg --list-keys --with-colons | grep fpr | head -n 1 | cut -d: -f10):6:" | gpg --import-ownertrust'
+    - BUCKET=$(aws ssm get-parameter --name "$BUCKET_PARAMETER" --query "Parameter.Value" --output text)
+    - echo "Bucket- $BUCKET"
+    - |
+      for file in $CERT_FILES; do
+        echo "Processing $file..."
+        # validation: ensure file exists in the store before trying
+        if [ -f "passwords/certs/${GOVWIFI_ENV}/${file}.gpg" ]; then
+           PASSWORD_STORE_DIR="passwords" pass show "certs/${GOVWIFI_ENV}/${file}" | aws s3 cp - "s3://$BUCKET/$file"
+        else
+           echo "WARNING: $file not found in password store. Skipping."
+        fi
+      done
