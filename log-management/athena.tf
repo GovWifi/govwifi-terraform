@@ -144,7 +144,7 @@ resource "aws_glue_catalog_table" "modern_logs" {
 # 2a. SIMPLIFIED VIEW of 'app_logs' table.
 #    Makes it simpler to query the logs without having to remember complex sql
 #    Programmatically Create the View linked to table, work around for running sql to create the view.
-#   Views are a special type of Glue Table wrapped in a Presto-specific envelope, handle with care!
+#    Views are a special type of Glue Table wrapped in a Presto-specific envelope, handle with care!
 # ---------------------------------------------------------
 
 resource "aws_glue_catalog_table" "active_logs_view" {
@@ -198,40 +198,6 @@ resource "aws_glue_catalog_table" "active_logs_view" {
     }
   }
 }
-
-locals {
-  # The SQL Query for the view
-  view_sql = <<EOF
-SELECT
-  region,
-  app_name,
-  logstream,
-  date_parse(cast(year as varchar) || '-' || cast(month as varchar) || '-' || cast(day as varchar), '%Y-%m-%d') AS "date",
-  from_unixtime(log_event.timestamp / 1000) AS "timestamp",
-  log_event.message AS message
-FROM "${aws_glue_catalog_table.modern_logs[0].name}"
-CROSS JOIN UNNEST(logevents) AS t(log_event)
-EOF
-
-  # -------------------------------------------------------------
-  # 2. PRESTO VIEW DEFINITION (What Athena Engine reads)
-  #    Use Presto types: varchar, integer, date, timestamp
-  # -------------------------------------------------------------
-  presto_view_blob = base64encode(jsonencode({
-    originalSql = local.view_sql,
-    catalog     = "awsdatacatalog",
-    schema      = aws_athena_database.govwifi_logs[0].name,
-    columns = [
-      { name = "region", type = "varchar" },
-      { name = "app_name", type = "varchar" },
-      { name = "logstream", type = "varchar" },
-      { name = "date", type = "date" },
-      { name = "timestamp", type = "timestamp" },
-      { name = "message", type = "varchar" }
-    ]
-  }))
-}
-
 
 # ---------------------------------------------------------
 # 3. TABLE B: HISTORICAL LOGS (CloudWatch Exports)
