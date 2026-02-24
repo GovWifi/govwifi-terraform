@@ -489,11 +489,12 @@ module "dublin_log_management" {
     aws = aws.main
   }
 
-  source         = "../../log-management"
-  env            = local.env
-  env_name       = local.env_name
-  aws_account_id = local.aws_account_id
-  region         = var.aws_region
-  region_name    = lower(var.aws_region_name)
-  log_retention  = local.log_retention
+  source                     = "../../log-management"
+  env                        = local.env
+  env_name                   = local.env_name
+  aws_account_id             = local.aws_account_id
+  region                     = var.aws_region
+  region_name                = lower(var.aws_region_name)
+  log_retention              = local.log_retention
+  capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
 }

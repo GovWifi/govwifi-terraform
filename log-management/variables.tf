@@ -23,3 +23,6 @@ variable "log_retention" {
   default = 30
 }
 
+variable "capacity_notifications_arn" {
+  type = string
+}
