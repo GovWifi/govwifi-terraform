@@ -29,7 +29,10 @@ variable "event_rule_count" {
   default = 1
 }
 
-variable "backend_instance_count" {
+variable "task_count_min" {
+  type = number
+}
+variable "task_count_max" {
   type = number
 }
 

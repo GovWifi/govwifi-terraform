@@ -320,7 +320,8 @@ module "api" {
   log_retention = local.log_retention
 
   backend_elb_count      = 1
-  backend_instance_count = 3
+  task_count_min         = 3
+  task_count_max         = 20
   aws_account_id         = local.aws_account_id
   aws_region_name        = var.aws_region_name
   aws_region             = var.aws_region
