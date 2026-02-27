@@ -319,14 +319,14 @@ module "api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  backend_elb_count      = 1
-  task_count_min         = 3
-  task_count_max         = 20
-  aws_account_id         = local.aws_account_id
-  aws_region_name        = var.aws_region_name
-  aws_region             = var.aws_region
-  route53_zone_id        = data.aws_route53_zone.main.zone_id
-  vpc_id                 = module.backend.backend_vpc_id
+  backend_elb_count = 1
+  task_count_min    = 3
+  task_count_max    = 20
+  aws_account_id    = local.aws_account_id
+  aws_region_name   = var.aws_region_name
+  aws_region        = var.aws_region
+  route53_zone_id   = data.aws_route53_zone.main.zone_id
+  vpc_id            = module.backend.backend_vpc_id
 
   vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
 

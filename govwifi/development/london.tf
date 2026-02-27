@@ -246,15 +246,15 @@ module "london_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  backend_elb_count      = 1
-  task_count_min         = 2
-  task_count_max         = 20
-  aws_account_id         = local.aws_account_id
-  aws_region_name        = local.london_aws_region_name
-  aws_region             = local.london_aws_region
-  route53_zone_id        = data.aws_route53_zone.main.zone_id
-  vpc_id                 = module.london_backend.backend_vpc_id
-  safe_restart_enabled   = 1
+  backend_elb_count    = 1
+  task_count_min       = 2
+  task_count_max       = 20
+  aws_account_id       = local.aws_account_id
+  aws_region_name      = local.london_aws_region_name
+  aws_region           = local.london_aws_region
+  route53_zone_id      = data.aws_route53_zone.main.zone_id
+  vpc_id               = module.london_backend.backend_vpc_id
+  safe_restart_enabled = 1
 
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 

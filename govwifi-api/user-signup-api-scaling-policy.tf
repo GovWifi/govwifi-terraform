@@ -20,10 +20,10 @@ resource "aws_appautoscaling_policy" "user_signup_api_cpu_policy" {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
 
-    target_value       = 70.0
+    target_value = 70.0
 
     # Scale in slowly to prevent "flapping"
-    scale_in_cooldown  = 300
+    scale_in_cooldown = 300
 
     # Scale out quickly to handle the load
     scale_out_cooldown = 60
