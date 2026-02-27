@@ -2,8 +2,8 @@ resource "aws_appautoscaling_target" "logging_ecs_target" {
   count              = var.logging_enabled
   service_namespace  = "ecs"
   resource_id        = "service/${aws_ecs_cluster.api_cluster.name}/${aws_ecs_service.logging_api_service[0].name}"
-  max_capacity       = 20
-  min_capacity       = 2
+  max_capacity       = var.task_count_max
+  min_capacity       = var.task_count_min
   scalable_dimension = "ecs:service:DesiredCount"
 }
 

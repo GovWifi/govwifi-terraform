@@ -120,7 +120,7 @@ resource "aws_ecs_service" "logging_api_service" {
   name             = "logging-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.logging_api_task[0].arn
-  desired_count    = var.backend_instance_count
+  desired_count    = var.task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
