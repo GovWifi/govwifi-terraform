@@ -263,13 +263,14 @@ module "dublin_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  backend_elb_count      = 1
-  backend_instance_count = 2
-  aws_account_id         = local.aws_account_id
-  aws_region_name        = local.dublin_aws_region_name
-  aws_region             = local.dublin_aws_region
-  route53_zone_id        = data.aws_route53_zone.main.zone_id
-  vpc_id                 = module.dublin_backend.backend_vpc_id
+  backend_elb_count = 1
+  task_count_min    = 2
+  task_count_max    = 20
+  aws_account_id    = local.aws_account_id
+  aws_region_name   = local.dublin_aws_region_name
+  aws_region        = local.dublin_aws_region
+  route53_zone_id   = data.aws_route53_zone.main.zone_id
+  vpc_id            = module.dublin_backend.backend_vpc_id
 
   vpc_endpoints_security_group_id = module.dublin_backend.vpc_endpoints_security_group_id
 
