@@ -201,7 +201,7 @@ resource "aws_ecs_service" "user_signup_api_service" {
   name             = "user-signup-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.user_signup_api_task[0].arn
-  desired_count    = var.backend_instance_count
+  desired_count    = var.task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -223,6 +223,11 @@ resource "aws_ecs_service" "user_signup_api_service" {
     target_group_arn = aws_alb_target_group.user_signup_api_tg[0].arn
     container_name   = "user-signup-api"
     container_port   = "8080"
+  }
+
+  lifecycle {
+    # This prevents Terraform from overwriting the changes made by Auto Scaling
+    ignore_changes = [desired_count]
   }
 }
 
