@@ -14,7 +14,7 @@ resource "aws_security_group" "elasticsearch_inbound" {
     cidr_blocks = [var.vpc_cidr_block]
   }
 }
-
+## this need to be migrated to resource "aws_opensearch_domain"
 resource "aws_elasticsearch_domain" "govwifi_elasticsearch" {
   domain_name           = var.domain_name
   elasticsearch_version = "7.9"
@@ -39,6 +39,11 @@ resource "aws_elasticsearch_domain" "govwifi_elasticsearch" {
   ebs_options {
     ebs_enabled = true
     volume_size = "10"
+  }
+
+  domain_endpoint_options {
+    enforce_https       = true
+    tls_security_policy = "Policy-Min-TLS-1-2-PFS-2023-10"
   }
 
   access_policies = <<DOC
