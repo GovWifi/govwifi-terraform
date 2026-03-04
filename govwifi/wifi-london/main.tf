@@ -219,9 +219,6 @@ module "frontend" {
 
   admin_app_data_s3_bucket_name = module.govwifi_admin.app_data_s3_bucket_name
 
-  logging_api_base_url = var.london_api_base_url
-  auth_api_base_url    = var.london_api_base_url
-
   authentication_api_internal_dns_name = module.api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.api.logging_api_internal_dns_name)
 
@@ -319,9 +316,14 @@ module "api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
+  auth_task_count_min    = 3
+  auth_task_count_max    = 20
+  logging_task_count_min = 3
+  logging_task_count_max = 20
+  user_task_count_min    = 3
+  user_task_count_max    = 20
+
   backend_elb_count = 1
-  task_count_min    = 3
-  task_count_max    = 20
   aws_account_id    = local.aws_account_id
   aws_region_name   = var.aws_region_name
   aws_region        = var.aws_region

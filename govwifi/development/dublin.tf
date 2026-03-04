@@ -230,8 +230,6 @@ module "dublin_frontend" {
 
   admin_app_data_s3_bucket_name = module.london_admin.replica_app_data_s3_bucket_name
 
-  logging_api_base_url = module.london_api.api_base_url
-  auth_api_base_url    = module.dublin_api.api_base_url
 
   authentication_api_internal_dns_name = module.dublin_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
@@ -263,9 +261,14 @@ module "dublin_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
+  auth_task_count_min    = 1
+  auth_task_count_max    = 5
+  logging_task_count_min = 1
+  logging_task_count_max = 5
+  user_task_count_min    = 1
+  user_task_count_max    = 5
+
   backend_elb_count = 1
-  task_count_min    = 2
-  task_count_max    = 20
   aws_account_id    = local.aws_account_id
   aws_region_name   = local.dublin_aws_region_name
   aws_region        = local.dublin_aws_region

@@ -229,9 +229,6 @@ module "dublin_frontend" {
 
   admin_app_data_s3_bucket_name = module.london_admin.replica_app_data_s3_bucket_name
 
-  logging_api_base_url = module.london_api.api_base_url
-  auth_api_base_url    = module.dublin_api.api_base_url
-
   authentication_api_internal_dns_name = module.dublin_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
 
@@ -262,17 +259,22 @@ module "dublin_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  backend_elb_count = 1
-  task_count_min    = 2
-  task_count_max    = 20
-  aws_account_id    = local.aws_account_id
-  aws_region_name   = local.dublin_aws_region_name
-  aws_region        = local.dublin_aws_region
-  route53_zone_id   = data.aws_route53_zone.main.zone_id
-  vpc_id            = module.dublin_backend.backend_vpc_id
+  auth_task_count_min    = 3
+  auth_task_count_max    = 20
+  logging_task_count_min = 0
+  logging_task_count_max = 0
+  user_task_count_min    = 0
+  user_task_count_max    = 0
+
+  aws_account_id  = local.aws_account_id
+  aws_region_name = local.dublin_aws_region_name
+  aws_region      = local.dublin_aws_region
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+  vpc_id          = module.dublin_backend.backend_vpc_id
 
   vpc_endpoints_security_group_id = module.dublin_backend.vpc_endpoints_security_group_id
 
+  backend_elb_count    = 1
   user_signup_enabled  = 0
   logging_enabled      = 0
   alarm_count          = 0
