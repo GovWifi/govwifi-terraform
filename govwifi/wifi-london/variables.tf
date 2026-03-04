@@ -60,11 +60,6 @@ variable "dublin_radius_ip_addresses" {
   description = "Frontend RADIUS server IP addresses - Dublin"
 }
 
-variable "london_api_base_url" {
-  type        = string
-  description = "Base URL for authentication, user signup and logging APIs"
-  default     = "https://api-elb.london.wifi.service.gov.uk:8443"
-}
 
 variable "critical_notification_email" {
   type = string

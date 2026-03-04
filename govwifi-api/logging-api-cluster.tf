@@ -120,7 +120,7 @@ resource "aws_ecs_service" "logging_api_service" {
   name             = "logging-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.logging_api_task[0].arn
-  desired_count    = var.task_count_min
+  desired_count    = var.logging_task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -140,59 +140,17 @@ resource "aws_ecs_service" "logging_api_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.logging_api_tg[0].arn
-    container_name   = "logging-api"
-    container_port   = "8080"
-  }
-
-  load_balancer {
     target_group_arn = aws_alb_target_group.logging_api[0].arn
     container_name   = "logging-api"
     container_port   = "8080"
   }
 
+  ## DEPLOYMENT CONFIGURATION - Rolling using dynamic calculation to allow 1 in and 1 out during deployment, while ensuring 100% of tasks stay up.
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 134 ## replaces tasks on a sliding scale, depending on desired task count.
+
   lifecycle {
     ignore_changes = [desired_count]
-  }
-}
-
-resource "aws_alb_target_group" "logging_api_tg" {
-  count       = var.logging_enabled
-  depends_on  = [aws_lb.api_alb]
-  name        = "logging-api-${var.env_name}"
-  port        = "8080"
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-
-  tags = {
-    Name = "logging-api-tg-${var.env_name}"
-  }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 4
-    interval            = 10
-    path                = "/healthcheck"
-  }
-}
-
-resource "aws_alb_listener_rule" "logging_api_lr" {
-  count        = var.logging_enabled
-  depends_on   = [aws_alb_target_group.logging_api_tg]
-  listener_arn = aws_alb_listener.alb_listener.arn
-  priority     = 3
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.logging_api_tg[0].id
-  }
-
-  condition {
-    path_pattern {
-      values = ["/logging/*"]
-    }
   }
 }
 
@@ -275,7 +233,8 @@ resource "aws_lb" "logging_api" {
     aws_security_group.logging_api_alb.id,
   ]
 
-  load_balancer_type = "application"
+  load_balancer_type         = "application"
+  drop_invalid_header_fields = true
 }
 
 resource "aws_alb_target_group" "logging_api" {
@@ -287,11 +246,13 @@ resource "aws_alb_target_group" "logging_api" {
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+  deregistration_delay = 10 ## allows the task to shutdown gracefully before being deregistered from the target group
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 4
-    interval            = 10
+    interval            = 5
     path                = "/healthcheck"
   }
 }

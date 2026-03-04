@@ -10,8 +10,8 @@ resource "aws_lb" "user_signup_api" {
     aws_security_group.user_signup_api_lb_in.*.id
   )
 
-  load_balancer_type = "application"
-
+  load_balancer_type         = "application"
+  drop_invalid_header_fields = true
   tags = {
     Name = "user-signup-api-${var.env_name}"
   }
