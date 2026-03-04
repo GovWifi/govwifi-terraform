@@ -201,7 +201,7 @@ resource "aws_ecs_service" "user_signup_api_service" {
   name             = "user-signup-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.user_signup_api_task[0].arn
-  desired_count    = var.task_count_min
+  desired_count    = var.user_task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -225,8 +225,15 @@ resource "aws_ecs_service" "user_signup_api_service" {
     container_port   = "8080"
   }
 
+  ## DEPLOYMENT CONFIGURATION - ROLLING UPDATES
+  # Ensure 100% of tasks stay up, while allowing a 1 in and 1 out policy during rollout, based of the current task count
+  # This is less stress on the API during deployment, more stable and allows us to rollback without downtime if we detect an issue with the new version
+  # using a calculation to ensue 1 in and 1 out, no matter the task count.
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = ceil(((var.auth_task_count_min + 1) / var.auth_task_count_min) * 100) ## = ~134% rounding up, allowing 1 additional task during deployment
+
   lifecycle {
-    # This prevents Terraform from overwriting the changes made by Auto Scaling
+    ## stops the tasks cound from being reset.
     ignore_changes = [desired_count]
   }
 }
@@ -243,6 +250,8 @@ resource "aws_alb_target_group" "user_signup_api_tg" {
   tags = {
     Name = "user-signup-api-tg-${var.env_name}"
   }
+
+  deregistration_delay = 60 ## allows the task to shutdown gracefully before being deregistered from the target group
 
   health_check {
     healthy_threshold   = 2

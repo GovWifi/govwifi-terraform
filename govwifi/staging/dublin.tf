@@ -262,9 +262,14 @@ module "dublin_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
+  auth_task_count_min    = 3
+  auth_task_count_max    = 20
+  logging_task_count_min = 3
+  logging_task_count_max = 20
+  user_task_count_min    = 3
+  user_task_count_max    = 20
+
   backend_elb_count = 1
-  task_count_min    = 2
-  task_count_max    = 20
   aws_account_id    = local.aws_account_id
   aws_region_name   = local.dublin_aws_region_name
   aws_region        = local.dublin_aws_region

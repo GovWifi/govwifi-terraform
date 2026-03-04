@@ -120,7 +120,7 @@ resource "aws_ecs_service" "logging_api_service" {
   name             = "logging-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.logging_api_task[0].arn
-  desired_count    = var.task_count_min
+  desired_count    = var.logging_task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -151,6 +151,12 @@ resource "aws_ecs_service" "logging_api_service" {
     container_port   = "8080"
   }
 
+  ## DEPLOYMENT CONFIGURATION - ROLLING UPDATES
+  # Ensure 100% of tasks stay up, and allow 1 in and 1 out during rollout
+  # This is less stress on the API during deployment, more stable and allows us to rollback without downtime if we detect an issue with the new version
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = ceil(((var.auth_task_count_min + 1) / var.auth_task_count_min) * 100) ## = ~134% rounding up, allowing 1 additional task during deployment
+
   lifecycle {
     ignore_changes = [desired_count]
   }
@@ -168,6 +174,8 @@ resource "aws_alb_target_group" "logging_api_tg" {
   tags = {
     Name = "logging-api-tg-${var.env_name}"
   }
+
+  deregistration_delay = 60 ## allows the task to shutdown gracefully before being deregistered from the target group
 
   health_check {
     healthy_threshold   = 2
@@ -193,6 +201,9 @@ resource "aws_alb_listener_rule" "logging_api_lr" {
     path_pattern {
       values = ["/logging/*"]
     }
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
