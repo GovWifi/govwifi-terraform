@@ -14,7 +14,7 @@ resource "aws_security_group" "elasticsearch_inbound" {
     cidr_blocks = [var.vpc_cidr_block]
   }
 }
-## this need to be migrated to resource "aws_opensearch_domain"
+## this needs to be migrated to resource "aws_opensearch_domain"
 resource "aws_elasticsearch_domain" "govwifi_elasticsearch" {
   domain_name           = var.domain_name
   elasticsearch_version = "7.9"
