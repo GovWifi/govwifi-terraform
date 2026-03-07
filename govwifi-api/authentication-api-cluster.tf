@@ -10,8 +10,8 @@ resource "aws_ecs_task_definition" "authentication_api_task" {
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.authentication_api_ecs_task.arn
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  memory                   = 512
-  cpu                      = "256"
+  memory                   = 1024
+  cpu                      = 512
   network_mode             = "awsvpc"
 
   container_definitions = <<EOF
@@ -94,7 +94,7 @@ resource "aws_ecs_service" "authentication_api_service" {
   name             = "authentication-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.authentication_api_task.arn
-  desired_count    = var.authentication_api_count
+  desired_count    = var.auth_task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -114,58 +114,27 @@ resource "aws_ecs_service" "authentication_api_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.alb_target_group.arn
+    target_group_arn = aws_alb_target_group.private_auth_api_tg.arn
     container_name   = "authentication-api"
     container_port   = "8080"
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.authentication_api.arn
+    target_group_arn = aws_alb_target_group.shared_auth_api_tg.arn
     container_name   = "authentication-api"
     container_port   = "8080"
   }
 
+  ## DEPLOYMENT CONFIGURATION - ROLLING UPDATES
+  # Ensure 100% of tasks stay up, while allowing a 1 in and 1 out policy during rollout, based of the current task count
+  # This is less stress on the API during deployment, more stable and allows us to rollback without downtime if we detect an issue with the new version
+  # using a calculation to ensue 1 in and 1 out, no matter the task count.
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = ceil(((var.auth_task_count_min + 1) / var.auth_task_count_min) * 100) ## = ~134% rounding up, allowing 1 additional task during deployment
+
   lifecycle {
+    ## stops the tasks cound from being reset.
     ignore_changes = [desired_count]
-  }
-
-}
-
-resource "aws_alb_listener_rule" "static" {
-  depends_on   = [aws_alb_target_group.alb_target_group]
-  listener_arn = aws_alb_listener.alb_listener.arn
-  priority     = 1
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.alb_target_group.id
-  }
-
-  condition {
-    path_pattern {
-      values = ["/authorize/*"]
-    }
-  }
-}
-
-resource "aws_alb_target_group" "alb_target_group" {
-  depends_on  = [aws_lb.api_alb]
-  name        = "api-lb-tg-${var.env_name}"
-  port        = "8080"
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-
-  tags = {
-    Name = "api-alb-tg-${var.env_name}"
-  }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 4
-    interval            = 10
-    path                = "/authorize/user/HEALTH"
   }
 }
 
@@ -182,12 +151,14 @@ resource "aws_lb" "authentication_api" {
   load_balancer_type = "application"
 }
 
-resource "aws_alb_target_group" "authentication_api" {
-  name        = "authentication-api"
+resource "aws_alb_target_group" "private_auth_api_tg" {
+  name        = "private-auth-api-lb-tg-${var.env_name}"
   port        = "8080"
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
+
+  deregistration_delay = 60 ## allows the task to shutdown gracefully before being deregistered from the target group
 
   health_check {
     healthy_threshold   = 2
@@ -195,6 +166,41 @@ resource "aws_alb_target_group" "authentication_api" {
     timeout             = 4
     interval            = 10
     path                = "/authorize/user/HEALTH"
+  }
+
+  tags = {
+    Name        = "private-auth-api-tg-${var.env_name}"
+    Environment = var.env_name
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_alb_target_group" "shared_auth_api_tg" {
+  depends_on  = [aws_lb.api_alb]
+  name        = "shared-auth-api-lb-tg-${var.env_name}"
+  port        = "8080"
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  tags = {
+    Name        = "shared-auth-api-lb-tg-${var.env_name}"
+    Environment = var.env_name
+  }
+
+  deregistration_delay = 60 ## allows the task to shutdown gracefully before being deregistered from the target group
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 4
+    interval            = 10
+    path                = "/authorize/user/HEALTH"
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -205,7 +211,27 @@ resource "aws_alb_listener" "authentication" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_alb_target_group.authentication_api.id
+    target_group_arn = aws_alb_target_group.private_auth_api_tg.id
+  }
+}
+
+resource "aws_alb_listener_rule" "static" {
+  depends_on   = [aws_alb_target_group.shared_auth_api_tg]
+  listener_arn = aws_alb_listener.alb_listener.arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.shared_auth_api_tg.id
+  }
+
+  condition {
+    path_pattern {
+      values = ["/authorize/*"]
+    }
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

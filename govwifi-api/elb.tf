@@ -24,7 +24,7 @@ resource "aws_alb_listener" "alb_listener" {
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
-    target_group_arn = aws_alb_target_group.alb_target_group.arn
+    target_group_arn = aws_alb_target_group.default_target_group.arn
     type             = "forward"
   }
 }
@@ -71,3 +71,30 @@ resource "aws_security_group" "api_alb_out" {
   }
 }
 
+## This is a default group, possibly left over from old architecture,
+## could consider if we need it or refactor to a 404 response.
+resource "aws_alb_target_group" "default_target_group" {
+  depends_on  = [aws_lb.api_alb]
+  name        = "default-api-lb-tg-${var.env_name}"
+  port        = "8080"
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  tags = {
+    Name = "default-api-lb-tg-${var.env_name}"
+  }
+
+  deregistration_delay = 60 ## allows the task to shutdown gracefully before being deregistered from the target group
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 4
+    interval            = 10
+    path                = "/authorize/user/HEALTH"
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
