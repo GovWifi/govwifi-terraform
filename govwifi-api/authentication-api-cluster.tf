@@ -186,7 +186,7 @@ resource "aws_alb_target_group" "shared_auth_api_tg" {
   target_type = "ip"
 
   tags = {
-    Name = "shared-auth-api-lb-tg-${var.env_name}"
+    Name        = "shared-auth-api-lb-tg-${var.env_name}"
     Environment = var.env_name
   }
 
