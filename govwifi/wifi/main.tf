@@ -238,9 +238,6 @@ module "frontend" {
 
   admin_app_data_s3_bucket_name = data.terraform_remote_state.london.outputs.replica_admin_app_data_s3_bucket_name
 
-  logging_api_base_url = var.london_api_base_url
-  auth_api_base_url    = var.dublin_api_base_url
-
   authentication_api_internal_dns_name = module.api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(data.terraform_remote_state.london.outputs.logging_api_internal_dns_name)
 
@@ -269,15 +266,19 @@ module "api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  backend_elb_count        = 1
-  task_count_min           = 2
-  task_count_max           = 20
-  authentication_api_count = 3
-  aws_account_id           = local.aws_account_id
-  aws_region_name          = lower(var.aws_region_name)
-  aws_region               = var.aws_region
-  route53_zone_id          = data.aws_route53_zone.main.zone_id
-  vpc_id                   = module.backend.backend_vpc_id
+  auth_task_count_min    = 2
+  auth_task_count_max    = 20
+  logging_task_count_min = 2
+  logging_task_count_max = 20
+  user_task_count_min    = 2
+  user_task_count_max    = 20
+
+  backend_elb_count = 1
+  aws_account_id    = local.aws_account_id
+  aws_region_name   = lower(var.aws_region_name)
+  aws_region        = var.aws_region
+  route53_zone_id   = data.aws_route53_zone.main.zone_id
+  vpc_id            = module.backend.backend_vpc_id
 
   vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
 
