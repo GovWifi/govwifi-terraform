@@ -125,8 +125,6 @@ resource "aws_codepipeline" "testing_dev_apps_pipeline" {
         owner           = "AWS"
         provider        = "CodeBuild"
         input_artifacts = ["${each.key}-source-art"]
-        # This resource lives in the Dev, Staging & Production environments. It will always have to
-        # either be hardcoded or retrieved from the AWS secrets or parameter store
         version   = 1
         run_order = 1
         configuration = {

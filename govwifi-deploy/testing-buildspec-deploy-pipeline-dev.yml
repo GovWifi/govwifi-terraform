@@ -3,18 +3,45 @@ version: 0.2
 phases:
   pre_build:
     commands:
-    ## Use github rev-parse to get the branch name and store in variable.
-    - GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    - echo "Git branch from webhook is $GIT_BRANCH"
+    # 1. Get the PR number from the CodeBuild Environment Variable
+    - PR_NUMBER=$(echo $CODEBUILD_WEBHOOK_TRIGGER | cut -d'/' -f2)
+    - echo "Checking labels for PR #$PR_NUMBER..."
+    # 2. Get the full PR JSON from GitHub API
+    - PR_DATA=$(curl -s https://api.github.com/repos/GovWifi/govwifi-$APPLICATION_NAME/pulls/$PR_NUMBER)
+
+    # 3. Extract the Labels.
+    - LABELS=$(echo "$PR_DATA" | jq -r '.labels[].name')
+
+    # 4. Only proceed if the label exists or if it's a merged PR, otherwise stop the build without failing.
+    - |
+      if [ "$CODEBUILD_WEBHOOK_EVENT" = "PULL_REQUEST_MERGED" ] || [[ "$LABELS" =~ "Deploy-to-Dev" ]]; then
+          echo "Event is $CODEBUILD_WEBHOOK_EVENT and/or Labels contain 'Deploy-to-Dev'. continuing..."
+      else
+        echo "This is not a merge and/or the 'Deploy-to-Dev' label is missing. Skipping deployment."
+        # Stop the build here without failing
+        codebuild-breakpoint || exit 0
+      fi
+
+    # 5. Set the git branch, to main if merged or custom if PR and Label Set.
+    - |
+      if [ "$CODEBUILD_WEBHOOK_EVENT" = "PULL_REQUEST_MERGED" ]; then
+        # Reset to main upon merge to keep dev clean.
+        GIT_BRANCH=$MAIN_BRANCH
+      else
+        # set to the custom branch triggered by webhook.
+        GIT_BRANCH=$(echo "$PR_DATA" | jq -r '.head.ref')
+      fi
+
+    - echo "Git branch set to $GIT_BRANCH"
     - echo "Default branch is set to $MAIN_BRANCH"
 
   build:
     commands:
-    # Download the pipeline definition from the target pipeline.
+    # Get the current pipeline definition and extract the branch name.
     - aws codepipeline get-pipeline --name $PIPELINE_NAME > pipeline.json
     - PIPELINE_BRANCH=$(cat pipeline.json | jq -r '.pipeline.stages[0].actions[0].configuration.BranchName')
     - echo "Pipeline branch is set to $PIPELINE_BRANCH"
-    ## if the git branch doesn't matches pipeline then update pipeline
+    ## if the GIT branch name doesn't matches Pipeline branch name then reset the Pipeline to the GIT branch name.
     - |
       if [ "$GIT_BRANCH" != $PIPELINE_BRANCH ]; then
         echo "Use JQ to update the branchName parameter."

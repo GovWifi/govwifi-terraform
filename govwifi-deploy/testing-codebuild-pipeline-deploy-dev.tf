@@ -1,6 +1,8 @@
 /**
 * This code build project is only required to update the source branch name for codepipeline, which will then trigger the codepipeline.
-* because as of 2025, it's STILL not possible to override the source branch in code pipeline, so this messy workaround is required.
+* because as of 202, it's STILL not possible to override the source branch in code pipeline, so this messy workaround is required.
+* The source branch name is taken from the git branch which triggers the codebuild project via the webhook,
+* to build with a custom branch, create a PR and add the "Deploy-to-DEV" label, which will trigger this codebuild.
 **/
 resource "aws_codebuild_project" "testing_codebuild_update_source_branch" {
   #for_each      = toset(var.deployed_app_names)
@@ -22,6 +24,7 @@ resource "aws_codebuild_project" "testing_codebuild_update_source_branch" {
     privileged_mode             = true
 
     environment_variable {
+      ## This is used to identify which pipeline to update the source branch for.
       name  = "PIPELINE_NAME"
       value = aws_codepipeline.testing_dev_apps_pipeline[each.key].name
     }
@@ -59,6 +62,8 @@ resource "aws_codebuild_project" "testing_codebuild_update_source_branch" {
   }
 }
 
+### THIS is what triggers this codebuild project to update the source branch based on the git branch which called it,
+# which then updates and runs the codepipeline.
 resource "aws_codebuild_webhook" "testing_app_webhook_pipeline_trigger" {
   #for_each     = toset(var.built_app_names)
   for_each     = toset(var.test_app_pipeline)
@@ -69,7 +74,7 @@ resource "aws_codebuild_webhook" "testing_app_webhook_pipeline_trigger" {
   filter_group {
     filter {
       type    = "EVENT"
-      pattern = "PULL_REQUEST_MERGED"
+      pattern = "PULL_REQUEST_UPDATED, PULL_REQUEST_REOPENED, PULL_REQUEST_CREATED, PULL_REQUEST_MERGED"
     }
   }
   depends_on = [
