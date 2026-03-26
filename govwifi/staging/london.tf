@@ -549,5 +549,7 @@ module "london_metrics" {
   aws_account_id = local.aws_account_id
   region_name    = local.london_aws_region_name
 
-  database_name = "govwifi_metrics"
+  database_name          = "govwifi_metrics"
+  vpc_security_group_ids = [aws_security_group.london_metrics_db.id]
+  db_subnet_group_name   = aws_db_subnet_group.london_metrics.name
 }
