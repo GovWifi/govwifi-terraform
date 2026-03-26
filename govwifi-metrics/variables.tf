@@ -19,7 +19,7 @@ variable "engine" {
 variable "engine_version" {
   type        = string
   description = "The database engine version"
-  default     = "13.6"
+  default     = "17.7"
 }
 
 variable "database_name" {
@@ -42,7 +42,7 @@ variable "db_subnet_group_name" {
 variable "min_capacity" {
   type        = number
   description = "Minimum capacity for an Aurora DB cluster in serverless v2 scaling configuration"
-  default     = 0.0
+  default     = 0.5
 }
 
 variable "max_capacity" {
