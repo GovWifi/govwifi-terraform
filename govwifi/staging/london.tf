@@ -525,6 +525,34 @@ module "london_account_policy" {
 
 }
 
+resource "aws_security_group" "london_metrics_db" {
+  provider    = aws.london
+  name        = "london-metrics-db"
+  description = "Allow inbound traffic from backend to metrics DB"
+  vpc_id      = module.london_backend.backend_vpc_id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [module.london_backend.vpc_cidr_block]
+  }
+
+  tags = {
+    Name = "${title(local.env_name)} London Metrics DB"
+  }
+}
+
+resource "aws_db_subnet_group" "london_metrics" {
+  provider   = aws.london
+  name       = "london-metrics-subnets"
+  subnet_ids = module.london_backend.backend_subnet_ids
+
+  tags = {
+    Name = "${title(local.env_name)} London Metrics Subnets"
+  }
+}
+
 module "london_metrics" {
   providers = {
     aws = aws.london
@@ -537,5 +565,7 @@ module "london_metrics" {
   aws_account_id = local.aws_account_id
   region_name    = local.london_aws_region_name
 
-  database_name = "govwifi_metrics"
+  database_name          = "govwifi_metrics"
+  vpc_security_group_ids = [aws_security_group.london_metrics_db.id]
+  db_subnet_group_name   = aws_db_subnet_group.london_metrics.name
 }
