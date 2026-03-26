@@ -568,4 +568,5 @@ module "london_metrics" {
   database_name          = "govwifi_metrics"
   vpc_security_group_ids = [aws_security_group.london_metrics_db.id]
   db_subnet_group_name   = aws_db_subnet_group.london_metrics.name
+  skip_final_snapshot    = true
 }
