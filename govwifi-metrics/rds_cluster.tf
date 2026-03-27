@@ -1,6 +1,6 @@
 
 resource "aws_rds_cluster" "metrics_db_cluster" {
-  cluster_identifier     = "metrics-db-cluster-${var.aws_region}"
+  cluster_identifier     = "metrics-db-cluster-${var.aws_region}-${var.env}"
   engine                 = var.engine
   engine_mode            = "provisioned"
   engine_version         = var.engine_version

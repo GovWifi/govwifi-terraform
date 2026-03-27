@@ -43,6 +43,7 @@ resource "aws_security_group" "be_ecs_out" {
   }
 
   egress {
+    # This is to allow access to the Aurora postgres DB when tunneling from the bastion host
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
