@@ -63,6 +63,24 @@ variable "skip_final_snapshot" {
   default     = false
 }
 
+variable "backend_subnet_ids" {
+  type        = list(string)
+  description = "List of backend subnet IDs"
+  default     = []
+}
+
+variable "backend_vpc_id" {
+  type        = string
+  description = "The ID of the backend VPC"
+  default     = ""
+}
+
+variable "backend_vpc_cidr_block" {
+  type        = string
+  description = "The CIDR block of the backend VPC"
+  default     = ""
+}
+
 variable "tags" {
   type        = map(string)
   description = "A mapping of tags to assign to the resource"
