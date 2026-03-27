@@ -7,8 +7,8 @@ resource "aws_rds_cluster" "metrics_db_cluster" {
   database_name          = var.database_name
   master_username        = jsondecode(data.aws_secretsmanager_secret_version.metrics_db_credentials_data.secret_string)["username"]
   master_password        = jsondecode(data.aws_secretsmanager_secret_version.metrics_db_credentials_data.secret_string)["password"]
-  vpc_security_group_ids = var.vpc_security_group_ids
-  db_subnet_group_name   = var.db_subnet_group_name
+  vpc_security_group_ids = [aws_security_group.london_metrics_db_sg.id]
+  db_subnet_group_name   = aws_db_subnet_group.london_metrics_db_subnet_group.name
   skip_final_snapshot    = var.skip_final_snapshot
 
   serverlessv2_scaling_configuration {
