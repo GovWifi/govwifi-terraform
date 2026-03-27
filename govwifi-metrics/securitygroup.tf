@@ -11,7 +11,7 @@ resource "aws_security_group" "london_metrics_db_sg" {
   }
 
   tags = {
-    Name = "${title(var.env)} London Metrics DB"
+    Name = "${title(var.env)} Metrics DB"
   }
 }
 
@@ -20,6 +20,6 @@ resource "aws_db_subnet_group" "london_metrics_db_subnet_group" {
   subnet_ids = var.backend_subnet_ids
 
   tags = {
-    Name = "${title(var.env)} London Metrics Subnets"
+    Name = "${title(var.env)} Metrics Subnets"
   }
 }
