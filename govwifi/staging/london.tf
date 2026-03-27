@@ -526,23 +526,21 @@ module "london_account_policy" {
 }
 
 
-# module "london_metrics" {
-#   providers = {
-#     aws = aws.london
-#   }
+module "london_metrics" {
+  providers = {
+    aws = aws.london
+  }
 
-#   source = "../../govwifi-metrics"
+  source = "../../govwifi-metrics"
 
-#   aws_region     = local.london_aws_region
-#   env            = local.env
-#   aws_account_id = local.aws_account_id
-#   region_name    = local.london_aws_region_name
+  aws_region     = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+  region_name    = local.london_aws_region_name
 
-#   database_name          = "govwifi_metrics"
-#   vpc_security_group_ids = [aws_security_group.london_metrics_db.id]
-#   db_subnet_group_name   = aws_db_subnet_group.london_metrics.name
-#   skip_final_snapshot    = true
-#   backend_subnet_ids     = module.london_backend.backend_subnet_ids
-#   backend_vpc_id         = module.london_backend.backend_vpc_id
-#   backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
-# }
+  database_name          = "govwifi_metrics"
+  skip_final_snapshot    = true
+  backend_subnet_ids     = module.london_backend.backend_subnet_ids
+  backend_vpc_id         = module.london_backend.backend_vpc_id
+  backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+}

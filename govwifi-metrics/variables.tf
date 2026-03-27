@@ -27,18 +27,6 @@ variable "database_name" {
   description = "Name for an automatically created database on cluster creation"
 }
 
-variable "vpc_security_group_ids" {
-  type        = list(string)
-  description = "List of VPC security groups to associate with the Cluster"
-  default     = []
-}
-
-variable "db_subnet_group_name" {
-  type        = string
-  description = "A DB subnet group to associate with this DB cluster"
-  default     = ""
-}
-
 variable "min_capacity" {
   type        = number
   description = "Minimum capacity for an Aurora DB cluster in serverless v2 scaling configuration"

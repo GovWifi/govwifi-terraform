@@ -1,5 +1,4 @@
-resource "aws_security_group" "london_metrics_db" {
-  provider    = aws.london
+resource "aws_security_group" "london_metrics_db_sg" {
   name        = "london-metrics-db"
   description = "Allow inbound traffic from backend to metrics DB"
   vpc_id      = var.backend_vpc_id
@@ -12,16 +11,15 @@ resource "aws_security_group" "london_metrics_db" {
   }
 
   tags = {
-    Name = "${title(local.env_name)} London Metrics DB"
+    Name = "${title(var.env)} London Metrics DB"
   }
 }
 
-resource "aws_db_subnet_group" "london_metrics" {
-  provider   = aws.london
+resource "aws_db_subnet_group" "london_metrics_db_subnet_group" {
   name       = "london-metrics-subnets"
   subnet_ids = var.backend_subnet_ids
 
   tags = {
-    Name = "${title(local.env_name)} London Metrics Subnets"
+    Name = "${title(var.env)} London Metrics Subnets"
   }
 }

@@ -41,6 +41,13 @@ resource "aws_security_group" "be_ecs_out" {
     protocol    = "tcp"
     cidr_blocks = [for subnet in aws_subnet.wifi_backend_subnet : subnet.cidr_block]
   }
+
+  egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [for subnet in aws_subnet.wifi_backend_subnet : subnet.cidr_block]
+  }
 }
 
 resource "aws_security_group" "be_db_in" {
