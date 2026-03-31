@@ -57,6 +57,11 @@ resource "aws_codebuild_project" "govwifi_codebuild_acceptance_tests" {
       name  = "ADMIN_BRANCH"
       value = "master"
     }
+
+    environment_variable {
+      name  = "METRICS_API_BRANCH"
+      value = "main"
+    }
   }
 
   source {
