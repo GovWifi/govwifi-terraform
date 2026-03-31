@@ -40,6 +40,7 @@ locals {
     }
     metrics-api = {
       repo    = "govwifi-metrics-api"
+      branch  = "main"
       regions = ["eu-west-2"]
     }
   }
