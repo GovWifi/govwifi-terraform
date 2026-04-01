@@ -38,18 +38,6 @@ variable "dublin_radius_ip_addresses" {
   description = "Frontend RADIUS server IP addresses - Dublin"
 }
 
-variable "london_api_base_url" {
-  type        = string
-  description = "Base URL for authentication, user signup and logging APIs"
-  default     = "https://api-elb.london.wifi.service.gov.uk:8443"
-}
-
-variable "dublin_api_base_url" {
-  type        = string
-  description = "Dublin - base URL for authentication, user signup and logging APIs"
-  default     = "https://api-elb.dublin.wifi.service.gov.uk:8443"
-}
-
 variable "user_db_hostname" {
   type        = string
   description = "User details database hostname"
