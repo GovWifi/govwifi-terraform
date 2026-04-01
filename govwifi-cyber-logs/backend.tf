@@ -1,7 +1,7 @@
 # Update to correct backend terraform state storage details for your logs account.
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = ">= 1.9.0"
 
   required_providers {
     aws = {
