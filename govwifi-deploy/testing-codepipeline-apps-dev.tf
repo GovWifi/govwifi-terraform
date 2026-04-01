@@ -125,8 +125,8 @@ resource "aws_codepipeline" "testing_dev_apps_pipeline" {
         owner           = "AWS"
         provider        = "CodeBuild"
         input_artifacts = ["${each.key}-source-art"]
-        version   = 1
-        run_order = 1
+        version         = 1
+        run_order       = 1
         configuration = {
           ProjectName = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
           EnvironmentVariables = jsonencode([
