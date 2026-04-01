@@ -379,7 +379,7 @@ module "dublin_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["authentication-api"]
+  deployed_app_names = ["authentication-api", "frontend"]
 
   env_name = "development"
 
@@ -388,6 +388,7 @@ module "dublin_govwifi-ecs-update-service" {
   depends_on = [
     module.london_smoke_tests
   ]
+
 }
 
 module "dublin_sync_certs" {

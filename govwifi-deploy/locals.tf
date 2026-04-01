@@ -20,23 +20,37 @@ locals {
   git_owner         = "GovWifi"
   branch            = "master"
   s3_source_dir     = "source"
-  integration_tests = ["logging-api", "authentication-api"]
+  integration_tests = ["logging-api", "authentication-api", "frontend"]
   app = {
     admin = {
-      repo    = "govwifi-admin"
-      regions = ["eu-west-2"]
-    }
-    logging-api = {
-      repo    = "govwifi-logging-api"
-      regions = ["eu-west-2"]
+      repo      = "govwifi-admin"
+      regions   = ["eu-west-2"]
+      branch    = "master"
+      buildspec = "buildspec.yml"
     }
     authentication-api = {
-      repo    = "govwifi-authentication-api"
-      regions = ["eu-west-1", "eu-west-2"]
+      repo      = "govwifi-authentication-api"
+      regions   = ["eu-west-1", "eu-west-2"]
+      branch    = "master"
+      buildspec = "buildspec.yml"
+    }
+    frontend = {
+      repo      = "govwifi-frontend"
+      regions   = ["eu-west-1", "eu-west-2"]
+      branch    = "master" #GW-2056_pipeline_changes
+      buildspec = "buildspec-ci.yml"
+    }
+    logging-api = {
+      repo      = "govwifi-logging-api"
+      regions   = ["eu-west-2"]
+      branch    = "master"
+      buildspec = "buildspec.yml"
     }
     user-signup-api = {
-      repo    = "govwifi-user-signup-api"
-      regions = ["eu-west-2"]
+      repo      = "govwifi-user-signup-api"
+      regions   = ["eu-west-2"]
+      branch    = "master"
+      buildspec = "buildspec.yml"
     }
   }
 }

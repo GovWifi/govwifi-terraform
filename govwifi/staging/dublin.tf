@@ -378,7 +378,7 @@ module "dublin_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["authentication-api"]
+  deployed_app_names = ["authentication-api", "frontend"]
 
   env_name = "staging"
 

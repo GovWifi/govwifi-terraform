@@ -20,7 +20,6 @@ resource "aws_kms_key" "codepipeline_key" {
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                  "arn:aws:iam::${local.aws_account_id}:role/${aws_iam_role.govwifi_codebuild_convert.name}",
                   "arn:aws:iam::${local.aws_account_id}:role/${aws_iam_role.govwifi_codebuild.name}"
 							   ]
             },
@@ -110,9 +109,8 @@ resource "aws_kms_key" "codepipeline_key_ireland" {
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                  "arn:aws:iam::${local.aws_account_id}:role/${aws_iam_role.govwifi_codebuild_convert.name}",
                   "arn:aws:iam::${local.aws_account_id}:role/${aws_iam_role.govwifi_codebuild.name}"
-							   ]
+				]
             },
             "Action": "kms:*",
             "Resource": "*"

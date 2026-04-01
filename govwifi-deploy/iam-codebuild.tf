@@ -46,46 +46,25 @@ resource "aws_iam_policy" "govwifi_codebuild_role_policy" {
         {
             "Action": [
                 "s3:GetObject",
-                "s3:GetObjectVersion"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "S3GetObjectPolicy"
-        },
-        {
-            "Action": [
-                "s3:PutObject"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "S3PutObjectPolicy"
-        },
-        {
-            "Action": [
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "ECRPullPolicy"
-        },
-        {
-            "Action": [
-                "ecr:GetAuthorizationToken"
-            ],
-            "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "ECRAuthPolicy"
-        },
-        {
-            "Action": [
+                "s3:GetObjectVersion",
+                "s3:PutObject",
                 "s3:GetBucketAcl",
                 "s3:GetBucketLocation"
             ],
             "Effect": "Allow",
             "Resource": "*",
-            "Sid": "S3BucketIdentity"
+            "Sid": "S3ObjectPolicy"
+        },
+        {
+            "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:GetAuthorizationToken"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Sid": "ECRPullPolicy"
         },
 				{
 						"Effect": "Allow",
@@ -98,12 +77,22 @@ resource "aws_iam_policy" "govwifi_codebuild_role_policy" {
 								"${aws_s3_bucket.codepipeline_bucket_ireland.arn}",
 								"${aws_s3_bucket.codepipeline_bucket_ireland.arn}/*"
 						]
-				}
+				},
+        {
+          "Sid": "SecretManagerAccess",
+          "Effect": "Allow",
+          "Action": [
+            "secretsmanager:GetSecretValue"
+          ],
+          "Resource": [
+            "${data.aws_secretsmanager_secret_version.docker_hub_authtoken.arn}",
+            "${data.aws_secretsmanager_secret_version.docker_hub_username.arn}"
+          ]
+        }
     ],
     "Version": "2012-10-17"
 }
 EOF
-
 }
 
 resource "aws_iam_policy_attachment" "govwifi_codebuild_role_policy" {
