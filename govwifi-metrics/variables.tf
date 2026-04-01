@@ -78,3 +78,36 @@ variable "tags" {
   description = "A mapping of tags to assign to the resource"
   default     = {}
 }
+
+variable "env_name" {
+  description = "E.g. wifi"
+}
+
+variable "env_subdomain" {
+  description = "E.g. staging.wifi"
+}
+
+variable "log_retention" {
+  type    = number
+  default = 7
+}
+
+variable "route53_zone_id" {
+  description = "Route53 zone to use for the domain name"
+}
+
+variable "admin_sg_id" {
+  description = "Security group ID of the admin service for ingress"
+}
+
+variable "api_sg_id" {
+  description = "Security group ID of the api services for ingress"
+}
+
+variable "metrics_api_docker_image" {
+  description = "Docker image for the metrics API"
+}
+
+variable "vpc_endpoints_security_group_id" {
+  description = "Security group ID for VPC endpoints"
+}
