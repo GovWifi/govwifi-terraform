@@ -384,7 +384,6 @@ module "dublin_govwifi-ecs-update-service" {
   env_name = "development"
 
   aws_account_id = local.aws_account_id
-  log_retention = local.log_retention
 
   depends_on = [
     module.london_smoke_tests

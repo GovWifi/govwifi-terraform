@@ -439,7 +439,6 @@ module "london_govwifi-ecs-update-service" {
 
   aws_account_id = local.aws_account_id
 
-  log_retention = local.log_retention
   depends_on = [
     module.london_smoke_tests
   ]

@@ -383,8 +383,6 @@ module "dublin_govwifi-ecs-update-service" {
   env_name = "staging"
 
   aws_account_id = local.aws_account_id
-
-  log_retention = local.log_retention
 }
 
 module "dublin_sync_certs" {
