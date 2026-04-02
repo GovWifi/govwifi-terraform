@@ -401,6 +401,11 @@ module "dublin_sync_certs" {
   aws_account_id = local.aws_account_id
   aws_region     = local.dublin_aws_region
   region_name    = local.dublin_aws_region_name
-
 }
 
+module "dublin_cyber_logs" {
+  source         = "../../govwifi-cyber-logs"
+  aws_account_id = local.aws_account_id
+  region         = local.london_aws_region
+  env            = local.env
+}

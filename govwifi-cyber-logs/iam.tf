@@ -1,5 +1,5 @@
 resource "aws_iam_role" "cribl_ingest" {
-  name = "cribl-ingest"
+  name = "${var.env}-cribl-ingest-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -7,12 +7,12 @@ resource "aws_iam_role" "cribl_ingest" {
       {
         Effect : "Allow",
         Principal : {
-          AWS : var.cribl_worker_arn
+          AWS : "${var.cribl_worker_arn}"
         },
         Action : "sts:AssumeRole",
         Condition : {
           StringEquals : {
-            "sts:ExternalId" : random_uuid.external_id.result
+            "sts:ExternalId" : "${data.aws_secretsmanager_secret_version.cribl_external_id_val.secret_string}"
           }
         }
       }
@@ -25,7 +25,7 @@ resource "aws_iam_role" "cribl_ingest" {
 }
 
 resource "aws_iam_policy" "cribl_kinesis" {
-  name        = "cribl-kinesis-policy"
+  name        = "${var.env}-cribl-kinesis-policy"
   description = "Allows necessary access to Kinesis."
   policy = jsonencode({
     Version = "2012-10-17",
@@ -36,7 +36,7 @@ resource "aws_iam_policy" "cribl_kinesis" {
         "kinesis:GetShardIterator",
         "kinesis:ListShards"
       ]
-      Resource = aws_kinesis_stream.log_stream.arn
+      Resource = "${aws_kinesis_stream.cribil_log_stream.arn}"
     }]
   })
 }
@@ -45,4 +45,51 @@ resource "aws_iam_policy" "cribl_kinesis" {
 resource "aws_iam_role_policy_attachment" "attach_kinesis" {
   policy_arn = aws_iam_policy.cribl_kinesis.arn
   role       = aws_iam_role.cribl_ingest.name
+}
+
+resource "aws_iam_role" "logs_kinesis_role" {
+  name = "${var.env}-kinesis-cloudwatch-logs-producer-role"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "logs.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole",
+        "Condition" : {
+          "StringLike" : {
+            "aws:SourceArn" : "arn:aws:logs:${var.region}:${var.aws_account_id}:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "logs_kinesis_policy" {
+  name        = "kinesis-cloudwatch-logs-producer-policy"
+  path        = "/"
+  description = "IAM policy for CloudWatch Logs to put records to Kinesis on another account."
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kinesis:PutRecord",
+          "kinesis:PutRecords"
+        ],
+        "Resource" : "${aws_kinesis_stream.cribil_log_stream.arn}"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "kinesis_role_policy_attachment" {
+  role       = aws_iam_role.logs_kinesis_role.name
+  policy_arn = aws_iam_policy.logs_kinesis_policy.arn
 }

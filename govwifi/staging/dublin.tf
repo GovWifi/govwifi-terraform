@@ -398,3 +398,10 @@ module "dublin_sync_certs" {
   region_name    = local.dublin_aws_region_name
 
 }
+
+module "dublin_cyber_logs" {
+  source         = "../../govwifi-cyber-logs"
+  region         = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+}

@@ -524,3 +524,10 @@ module "london_account_policy" {
   region_name    = local.london_aws_region_name
 
 }
+
+module "london_cyber_logs" {
+  source         = "../../govwifi-cyber-logs"
+  region         = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+}
