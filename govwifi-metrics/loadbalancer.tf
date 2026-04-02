@@ -72,5 +72,3 @@ resource "aws_alb_listener" "metrics_https" {
     type             = "forward"
   }
 }
-
-}
