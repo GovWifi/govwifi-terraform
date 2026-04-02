@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.9.0"
+  required_version = "~> 1.14"
 
   backend "s3" {
     bucket = "govwifi-staging-tfstate-eu-west-2"
