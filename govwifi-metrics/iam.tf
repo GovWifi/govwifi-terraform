@@ -47,6 +47,7 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
   name = "metrics-api-task-policy-${var.env}-${var.region_name}"
   role = aws_iam_role.metrics_api_task_role.id
 
+  # Resources are wildcards to allow any ecs-execute-command session to connect from the container
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -59,7 +60,6 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
         "ssmmessages:OpenControlChannel",
         "ssmmessages:OpenDataChannel"
       ],
-      # Resources are wildcards to allow any ecs-execute-command session to connect from the container.
       "Resource": "*"
     }
   ]
