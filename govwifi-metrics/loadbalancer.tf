@@ -50,7 +50,10 @@ resource "aws_s3_bucket_policy" "metrics_logs" {
         "AWS": "${data.aws_elb_service_account.main.arn}"
       },
       "Action": "s3:PutObject",
-      "Resource": ["${aws_s3_bucket.metrics_access_logs.arn}/AWSLogs/*"]
+      "Resource": [
+        "${aws_s3_bucket.metrics_access_logs.arn}/AWSLogs/*",
+        "${aws_s3_bucket.metrics_access_logs.arn}/AWSLogs"
+      ]
     }
   ]
 }
