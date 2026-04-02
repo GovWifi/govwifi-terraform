@@ -668,3 +668,38 @@ module "london_log_management" {
   log_retention              = local.log_retention
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
 }
+
+module "london_metrics" {
+  providers = {
+    aws = aws.main
+  }
+
+  source = "../../govwifi-metrics"
+
+  aws_region     = var.aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+  region_name    = var.aws_region_name
+
+  database_name          = "govwifi_metrics"
+  skip_final_snapshot    = false
+  backend_subnet_ids     = module.backend.backend_subnet_ids
+  backend_vpc_id         = module.backend.backend_vpc_id
+  backend_vpc_cidr_block = module.backend.vpc_cidr_block
+
+  env_name      = local.env_name
+  env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
+
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+
+  admin_sg_id = module.govwifi_admin.admin_ec2_out_sg_id
+  api_sg_id   = module.api.api_out_sg_id
+
+  metrics_api_docker_image        = format("%s/metrics-api:production", local.docker_image_path)
+  vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
+
+  tags = {
+    Name = "london-metrics-production"
+  }
+}

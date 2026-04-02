@@ -561,3 +561,38 @@ module "london_admin_portal_cyber_logs" {
   env                 = local.env
   account_access_arns = ["arn:aws:logs:${local.london_aws_region}:${local.aws_account_id}:*"]
 }
+
+module "london_metrics" {
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../govwifi-metrics"
+
+  aws_region     = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+  region_name    = local.london_aws_region_name
+
+  database_name          = "govwifi_metrics"
+  skip_final_snapshot    = true
+  backend_subnet_ids     = module.london_backend.backend_subnet_ids
+  backend_vpc_id         = module.london_backend.backend_vpc_id
+  backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+
+  env_name      = local.env_name
+  env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
+
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+
+  admin_sg_id = module.london_admin.admin_ec2_out_sg_id
+  api_sg_id   = module.london_api.api_out_sg_id
+
+  metrics_api_docker_image        = format("%s/metrics-api:development", local.docker_image_path)
+  vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
+
+  tags = {
+    Name = "london-metrics-development"
+  }
+}
