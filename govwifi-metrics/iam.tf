@@ -59,6 +59,7 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
         "ssmmessages:OpenControlChannel",
         "ssmmessages:OpenDataChannel"
       ],
+      # Resources are wildcards to allow any ecs-execute-command session to connect from the container.
       "Resource": "*"
     }
   ]

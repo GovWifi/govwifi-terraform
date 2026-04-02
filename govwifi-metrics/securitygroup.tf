@@ -63,7 +63,7 @@ resource "aws_security_group" "metrics_alb_out" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.backend_vpc_cidr_block]
   }
 }
 
@@ -97,7 +97,7 @@ resource "aws_security_group" "metrics_service_out" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.backend_vpc_cidr_block]
   }
 }
 
