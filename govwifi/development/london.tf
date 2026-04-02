@@ -558,12 +558,16 @@ module "london_account_policy" {
 }
 
 module "london_cyber_logs" {
+  providers = {
+    aws = aws.london
+  }
+
   source         = "../../govwifi-cyber-logs"
-  aws_account_id = local.aws_account_id
+
   region         = local.london_aws_region
   env            = local.env
+  aws_account_id = local.aws_account_id
 }
-
 module "london_metrics" {
   providers = {
     aws = aws.london

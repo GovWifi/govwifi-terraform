@@ -556,3 +556,15 @@ module "london_metrics" {
   db_subnet_group_name   = aws_db_subnet_group.london_metrics.name
   skip_final_snapshot    = true
 }
+
+module "london_cyber_logs" {
+  providers = {
+    aws = aws.london
+  }
+
+  source         = "../../govwifi-cyber-logs"
+
+  region         = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+}
