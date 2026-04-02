@@ -41,13 +41,6 @@ resource "aws_security_group" "metrics_alb_in" {
     protocol        = "tcp"
     security_groups = [var.admin_sg_id, var.api_sg_id]
   }
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [var.admin_sg_id, var.api_sg_id]
-  }
 }
 
 resource "aws_security_group" "metrics_alb_out" {
