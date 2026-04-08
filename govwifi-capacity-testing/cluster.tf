@@ -8,30 +8,30 @@
 */
 
 resource "aws_cloudwatch_log_group" "capacity_testing" {
-	name              = "/ecs/govwifi-capacity-testing-${var.env}"
-	retention_in_days = 30
-	tags = { Env = var.env }
+  name              = "/ecs/govwifi-capacity-testing-${var.env}"
+  retention_in_days = 30
+  tags              = { Env = var.env }
 }
 
 resource "aws_ecs_cluster" "capacity" {
-	name = "govwifi-capacity-${var.env}"
-	setting {
-		name  = "containerInsights"
-		value = "disabled"
-	}
-	tags = { Env = var.env }
+  name = "govwifi-capacity-${var.env}"
+  setting {
+    name  = "containerInsights"
+    value = "disabled"
+  }
+  tags = { Env = var.env }
 }
 
 resource "aws_ecs_task_definition" "capacity_testing" {
-	family                   = "govwifi-capacity-testing-${var.env}"
-	requires_compatibilities = ["FARGATE"]
-	network_mode             = "awsvpc"
-	cpu                      = "8192"
-	memory                   = "61440"
-	execution_role_arn       = aws_iam_role.ecs_task_execution.arn
-	task_role_arn            = aws_iam_role.ecs_task_role.arn
+  family                   = "govwifi-capacity-testing-${var.env}"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "8192"
+  memory                   = "61440"
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-	container_definitions = <<EOF
+  container_definitions = <<EOF
 [
 		{
 			"name": "capacity-testing",
@@ -69,33 +69,33 @@ EOF
 }
 
 resource "aws_ecs_service" "capacity_testing" {
-	name            = "govwifi-capacity-testing-svc-${var.env}"
-	cluster         = aws_ecs_cluster.capacity.id
-	task_definition = aws_ecs_task_definition.capacity_testing.arn
-	desired_count   = 3
-	launch_type     = "FARGATE"
-	platform_version = "LATEST"
+  name             = "govwifi-capacity-testing-svc-${var.env}"
+  cluster          = aws_ecs_cluster.capacity.id
+  task_definition  = aws_ecs_task_definition.capacity_testing.arn
+  desired_count    = 3
+  launch_type      = "FARGATE"
+  platform_version = "LATEST"
 
-	network_configuration {
-		subnets         = aws_subnet.capacity_private[*].id
-		security_groups = [aws_security_group.capacity_tasks_sg.id]
-		assign_public_ip = false
-	}
+  network_configuration {
+    subnets          = aws_subnet.capacity_private[*].id
+    security_groups  = [aws_security_group.capacity_tasks_sg.id]
+    assign_public_ip = false
+  }
 
-	enable_execute_command = true
+  enable_execute_command = true
 
-	tags = { Env = var.env }
+  tags = { Env = var.env }
 }
 
 
 resource "aws_security_group" "capacity_tasks_sg" {
-	name        = "govwifi-capacity-tasks-sg-${var.env}"
-	description = "Security group for capacity testing ECS tasks"
-	vpc_id      = aws_vpc.capacity_public.id
+  name        = "govwifi-capacity-tasks-sg-${var.env}"
+  description = "Security group for capacity testing ECS tasks"
+  vpc_id      = aws_vpc.capacity_public.id
 
-	tags = {
-		Name = "${title(var.env)} Capacity Testing"
-	}
+  tags = {
+    Name = "${title(var.env)} Capacity Testing"
+  }
 
   ingress {
     description = "RADIUS traffic"
@@ -106,10 +106,10 @@ resource "aws_security_group" "capacity_tasks_sg" {
   }
 
   ingress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    cidr_blocks  	= ["0.0.0.0/0"]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
