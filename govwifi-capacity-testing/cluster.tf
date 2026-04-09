@@ -72,7 +72,7 @@ resource "aws_ecs_service" "capacity_testing" {
   name             = "govwifi-capacity-testing-svc-${var.env}"
   cluster          = aws_ecs_cluster.capacity.id
   task_definition  = aws_ecs_task_definition.capacity_testing.arn
-  desired_count    = 3
+  desired_count    = 0
   launch_type      = "FARGATE"
   platform_version = "LATEST"
 
@@ -85,6 +85,11 @@ resource "aws_ecs_service" "capacity_testing" {
   enable_execute_command = true
 
   tags = { Env = var.env }
+
+  lifecycle {
+    ignore_changes = [
+    desired_count]
+  }
 }
 
 
