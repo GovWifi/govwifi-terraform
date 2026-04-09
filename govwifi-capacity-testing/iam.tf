@@ -36,7 +36,7 @@ resource "aws_iam_policy" "codebuild_policy" {
         Action = [
           "ecr:*"
         ]
-        Resource = aws_ecr_repository.capacity_testing.arn
+        Resource = "${aws_ecr_repository.capacity_testing.arn}"
       },
       {
         Sid    = "CloudWatchLogs"
@@ -109,7 +109,10 @@ resource "aws_iam_role_policy" "ecs_exec_ssm_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ssmmessages:*"
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
         ]
         Resource = "*"
       },
@@ -127,7 +130,7 @@ resource "aws_iam_role_policy" "ecs_exec_ssm_policy" {
           "logs:PutLogEvents",
           "logs:CreateLogGroup"
         ]
-        Resource = "*"
+        Resource = "${aws_cloudwatch_log_group.capacity_testing.arn}:*"
       }
     ]
   })
@@ -165,7 +168,10 @@ resource "aws_iam_policy" "ecs_task_role" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "ssmmessages:*"
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
         ],
         "Resource" : "*"
       },
@@ -174,7 +180,9 @@ resource "aws_iam_policy" "ecs_task_role" {
         "Action" : [
           "logs:*"
         ],
-        "Resource" : "*"
+        "Resource" : [
+          "${aws_cloudwatch_log_group.capacity_testing.arn}:*"
+        ]
       },
       {
         "Effect" : "Allow",

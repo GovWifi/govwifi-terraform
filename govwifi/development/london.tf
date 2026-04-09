@@ -573,6 +573,5 @@ module "london_capacity_testing" {
   env            = local.env
   aws_account_id = local.aws_account_id
   aws_region     = local.london_aws_region
-  # administrator_cidrs = var.administrator_cidrs
 
 }
