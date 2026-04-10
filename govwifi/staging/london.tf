@@ -553,7 +553,7 @@ module "london_metrics" {
   admin_sg_id = module.london_admin.admin_ec2_out_sg_id
   api_sg_id   = module.london_api.api_out_sg_id
 
-  metrics_api_docker_image        = format("%s/metrics-api:staging", local.docker_image_path)
+  metrics_api_docker_image        = local.metrics_api_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
   tags = {
