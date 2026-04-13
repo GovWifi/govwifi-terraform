@@ -37,6 +37,10 @@ resource "aws_ecs_task_definition" "metrics_api" {
         {
           "name": "DATABASE_DSN",
           "value": "${local.database_dsn}"
+        },
+        {
+          "name": "PERMITTED_HOSTS",
+          "value": "metrics.${var.env_subdomain}.service.gov.uk"
         }
       ],
       "logConfiguration": {

@@ -41,6 +41,13 @@ resource "aws_security_group" "metrics_alb_in" {
     protocol        = "tcp"
     security_groups = [var.admin_sg_id, var.api_sg_id]
   }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.backend_vpc_cidr_block]
+  }
 }
 
 resource "aws_security_group" "metrics_alb_out" {
