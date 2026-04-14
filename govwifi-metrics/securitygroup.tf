@@ -1,3 +1,11 @@
+data "aws_prefix_list" "s3" {
+  # ECR pulls container image layers from S3. Since S3 is accessed via a Gateway
+  # Endpoint, it uses public IPs managed by an AWS Prefix List. This allows the
+  # service to reach Interface endpoints (ECR, Logs, Secrets Manager) and the S3
+  # Gateway Endpoint.
+  name = "com.amazonaws.${var.aws_region}.s3"
+}
+
 resource "aws_security_group" "london_metrics_db_sg" {
   name        = "london-metrics-db"
   description = "Allow inbound traffic from metrics-api to metrics DB"
@@ -93,31 +101,32 @@ resource "aws_security_group" "metrics_service_out" {
     Name = "${var.env} Metrics API Traffic Out"
   })
 
-  # If I restrict 443 & 53 to backend_vpc_cidr_block the container image won't
-  # be pulled in and the request will timeout. I wasn't able to resolve this
-  # issue.
   egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    cidr_blocks     = [var.backend_vpc_cidr_block]
+    prefix_list_ids = [data.aws_prefix_list.s3.id]
   }
 
+  # Restricted egress to the VPC CIDR and added the Amazon Provided DNS IP
+  # (169.254.169.253/32), which is required for DNS resolution within the VPC.
   egress {
     from_port   = 53
     to_port     = 53
     protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.backend_vpc_cidr_block, "169.254.169.253/32"]
   }
 
   egress {
     from_port   = 53
     to_port     = 53
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.backend_vpc_cidr_block, "169.254.169.253/32"]
   }
 
   egress {
+    # This is for the metrics-api to talk to the metrics-db (postgresql)
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
