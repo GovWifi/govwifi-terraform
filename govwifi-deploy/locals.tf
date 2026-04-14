@@ -38,10 +38,5 @@ locals {
       repo    = "govwifi-user-signup-api"
       regions = ["eu-west-2"]
     }
-    metrics-api = {
-      repo    = "govwifi-metrics-api"
-      branch  = "main"
-      regions = ["eu-west-2"]
-    }
   }
 }
