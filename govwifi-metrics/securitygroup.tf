@@ -93,6 +93,9 @@ resource "aws_security_group" "metrics_service_out" {
     Name = "${var.env} Metrics API Traffic Out"
   })
 
+  # If I restrict 443 & 53 to backend_vpc_cidr_block the container image won't
+  # be pulled in and the request will timeout. I wasn't able to resolve this
+  # issue.
   egress {
     from_port   = 443
     to_port     = 443
@@ -115,8 +118,8 @@ resource "aws_security_group" "metrics_service_out" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 5432
+    to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = [var.backend_vpc_cidr_block]
   }
