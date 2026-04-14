@@ -13,7 +13,8 @@ resource "aws_lb" "metrics_alb" {
     enabled = true
   }
 
-  load_balancer_type = "application"
+  load_balancer_type         = "application"
+  drop_invalid_header_fields = true
 
   tags = var.tags
 }
