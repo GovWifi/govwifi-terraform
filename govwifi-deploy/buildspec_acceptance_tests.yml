@@ -10,7 +10,6 @@ phases:
       - git clone -b $LOGGING_API_BRANCH https://github.com/govwifi/govwifi-logging-api.git govwifi-acceptance-tests/.logging-api
       - git clone -b $ADMIN_BRANCH https://github.com/govwifi/govwifi-admin.git govwifi-acceptance-tests/.admin
       - git clone -b $USER_SIGNUP_API_BRANCH https://github.com/govwifi/govwifi-user-signup-api.git govwifi-acceptance-tests/.user-signup-api
-      - git clone -b $METRICS_API_BRANCH https://github.com/govwifi/govwifi-metrics-api.git govwifi-acceptance-tests/.metrics-api
 
   build:
     commands:
