@@ -14,14 +14,6 @@ data "aws_secretsmanager_secret" "staging_aws_account_no" {
   name = "staging/AccountID"
 }
 
-data "aws_secretsmanager_secret_version" "alpaca_aws_account_no" {
-  secret_id = data.aws_secretsmanager_secret.alpaca_aws_account_no.id
-}
-
-data "aws_secretsmanager_secret" "alpaca_aws_account_no" {
-  name = "alpaca/AccountID"
-}
-
 data "aws_secretsmanager_secret_version" "development_aws_account_no" {
   secret_id = data.aws_secretsmanager_secret.development_aws_account_no.id
 }

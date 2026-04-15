@@ -216,12 +216,12 @@ The first time terraform is run in a new environment the replication configurati
 > - Comment out between these markers when doing plan and apply:
 
 
-> **NOTE:** we had to go to AWS KMS (Key Management Service) and enable all the kesy that were marked for deletion, 
+> **NOTE:** we had to go to AWS KMS (Key Management Service) and enable all the kesy that were marked for deletion,
 > and comment out the ```mysql_rds_backup_s3_key``` and ```mysql_rds_backup_s3_key_alias``` resources in
 > - govwifi-terraform/govwifi-backend/kms.tf
 
 > **NOTE: ** the ```rds/users-db/credentials``` already exists in **Secrets Manager** in AWS, so we need to comment out the:
-> - govwifi-terraform/govwifi-backend/secrets-manager.tf resource ```users_db_credentials```, 
+> - govwifi-terraform/govwifi-backend/secrets-manager.tf resource ```users_db_credentials```,
 > ```users_db_creds_password_username```, ```users_db_creds_update_existing```
 
 

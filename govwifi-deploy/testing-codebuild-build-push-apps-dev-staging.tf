@@ -1,7 +1,8 @@
-resource "aws_codebuild_project" "govwifi_codebuild_deployed_app" {
-  for_each       = toset(var.deployed_app_names)
-  name           = "${each.key}-app-build-push-image-ECR"
-  description    = "A common project that builds the ${each.key} app docker image and pushes it to ECR for the given environment"
+resource "aws_codebuild_project" "testing_codebuild_build_push_app" {
+  #for_each      = toset(var.deployed_app_names)
+  for_each       = toset(var.test_app_pipeline)
+  name           = "TESTING-${each.key}-app-build-push-image-ECR-ALL-ENVS"
+  description    = "A common project that builds the ${each.key} app docker image and pushes to provided environment ECR"
   build_timeout  = "20"
   service_role   = aws_iam_role.govwifi_codebuild.arn
   encryption_key = aws_kms_key.codepipeline_key.arn
@@ -12,7 +13,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_deployed_app" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:6.0"
+    image                       = "aws/codebuild/standard:7.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
@@ -31,16 +32,11 @@ resource "aws_codebuild_project" "govwifi_codebuild_deployed_app" {
       name  = "AWS_ACCOUNT_ID"
       value = local.aws_account_id
     }
-
-    environment_variable {
-      name  = "ACCEPTANCE_TESTS_PROJECT_NAME"
-      value = aws_codebuild_project.govwifi_codebuild_acceptance_tests.name
-    }
   }
 
   source {
     type      = "CODEPIPELINE"
-    buildspec = "buildspec.yml"
+    buildspec = local.app[each.key].buildspec
   }
 
   logs_config {
