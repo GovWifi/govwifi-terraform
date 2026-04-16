@@ -144,7 +144,7 @@ resource "aws_lb" "authentication_api" {
 }
 
 resource "aws_alb_target_group" "private_auth_api_tg" {
-  name        = "private-auth-api-lb-tg-${var.env_name}"
+  name        = "private-auth-api-lb-tg"
   port        = "8080"
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
