@@ -1,3 +1,37 @@
+resource "aws_security_group" "api_alb_in" {
+  name        = "loadbalancer-in"
+  description = "Allow Inbound Traffic To The ALB"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = "${title(var.env_name)} ALB Traffic In"
+  }
+
+  ingress {
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = [for ip in var.radius_server_ips : "${ip}/32"]
+  }
+}
+
+resource "aws_security_group" "api_alb_out" {
+  name        = "loadbalancer-out"
+  description = "Allow Outbound Traffic To The ALB"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = "${title(var.env_name)} ALB Traffic Out"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_security_group" "api_in" {
   name        = "api-in"
   description = "Allow Inbound Traffic To API"

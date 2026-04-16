@@ -52,12 +52,6 @@ variable "ssh_key_name" {
 variable "dns_numbering_base" {
 }
 
-variable "logging_api_base_url" {
-}
-
-variable "auth_api_base_url" {
-}
-
 variable "authentication_api_internal_dns_name" {
 }
 
