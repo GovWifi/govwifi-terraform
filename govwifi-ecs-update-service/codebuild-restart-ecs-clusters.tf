@@ -10,11 +10,11 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
   }
 
   environment {
-    ## Using Lambda Compute instead of EC2, for speed and efficiency, but caution, only for non privileged builds, great for cli commands, not for Docker builds.
-    ## Also note that there is also a hard limit of 15 minutes build time.
-    compute_type = "BUILD_LAMBDA_1GB"
-    type         = "LINUX_LAMBDA_CONTAINER"
-    image        = "aws/codebuild/amazonlinux-x86_64-lambda-standard:python3.12"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "aws/codebuild/standard:5.0"
+    type                        = "LINUX_CONTAINER"
+    image_pull_credentials_type = "CODEBUILD"
+    privileged_mode             = true
 
     environment_variable {
       name  = "SERVICE_NAME"
