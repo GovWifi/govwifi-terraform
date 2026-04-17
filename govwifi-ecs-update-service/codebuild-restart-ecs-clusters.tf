@@ -23,7 +23,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
 
     environment_variable {
       name  = "CLUSTER_NAME"
-      value = each.key == "admin" ? "${var.env_name}-admin-cluster" : "${var.env_name}-api-cluster"
+      value = each.key == "admin" ? "${var.env_name}-admin-cluster" : (each.key == "metrics-api" ? "metrics-cluster-${var.env_name}" : "${var.env_name}-api-cluster")
     }
 
     # This is the Task Definition Family Name
