@@ -2,7 +2,7 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
   for_each      = toset(var.deployed_app_names)
   name          = "govwifi-ecs-update-service-${each.key}"
   description   = "Force restart the service to pick up the latest production image."
-  build_timeout = "10"
+  build_timeout = "30"
   service_role  = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
 
   artifacts {
