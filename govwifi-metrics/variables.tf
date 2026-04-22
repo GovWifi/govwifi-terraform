@@ -115,6 +115,11 @@ variable "metrics_api_docker_image" {
   description = "Docker image for the metrics API"
 }
 
+variable "tableau_bridge_docker_image" {
+  type        = string
+  description = "Docker image for the Tableau Bridge"
+}
+
 variable "vpc_endpoints_security_group_id" {
   type        = string
   description = "Security group ID for VPC endpoints"
