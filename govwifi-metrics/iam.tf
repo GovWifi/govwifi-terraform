@@ -92,6 +92,29 @@ resource "aws_iam_role_policy_attachment" "tableau_bridge_task_execution_role_po
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "tableau_bridge_task_execution_policy" {
+  name = "tableau-bridge-task-execution-policy-${var.env}-${var.region_name}"
+  role = aws_iam_role.tableau_bridge_task_execution_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "${data.aws_secretsmanager_secret.tableau_bridge_pat.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role" "tableau_bridge_task_role" {
   name = "tableau-bridge-task-role-${var.env}-${var.region_name}"
 
