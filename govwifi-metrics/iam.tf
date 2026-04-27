@@ -23,6 +23,29 @@ resource "aws_iam_role_policy_attachment" "metrics_api_task_execution_role_polic
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "metrics_api_task_execution_policy" {
+  name = "metrics-api-task-execution-policy-${var.env}-${var.region_name}"
+  role = aws_iam_role.metrics_api_task_execution_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role" "metrics_api_task_role" {
   name = "metrics-api-task-role-${var.env}-${var.region_name}"
 
@@ -58,7 +81,9 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
         "ssmmessages:CreateControlChannel",
         "ssmmessages:CreateDataChannel",
         "ssmmessages:OpenControlChannel",
-        "ssmmessages:OpenDataChannel"
+        "ssmmessages:OpenDataChannel",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
       ],
       "Resource": "*"
     }
@@ -107,7 +132,8 @@ resource "aws_iam_role_policy" "tableau_bridge_task_execution_policy" {
         "kms:Decrypt"
       ],
       "Resource": [
-        "${data.aws_secretsmanager_secret.tableau_bridge_pat.arn}"
+        "${data.aws_secretsmanager_secret.tableau_bridge_pat.arn}",
+        "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
       ]
     }
   ]

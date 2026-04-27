@@ -43,6 +43,12 @@ resource "aws_ecs_task_definition" "metrics_api" {
           "value": "metrics.${var.env_subdomain}.service.gov.uk"
         }
       ],
+      "secrets": [
+        {
+          "name": "METRICS_API_KEY",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -163,6 +169,10 @@ resource "aws_ecs_task_definition" "tableau_bridge" {
         {
           "name": "TABLEAU_PAT_JSON",
           "valueFrom": "${data.aws_secretsmanager_secret.tableau_bridge_pat.arn}"
+        },
+        {
+          "name": "METRICS_API_KEY",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
         }
       ],
       "logConfiguration": {
