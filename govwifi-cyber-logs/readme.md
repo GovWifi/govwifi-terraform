@@ -22,3 +22,6 @@ locals {
 ```
 * **Key (Left):** The "Short Name" (e.g., `my-new-app`). This becomes the folder name in S3 and the `app_name` in Athena.
 * **Value (Right):** The exact CloudWatch Log Group name.
+
+#### 2 API Key
+The UUID we give to Cyber is in secrets manager under the path logs/cribl/external_id, this is copied to both regions

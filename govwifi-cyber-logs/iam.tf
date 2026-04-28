@@ -1,5 +1,5 @@
 resource "aws_iam_role" "cribl_ingest" {
-  name = "${var.env}-cribl-ingest-role"
+  name = "${var.env}-${var.region_name}-cribl-ingest-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -25,7 +25,7 @@ resource "aws_iam_role" "cribl_ingest" {
 }
 
 resource "aws_iam_policy" "cribl_kinesis" {
-  name        = "${var.env}-cribl-kinesis-policy"
+  name        = "${var.env}-${var.region_name}-cribl-kinesis-policy"
   description = "Allows necessary access to Kinesis."
   policy = jsonencode({
     Version = "2012-10-17",
@@ -48,14 +48,14 @@ resource "aws_iam_role_policy_attachment" "attach_kinesis" {
 }
 
 resource "aws_iam_role" "logs_kinesis_role" {
-  name = "${var.env}-kinesis-cloudwatch-logs-producer-role"
+  name = "${var.env}-${var.region_name}-kinesis-cloudwatch-logs-producer-role"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Service" : "logs.amazonaws.com"
+          "Service" : "logs.${var.region}.amazonaws.com"
         },
         "Action" : "sts:AssumeRole",
         "Condition" : {
@@ -70,7 +70,7 @@ resource "aws_iam_role" "logs_kinesis_role" {
 
 
 resource "aws_iam_policy" "logs_kinesis_policy" {
-  name        = "kinesis-cloudwatch-logs-producer-policy"
+  name        = "${var.env}-${var.region_name}-kinesis-cloudwatch-logs-producer-policy"
   path        = "/"
   description = "IAM policy for CloudWatch Logs to put records to Kinesis on another account."
   policy = jsonencode({

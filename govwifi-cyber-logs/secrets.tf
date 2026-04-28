@@ -1,6 +1,4 @@
-resource "random_uuid" "external_id" {
-}
-
+## value is stored in secrets manager and copied to both regions
 data "aws_secretsmanager_secret" "cribl_external_id" {
   name = "logs/cribl/external_id"
 }

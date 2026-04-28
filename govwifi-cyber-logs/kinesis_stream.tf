@@ -1,5 +1,5 @@
 resource "aws_kinesis_stream" "cribil_log_stream" {
-  name             = "${var.env}-${var.region}-cribl-cloudwatch-kinesis-stream"
+  name             = "${var.env}-${var.region_name}-cribl-cloudwatch-kinesis-stream"
   shard_count      = var.shard_count
   retention_period = 24
   encryption_type  = "KMS"
@@ -12,7 +12,7 @@ resource "aws_kinesis_stream" "cribil_log_stream" {
 
 resource "aws_cloudwatch_log_destination" "kinesis_log_destination" {
   depends_on = [aws_kinesis_stream.cribil_log_stream, aws_iam_role.logs_kinesis_role, aws_iam_policy.logs_kinesis_policy]
-  name       = "kinesis-log-destination"
+  name       = "${var.env}-${var.region_name}-kinesis-log-destination"
   role_arn   = aws_iam_role.logs_kinesis_role.arn
   target_arn = aws_kinesis_stream.cribil_log_stream.arn
 }

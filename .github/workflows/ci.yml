@@ -14,12 +14,16 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - uses: Homebrew/actions/setup-homebrew@master
-      - name: Install Required Packages
-        run: |
-          brew install tfenv grep findutils
-          tfenv install $(cat .terraform-version)
-          tfenv use $(cat .terraform-version)
+      - name: Read Terraform Version
+        id: tf-version
+        run: echo "version=$(cat .terraform-version)" >> $GITHUB_OUTPUT
+
+      # Replaces brew + tfenv
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ steps.tf-version.outputs.version }}
+          terraform_wrapper: false
 
       - uses: actions/cache@v4
         name: Cache plugin dir
@@ -35,7 +39,7 @@ jobs:
           cache: true
 
       - name: Show terraform version
-        run: tfenv version-name
+        run: terraform version
 
       - name: Show lint version
         run: tflint --version
@@ -59,12 +63,19 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - uses: Homebrew/actions/setup-homebrew@master
-      - name: Install Required Packages
-        run: |
-          brew install tfenv
-          tfenv install $(cat .terraform-version)
-          tfenv use $(cat .terraform-version)
+        - name: Read Terraform Version
+        id: tf-version
+        run: echo "version=$(cat .terraform-version)" >> $GITHUB_OUTPUT
+
+      # Replaces brew + tfenv
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ steps.tf-version.outputs.version }}
+          terraform_wrapper: false
+
+      - name: Show terraform version
+        run: terraform version
 
       - name: Run Validator
         run: |

@@ -25,6 +25,12 @@ variable "region" {
   default = "eu-west-2"
 }
 
+variable "region_name" {
+  type        = string
+  default     = "london"
+  description = "The friendly name of the region, eg london"
+}
+
 variable "aws_account_id" {
   type        = string
   description = "The AWS account ID where the resources will be deployed."
