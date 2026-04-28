@@ -563,6 +563,7 @@ module "london_metrics" {
   tableau_user_email   = local.tableau_user_email
   tableau_pat_token_id = local.tableau_pat_token_id
   tableau_pool_id      = local.tableau_pool_id
+  administrator_cidrs  = var.administrator_cidrs
 
   tags = {
     Name = "london-metrics-staging"

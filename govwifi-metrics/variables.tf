@@ -144,3 +144,9 @@ variable "tableau_site" {
   type        = string
   description = "Tableau Cloud Site Name"
 }
+
+variable "administrator_cidrs" {
+  type        = list(string)
+  description = "IPs associated with the GDS/CDIO VPN to allow access"
+  default     = []
+}
