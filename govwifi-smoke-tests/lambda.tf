@@ -6,7 +6,7 @@ resource "aws_lambda_function" "slack_alert" {
   handler       = "index.handler"
   description   = "Alerts slack govwifi-monitoring channel on smoke test failure via SNS"
 
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs24.x"
   architectures = ["x86_64"]
 
   environment {
