@@ -436,7 +436,7 @@ module "london_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api", "tableau-bridge"]
 
   env_name = "development"
 
