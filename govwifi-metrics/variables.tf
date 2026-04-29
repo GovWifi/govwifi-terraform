@@ -125,26 +125,6 @@ variable "vpc_endpoints_security_group_id" {
   description = "Security group ID for VPC endpoints"
 }
 
-variable "tableau_user_email" {
-  type        = string
-  description = "Email associated with the Tableau Personal Access Token"
-}
-
-variable "tableau_pat_token_id" {
-  type        = string
-  description = "Tableau Personal Access Token Name"
-}
-
-variable "tableau_pool_id" {
-  type        = string
-  description = "Tableau Bridge Pool ID"
-}
-
-variable "tableau_site" {
-  type        = string
-  description = "Tableau Cloud Site Name"
-}
-
 variable "administrator_cidrs" {
   type        = list(string)
   description = "IPs associated with the GDS/CDIO VPN to allow access"

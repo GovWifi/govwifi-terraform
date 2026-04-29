@@ -559,11 +559,7 @@ module "london_metrics" {
   tableau_bridge_docker_image     = local.tableau_bridge_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
-  tableau_site         = local.tableau_site
-  tableau_user_email   = local.tableau_user_email
-  tableau_pat_token_id = local.tableau_pat_token_id
-  tableau_pool_id      = local.tableau_pool_id
-  administrator_cidrs  = var.administrator_cidrs
+  administrator_cidrs = var.administrator_cidrs
 
   tags = {
     Name = "london-metrics-staging"

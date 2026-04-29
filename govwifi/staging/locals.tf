@@ -7,11 +7,6 @@ locals {
   backup_mysql_rds         = true
   log_retention            = 30
   recovery_backups_enabled = false
-
-  tableau_site         = "cdioanalytics"
-  tableau_user_email   = "govwifi-core-team@digital.cabinet-office.gov.uk"
-  tableau_pat_token_id = "GovWifiDataBridge02"
-  tableau_pool_id      = "c04ee3d4-10fd-44a3-a6a4-5d8096fa1f6d"
 }
 
 locals {

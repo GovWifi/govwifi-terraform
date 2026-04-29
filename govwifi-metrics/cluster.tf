@@ -146,19 +146,19 @@ resource "aws_ecs_task_definition" "tableau_bridge" {
         },
         {
           "name": "TABLEAU_SITE",
-          "value": "${var.tableau_site}"
+          "value": "${local.tableau_site}"
         },
         {
           "name": "TABLEAU_USER_EMAIL",
-          "value": "${var.tableau_user_email}"
+          "value": "${local.tableau_user_email}"
         },
         {
           "name": "TABLEAU_PAT_TOKEN_ID",
-          "value": "${var.tableau_pat_token_id}"
+          "value": "${local.tableau_pat_token_id}"
         },
         {
           "name": "TABLEAU_POOL_ID",
-          "value": "${var.tableau_pool_id}"
+          "value": "${local.tableau_pool_id}"
         },
         {
           "name": "TABLEAU_PAT_TOKEN_FILE",
