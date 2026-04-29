@@ -527,18 +527,19 @@ module "london_account_policy" {
 
 }
 
-module "london_cyber_logs" {
-  providers = {
-    aws = aws.london
-  }
+# To be implimented soon
+# module "london_cyber_logs" {
+#   providers = {
+#     aws = aws.london
+#   }
 
-  source = "../../govwifi-cyber-logs"
+#   source = "../../govwifi-cyber-logs"
 
-  region         = local.london_aws_region
-  region_name    = lower(local.london_aws_region_name)
-  env            = lower(local.env)
-  aws_account_id = local.aws_account_id
-}
+#   region         = local.london_aws_region
+#   region_name    = lower(local.london_aws_region_name)
+#   env            = lower(local.env)
+#   aws_account_id = local.aws_account_id
+# }
 
 module "london_metrics" {
   providers = {
