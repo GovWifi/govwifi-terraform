@@ -555,6 +555,8 @@ module "london_metrics" {
   admin_sg_id = module.london_admin.admin_ec2_out_sg_id
   api_sg_id   = module.london_api.api_out_sg_id
 
+  bastion_sg_id = module.london_backend.bastion_sg_id
+
   metrics_api_docker_image        = local.metrics_api_docker_image
   tableau_bridge_docker_image     = local.tableau_bridge_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id

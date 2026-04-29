@@ -210,3 +210,12 @@ resource "aws_security_group_rule" "metrics_db_ingress_from_tableau_bridge" {
   source_security_group_id = aws_security_group.tableau_bridge_service_out.id
   security_group_id        = aws_security_group.london_metrics_db_sg.id
 }
+
+resource "aws_security_group_rule" "metrics_db_ingress_from_bastion" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = var.bastion_sg_id
+  security_group_id        = aws_security_group.london_metrics_db_sg.id
+}

@@ -38,6 +38,10 @@ output "bastion_public_ip" {
   value = var.enable_bastion == 1 ? aws_eip.bastion_eip[0].public_ip : null
 }
 
+output "bastion_sg_id" {
+  value = aws_security_group.be_ecs_out.id
+}
+
 output "vpc_endpoints_security_group_id" {
   value = aws_security_group.vpc_endpoints.id
 }
