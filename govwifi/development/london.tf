@@ -558,12 +558,17 @@ module "london_account_policy" {
 }
 
 
-module "london_admin_portal_cyber_logs" {
+module "london_cyber_logs" {
+  providers = {
+    aws = aws.london
+  }
+
   source = "../../govwifi-cyber-logs"
 
-  region              = local.london_aws_region
-  env                 = local.env
-  account_access_arns = ["arn:aws:logs:${local.london_aws_region}:${local.aws_account_id}:*"]
+  region         = local.london_aws_region
+  region_name    = lower(local.london_aws_region_name)
+  env            = lower(local.env)
+  aws_account_id = local.aws_account_id
 }
 
 module "london_capacity_testing" {

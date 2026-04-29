@@ -18,6 +18,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Clear tfenv locks
+        run: rm -rf /home/linuxbrew/.linuxbrew/Cellar/tfenv/version_lock || true
+
       - uses: Homebrew/actions/setup-homebrew@master
       - name: Install Required Packages
         run: |
@@ -63,7 +66,10 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - uses: Homebrew/actions/setup-homebrew@master
+      - name: Clear tfenv locks
+        run: rm -rf /home/linuxbrew/.linuxbrew/Cellar/tfenv/version_lock || true
+
+      - uses: Homebrew/actions/setup-homebrew@996ddca5fc18b6bef4882270edbe9ef95bfffd87 # main
       - name: Install Required Packages
         run: |
           brew install tfenv

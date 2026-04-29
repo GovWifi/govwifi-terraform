@@ -400,3 +400,17 @@ module "dublin_sync_certs" {
   region_name    = local.dublin_aws_region_name
 
 }
+
+# To be implimented soon
+# module "dublin_cyber_logs" {
+#   providers = {
+#     aws = aws.dublin
+#   }
+
+#   source = "../../govwifi-cyber-logs"
+
+#   region         = local.dublin_aws_region
+#   region_name    = lower(local.dublin_aws_region_name)
+#   env            = lower(local.env)
+#   aws_account_id = local.aws_account_id
+# }
