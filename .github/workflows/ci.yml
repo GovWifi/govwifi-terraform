@@ -63,7 +63,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-        - name: Read Terraform Version
+      - name: Read Terraform Version
         id: tf-version
         run: echo "version=$(cat .terraform-version)" >> $GITHUB_OUTPUT
 
