@@ -14,7 +14,8 @@ locals {
 }
 
 locals {
-  docker_image_path = nonsensitive(jsondecode(data.aws_secretsmanager_secret_version.docker_image_path.secret_string)["path"])
+  docker_image_path        = nonsensitive(jsondecode(data.aws_secretsmanager_secret_version.docker_image_path.secret_string)["path"])
+  metrics_api_docker_image = nonsensitive(data.aws_secretsmanager_secret_version.metrics_api_docker_image.secret_string)
 }
 
 locals {

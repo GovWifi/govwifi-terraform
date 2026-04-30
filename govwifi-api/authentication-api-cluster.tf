@@ -10,8 +10,8 @@ resource "aws_ecs_task_definition" "authentication_api_task" {
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.authentication_api_ecs_task.arn
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  memory                   = 512
-  cpu                      = "256"
+  memory                   = 1024
+  cpu                      = 512
   network_mode             = "awsvpc"
 
   container_definitions = <<EOF
@@ -69,7 +69,7 @@ resource "aws_ecs_task_definition" "authentication_api_task" {
       "workingDirectory": null,
       "readonlyRootFilesystem": null,
       "image": "${local.tools_account_id}.dkr.ecr.eu-west-2.amazonaws.com/govwifi/authentication-api/${var.env}:latest",
-
+      "stopTimeout": 10,
       "command": null,
       "user": null,
       "dockerLabels": null,
@@ -94,7 +94,7 @@ resource "aws_ecs_service" "authentication_api_service" {
   name             = "authentication-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.api_cluster.id
   task_definition  = aws_ecs_task_definition.authentication_api_task.arn
-  desired_count    = var.authentication_api_count
+  desired_count    = var.auth_task_count_min
   launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
@@ -114,58 +114,18 @@ resource "aws_ecs_service" "authentication_api_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.alb_target_group.arn
+    target_group_arn = aws_alb_target_group.private_auth_api_tg.arn
     container_name   = "authentication-api"
     container_port   = "8080"
   }
 
-  load_balancer {
-    target_group_arn = aws_alb_target_group.authentication_api.arn
-    container_name   = "authentication-api"
-    container_port   = "8080"
-  }
+  ## DEPLOYMENT CONFIGURATION - Rolling using dynamic calculation to allow 1 in and 1 out during deployment, while ensuring 100% of tasks stay up.
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 134 ## replaces tasks on a sliding scale, depending on desired task count.
 
   lifecycle {
+    ## stops the tasks count from being reset.
     ignore_changes = [desired_count]
-  }
-
-}
-
-resource "aws_alb_listener_rule" "static" {
-  depends_on   = [aws_alb_target_group.alb_target_group]
-  listener_arn = aws_alb_listener.alb_listener.arn
-  priority     = 1
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.alb_target_group.id
-  }
-
-  condition {
-    path_pattern {
-      values = ["/authorize/*"]
-    }
-  }
-}
-
-resource "aws_alb_target_group" "alb_target_group" {
-  depends_on  = [aws_lb.api_alb]
-  name        = "api-lb-tg-${var.env_name}"
-  port        = "8080"
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "ip"
-
-  tags = {
-    Name = "api-alb-tg-${var.env_name}"
-  }
-
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 4
-    interval            = 10
-    path                = "/authorize/user/HEALTH"
   }
 }
 
@@ -179,22 +139,32 @@ resource "aws_lb" "authentication_api" {
     aws_security_group.authentication_api_alb.id,
   ]
 
-  load_balancer_type = "application"
+  load_balancer_type         = "application"
+  drop_invalid_header_fields = true
 }
 
-resource "aws_alb_target_group" "authentication_api" {
-  name        = "authentication-api"
+resource "aws_alb_target_group" "private_auth_api_tg" {
+  name        = "private-auth-api-lb-tg"
   port        = "8080"
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
+  deregistration_delay = 10 ## allows the task to shutdown gracefully before being deregistered from the target group
+
   health_check {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 4
-    interval            = 10
+    interval            = 5
     path                = "/authorize/user/HEALTH"
+  }
+
+  tags = {
+    Name = "private-auth-api-tg-${var.env_name}"
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -205,9 +175,10 @@ resource "aws_alb_listener" "authentication" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_alb_target_group.authentication_api.id
+    target_group_arn = aws_alb_target_group.private_auth_api_tg.id
   }
 }
+
 
 resource "aws_iam_role" "authentication_api_ecs_task" {
   name = "${var.aws_region_name}-apiEcsTask-${var.rack_env}"

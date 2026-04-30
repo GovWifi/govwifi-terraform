@@ -29,15 +29,23 @@ variable "event_rule_count" {
   default = 1
 }
 
-variable "task_count_min" {
+variable "user_task_count_min" {
   type = number
 }
-variable "task_count_max" {
+variable "user_task_count_max" {
   type = number
 }
-
-variable "authentication_api_count" {
-  default = 3
+variable "logging_task_count_min" {
+  type = number
+}
+variable "logging_task_count_max" {
+  type = number
+}
+variable "auth_task_count_min" {
+  type = number
+}
+variable "auth_task_count_max" {
+  type = number
 }
 
 variable "backend_elb_count" {

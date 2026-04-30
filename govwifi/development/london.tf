@@ -127,7 +127,7 @@ module "london_frontend" {
   # Instance-specific setup -------------------------------
   radius_instance_count = 3
   radius_task_count     = 3
-  radius_task_count_max = 3
+  radius_task_count_max = 6
   radius_task_count_min = 3
 
   enable_detailed_monitoring = false
@@ -143,9 +143,6 @@ module "london_frontend" {
   create_ecr            = 1
 
   admin_app_data_s3_bucket_name = module.london_admin.app_data_s3_bucket_name
-
-  logging_api_base_url = module.london_api.api_base_url
-  auth_api_base_url    = module.london_api.api_base_url
 
   authentication_api_internal_dns_name = module.london_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
@@ -246,9 +243,15 @@ module "london_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
+  auth_task_count_min    = 1
+  auth_task_count_max    = 5
+  logging_task_count_min = 1
+  logging_task_count_max = 5
+  user_task_count_min    = 1
+  user_task_count_max    = 5
+
+
   backend_elb_count    = 1
-  task_count_min       = 2
-  task_count_max       = 20
   aws_account_id       = local.aws_account_id
   aws_region_name      = local.london_aws_region_name
   aws_region           = local.london_aws_region
@@ -554,10 +557,29 @@ module "london_account_policy" {
 
 }
 
-module "london_admin_portal_cyber_logs" {
+
+module "london_cyber_logs" {
+  providers = {
+    aws = aws.london
+  }
+
   source = "../../govwifi-cyber-logs"
 
-  region              = local.london_aws_region
-  env                 = local.env
-  account_access_arns = ["arn:aws:logs:${local.london_aws_region}:${local.aws_account_id}:*"]
+  region         = local.london_aws_region
+  region_name    = lower(local.london_aws_region_name)
+  env            = lower(local.env)
+  aws_account_id = local.aws_account_id
+}
+
+module "london_capacity_testing" {
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../govwifi-capacity-testing"
+
+  env            = local.env
+  aws_account_id = local.aws_account_id
+  aws_region     = local.london_aws_region
+
 }
