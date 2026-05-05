@@ -23,6 +23,29 @@ resource "aws_iam_role_policy_attachment" "metrics_api_task_execution_role_polic
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "metrics_api_task_execution_policy" {
+  name = "metrics-api-task-execution-policy-${var.env}-${var.region_name}"
+  role = aws_iam_role.metrics_api_task_execution_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_role" "metrics_api_task_role" {
   name = "metrics-api-task-role-${var.env}-${var.region_name}"
 
@@ -58,7 +81,103 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
         "ssmmessages:CreateControlChannel",
         "ssmmessages:CreateDataChannel",
         "ssmmessages:OpenControlChannel",
-        "ssmmessages:OpenDataChannel"
+        "ssmmessages:OpenDataChannel",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "tableau_bridge_task_execution_role" {
+  name = "tableau-bridge-ecsTaskExecutionRole-${var.env}-${var.region_name}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "tableau_bridge_task_execution_role_policy" {
+  role       = aws_iam_role.tableau_bridge_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy" "tableau_bridge_task_execution_policy" {
+  name = "tableau-bridge-task-execution-policy-${var.env}-${var.region_name}"
+  role = aws_iam_role.tableau_bridge_task_execution_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
+      ],
+      "Resource": [
+        "${data.aws_secretsmanager_secret.tableau_bridge_pat.arn}",
+        "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "tableau_bridge_task_role" {
+  name = "tableau-bridge-task-role-${var.env}-${var.region_name}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "tableau_bridge_task_policy" {
+  name = "tableau-bridge-task-policy-${var.env}-${var.region_name}"
+  role = aws_iam_role.tableau_bridge_task_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel",
+        "secretsmanager:GetSecretValue",
+        "kms:Decrypt"
       ],
       "Resource": "*"
     }
