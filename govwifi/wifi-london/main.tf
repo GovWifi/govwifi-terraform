@@ -686,9 +686,9 @@ module "london_metrics" {
 
   database_name          = "govwifi_metrics"
   skip_final_snapshot    = true
-  backend_subnet_ids     = module.london_backend.backend_subnet_ids
-  backend_vpc_id         = module.london_backend.backend_vpc_id
-  backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+  backend_subnet_ids     = module.backend.backend_subnet_ids
+  backend_vpc_id         = module.backend.backend_vpc_id
+  backend_vpc_cidr_block = module.backend.vpc_cidr_block
 
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
@@ -696,14 +696,14 @@ module "london_metrics" {
 
   route53_zone_id = data.aws_route53_zone.main.zone_id
 
-  admin_sg_id = module.london_admin.admin_ec2_out_sg_id
-  api_sg_id   = module.london_api.api_out_sg_id
+  admin_sg_id = module.govwifi_admin.admin_ec2_out_sg_id
+  api_sg_id   = module.api.api_out_sg_id
 
-  bastion_sg_id = module.london_backend.bastion_sg_id
+  bastion_sg_id = module.backend.bastion_sg_id
 
   metrics_api_docker_image        = local.metrics_api_docker_image
   tableau_bridge_docker_image     = local.tableau_bridge_docker_image
-  vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
+  vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
 
   administrator_cidrs = var.administrator_cidrs
 
