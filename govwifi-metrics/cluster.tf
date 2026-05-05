@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "metrics_cluster" {
-  name = "metrics-cluster-${var.env}"
+  name = "${var.env_name}-metrics-cluster"
 
   tags = var.tags
 }
