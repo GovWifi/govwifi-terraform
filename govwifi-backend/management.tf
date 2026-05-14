@@ -246,8 +246,8 @@ resource "aws_iam_instance_profile" "bastion_instance_profile" {
 }
 
 resource "aws_eip" "bastion_eip" {
-  count = var.enable_bastion
-  domain   = "vpc"
+  count  = var.enable_bastion
+  domain = "vpc"
   tags = {
     Name = "bastion"
   }
