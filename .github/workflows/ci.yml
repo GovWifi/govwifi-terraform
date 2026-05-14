@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Clear tfenv locks
         run: rm -rf /home/linuxbrew/.linuxbrew/Cellar/tfenv/version_lock || true
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Clear tfenv locks
         run: rm -rf /home/linuxbrew/.linuxbrew/Cellar/tfenv/version_lock || true
@@ -81,6 +81,7 @@ jobs:
           for dir in govwifi/*;
           do
             cd $dir
+            echo "Initializing terraform in $dir "
             terraform init -backend=false
             echo "Validating $dir"
             terraform validate
