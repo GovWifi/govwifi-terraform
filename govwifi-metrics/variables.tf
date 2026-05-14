@@ -110,12 +110,28 @@ variable "api_sg_id" {
   description = "Security group ID of the api services for ingress"
 }
 
+variable "bastion_sg_id" {
+  type        = string
+  description = "Security group ID of the bastion for ingress"
+}
+
 variable "metrics_api_docker_image" {
   type        = string
   description = "Docker image for the metrics API"
 }
 
+variable "tableau_bridge_docker_image" {
+  type        = string
+  description = "Docker image for the Tableau Bridge"
+}
+
 variable "vpc_endpoints_security_group_id" {
   type        = string
   description = "Security group ID for VPC endpoints"
+}
+
+variable "administrator_cidrs" {
+  type        = list(string)
+  description = "IPs associated with the GDS/CDIO VPN to allow access"
+  default     = []
 }

@@ -1,6 +1,6 @@
 resource "aws_lb" "metrics_alb" {
   name     = "metrics-alb-${var.env}"
-  internal = true
+  internal = false
   subnets  = var.backend_subnet_ids
 
   security_groups = [
