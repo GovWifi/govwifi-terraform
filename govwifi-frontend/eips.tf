@@ -1,6 +1,6 @@
 resource "aws_eip" "radius_eips" {
   count = var.radius_instance_count
-  vpc   = true
+  domain   = "vpc"
 
   lifecycle {
     prevent_destroy = true
