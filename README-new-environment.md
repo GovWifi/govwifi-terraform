@@ -19,6 +19,14 @@ Edit then run the command below to update the terraform resource names (replace 
 for filename in ./govwifi/<NEW-ENV-NAME>/* ; do sed -i '' 's/staging/<NEW-ENV-NAME>/g' $filename ; done
 ```
 
+#### Disable Database Backups In Your New Environment
+
+Database backups only need to be enabled for Staging and Production. If you are building another environment or performing a diaster recovery exercise the database backups should be disabled to save costs ( you can see an example of this setting in [govwifi/staging/locals.tf](https://github.com/GovWifi/govwifi-terraform/blob/master/govwifi/staging/locals.tf#L7) but in your new environment it should be set to `false` not `true`).
+
+```
+backup_mysql_rds    = false
+```
+
 #### Add The New Environment To The Makefile
 
 Add the new environment to the Makefile. [See here for an example commit](https://github.com/GovWifi/govwifi-terraform/pull/777/commits/5482ac674b74b946b66040e158101bd4aa703a44#diff-76ed074a9305c04054cdebb9e9aad2d818052b07091de1f20cad0bbac34ffb52).

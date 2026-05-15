@@ -144,9 +144,6 @@ module "london_frontend" {
 
   admin_app_data_s3_bucket_name = module.london_admin.app_data_s3_bucket_name
 
-  logging_api_base_url = module.london_api.api_base_url
-  auth_api_base_url    = module.london_api.api_base_url
-
   authentication_api_internal_dns_name = module.london_api.authentication_api_internal_dns_name
   logging_api_internal_dns_name        = one(module.london_api.logging_api_internal_dns_name)
 
@@ -247,9 +244,14 @@ module "london_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
+  auth_task_count_min    = 3
+  auth_task_count_max    = 20
+  logging_task_count_min = 3
+  logging_task_count_max = 20
+  user_task_count_min    = 3
+  user_task_count_max    = 20
+
   backend_elb_count    = 1
-  task_count_min       = 2
-  task_count_max       = 20
   aws_account_id       = local.aws_account_id
   aws_region_name      = local.london_aws_region_name
   aws_region           = local.london_aws_region
@@ -434,7 +436,7 @@ module "london_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "frontend"]
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api", "tableau-bridge", "frontend"]
 
   env_name = "staging"
 
@@ -525,6 +527,19 @@ module "london_account_policy" {
 
 }
 
+# To be implimented soon
+# module "london_cyber_logs" {
+#   providers = {
+#     aws = aws.london
+#   }
+
+#   source = "../../govwifi-cyber-logs"
+
+#   region         = local.london_aws_region
+#   region_name    = lower(local.london_aws_region_name)
+#   env            = lower(local.env)
+#   aws_account_id = local.aws_account_id
+# }
 
 module "london_metrics" {
   providers = {
@@ -543,4 +558,25 @@ module "london_metrics" {
   backend_subnet_ids     = module.london_backend.backend_subnet_ids
   backend_vpc_id         = module.london_backend.backend_vpc_id
   backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+
+  env_name      = local.env_name
+  env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
+
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+
+  admin_sg_id = module.london_admin.admin_ec2_out_sg_id
+  api_sg_id   = module.london_api.api_out_sg_id
+
+  bastion_sg_id = module.london_backend.bastion_sg_id
+
+  metrics_api_docker_image        = local.metrics_api_docker_image
+  tableau_bridge_docker_image     = local.tableau_bridge_docker_image
+  vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
+
+  administrator_cidrs = var.administrator_cidrs
+
+  tags = {
+    Name = "london-metrics-staging"
+  }
 }

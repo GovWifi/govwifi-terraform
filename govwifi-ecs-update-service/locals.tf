@@ -25,5 +25,15 @@ locals {
       cluster  = "${var.env_name}-api-cluster"
       task_def = "user-signup-api-task-${var.env_name}"
     }
+    metrics-api = {
+      service  = "metrics-api-service-${var.env_name}"
+      cluster  = "${var.env_name}-metrics-cluster"
+      task_def = "metrics-api-task-${var.env_name}"
+    }
+    tableau-bridge = {
+      service  = "tableau-bridge-service-${var.env_name}"
+      cluster  = "${var.env_name}-metrics-cluster"
+      task_def = "tableau-bridge-task-${var.env_name}"
+    }
   }
 }
