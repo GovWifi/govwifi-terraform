@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_log_group" "ecs_frontend_reset" {
-  name              = "govwifi-codebuild-ecs-frontend-reset-service-log-group"
+resource "aws_cloudwatch_log_group" "radius_frontend_task_reset_log_group" {
+  name              = "codebuild-ecs-frontend-reset-service"
   retention_in_days = 30
 }
 
@@ -44,8 +44,8 @@ resource "aws_codebuild_project" "ecs_service_radius_frontend_task_reset" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = aws_cloudwatch_log_group.ecs_frontend_reset.name
-      stream_name = "govwifi-codebuild-ecs-frontend-reset-service-log-stream"
+      group_name  = aws_cloudwatch_log_group.radius_frontend_task_reset_log_group.name
+      stream_name = aws_cloudwatch_log_group.radius_frontend_task_reset_log_group.name
     }
 
     s3_logs {

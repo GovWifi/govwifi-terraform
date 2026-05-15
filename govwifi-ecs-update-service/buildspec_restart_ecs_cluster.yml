@@ -9,8 +9,6 @@ phases:
     - echo "Build started on `date`"
     - echo "Restart ECS Service $SERVICE_NAME in $ENV_NAME"
     - aws ecs update-service --force-new-deployment --service $SERVICE_NAME --cluster $CLUSTER_NAME --task-definition $FAMILY_NAME
-
-
     - echo "Waiting for tasks to reach a steady state"
     - sleep 1m
     - CURRENT_SERVICE_STATUS=$(aws ecs describe-services --service $SERVICE_NAME --cluster $CLUSTER_NAME | jq -r '.services[].events[0].message')
