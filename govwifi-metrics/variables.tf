@@ -135,3 +135,9 @@ variable "administrator_cidrs" {
   description = "IPs associated with the GDS/CDIO VPN to allow access"
   default     = []
 }
+
+variable "nat_gateway_elastic_ips" {
+  type        = list(string)
+  description = "Elastic IPs of the NAT gateways"
+  default     = []
+}

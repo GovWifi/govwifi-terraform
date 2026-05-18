@@ -135,8 +135,8 @@ resource "aws_ecs_service" "logging_api_service" {
       [aws_security_group.logging_api_service.id]
     )
 
-    subnets          = var.subnet_ids
-    assign_public_ip = true
+    subnets          = var.private_subnet_ids
+    assign_public_ip = false
   }
 
   load_balancer {
