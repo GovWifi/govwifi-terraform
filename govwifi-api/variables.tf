@@ -243,3 +243,9 @@ variable "smoke_test_ips" {
 variable "log_retention" {
   type = number
 }
+
+variable "metrics_api_endpoint" {
+  type        = string
+  default     = ""
+  description = "The metrics API endpoint URL (e.g. https://metrics.wifi.service.gov.uk)"
+}

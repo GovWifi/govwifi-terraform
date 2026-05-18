@@ -386,6 +386,8 @@ module "api" {
 
   elasticsearch_endpoint = module.govwifi_elasticsearch.endpoint
   smoke_test_ips         = module.london_tests_vpc.eip_public_ips
+
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
 }
 
 module "london_critical_notifications" {
