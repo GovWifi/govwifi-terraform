@@ -63,6 +63,13 @@ resource "aws_security_group" "metrics_alb_in" {
     protocol    = "tcp"
     cidr_blocks = var.administrator_cidrs
   }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [for ip in var.nat_gateway_elastic_ips : "${ip}/32"]
+  }
 }
 
 resource "aws_security_group" "metrics_alb_out" {

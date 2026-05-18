@@ -620,7 +620,8 @@ module "london_metrics" {
   tableau_bridge_docker_image     = local.tableau_bridge_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
-  administrator_cidrs = var.administrator_cidrs
+  administrator_cidrs     = var.administrator_cidrs
+  nat_gateway_elastic_ips = module.london_backend.nat_gateway_elastic_ips
 
   tags = {
     Name = "london-metrics-development"
