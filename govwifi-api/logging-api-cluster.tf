@@ -72,10 +72,7 @@ resource "aws_ecs_task_definition" "logging_api_task" {
         },{
           "name": "VOLUMETRICS_ENDPOINT",
           "value": "https://${var.elasticsearch_endpoint}"
-        },{
-          "name": "METRICS_API_ENDPOINT",
-          "value": "${var.metrics_api_endpoint}"
-        }
+        }${var.metrics_api_endpoint != "" ? ",{\"name\":\"METRICS_API_ENDPOINT\",\"value\":\"${var.metrics_api_endpoint}\"}" : ""}
       ],
       "secrets": [
         {
@@ -93,10 +90,7 @@ resource "aws_ecs_task_definition" "logging_api_task" {
         },{
           "name": "SENTRY_DSN",
           "valueFrom": "${data.aws_secretsmanager_secret.logging_api_sentry_dsn.arn}"
-        },{
-          "name": "METRICS_API_BEARER_TOKEN",
-          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
-        }
+        }${var.metrics_api_endpoint != "" ? ",{\"name\":\"METRICS_API_BEARER_TOKEN\",\"valueFrom\":\"${data.aws_secretsmanager_secret.metrics_api_key[0].arn}\"}" : ""}
       ],
       "links": null,
       "workingDirectory": null,

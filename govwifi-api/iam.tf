@@ -43,12 +43,24 @@ data "aws_iam_policy_document" "secrets_manager_policy" {
       data.aws_secretsmanager_secret.user_signup_api_sentry_dsn.arn,
       data.aws_secretsmanager_secret.logging_api_sentry_dsn.arn,
       data.aws_secretsmanager_secret.notify_do_not_reply.arn,
-      data.aws_secretsmanager_secret.notify_support_reply.arn,
-      data.aws_secretsmanager_secret.metrics_api_key.arn
+      data.aws_secretsmanager_secret.notify_support_reply.arn
     ]
   }
 }
 
+resource "aws_iam_role_policy" "secrets_manager_metrics_api_key_policy" {
+  count  = var.metrics_api_endpoint != "" ? 1 : 0
+  name   = "${var.aws_region_name}-api-cluster-access-metrics-api-secret-${var.env_name}"
+  role   = aws_iam_role.ecs_task_execution_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["secretsmanager:GetSecretValue"]
+      Resource = data.aws_secretsmanager_secret.metrics_api_key[0].arn
+    }]
+  })
+}
 
 resource "aws_iam_user" "govwifi_deploy_pipeline" {
   count         = var.create_wordlist_bucket ? 1 : 0
