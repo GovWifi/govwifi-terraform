@@ -66,6 +66,16 @@ resource "aws_security_group" "be_db_in" {
     protocol    = "tcp"
     cidr_blocks = [for subnet in aws_subnet.wifi_backend_subnet : subnet.cidr_block]
   }
+
+  dynamic "ingress" {
+    for_each = length(aws_subnet.wifi_backend_private_subnets) > 0 ? [1] : []
+    content {
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      cidr_blocks = [for subnet in aws_subnet.wifi_backend_private_subnets : subnet.cidr_block]
+    }
+  }
 }
 
 resource "aws_security_group" "be_radius_api_in" {

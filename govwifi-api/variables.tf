@@ -122,7 +122,8 @@ variable "subnet_ids" {
 }
 
 variable "private_subnet_ids" {
-  type = list(string)
+  type    = list(string)
+  default = []
 }
 
 variable "user_signup_docker_image" {
