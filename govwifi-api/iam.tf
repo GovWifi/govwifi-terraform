@@ -49,20 +49,6 @@ data "aws_iam_policy_document" "secrets_manager_policy" {
 }
 
 resource "aws_iam_role_policy" "secrets_manager_metrics_api_key_policy" {
-  count  = var.metrics_api_endpoint != "" ? 1 : 0
-  name   = "${var.aws_region_name}-api-cluster-access-metrics-api-secret-${var.env_name}"
-  role   = aws_iam_role.ecs_task_execution_role.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = data.aws_secretsmanager_secret.metrics_api_key[0].arn
-    }]
-  })
-}
-
-resource "aws_iam_role_policy" "secrets_manager_metrics_api_key_policy" {
   count = var.metrics_api_endpoint != "" ? 1 : 0
   name  = "${var.aws_region_name}-api-cluster-access-metrics-api-secret-${var.env_name}"
   role  = aws_iam_role.ecs_task_execution_role.id
@@ -315,5 +301,3 @@ resource "aws_cloudwatch_event_target" "logging_daily_session_deletion" {
 EOF
 
 }
-
-
