@@ -386,6 +386,8 @@ module "api" {
 
   elasticsearch_endpoint = module.govwifi_elasticsearch.endpoint
   smoke_test_ips         = module.london_tests_vpc.eip_public_ips
+
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
 }
 
 module "london_critical_notifications" {
@@ -705,7 +707,8 @@ module "london_metrics" {
   tableau_bridge_docker_image     = local.tableau_bridge_docker_image
   vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
 
-  administrator_cidrs = var.administrator_cidrs
+  administrator_cidrs     = var.administrator_cidrs
+  nat_gateway_elastic_ips = module.backend.nat_gateway_elastic_ips
 
   tags = {
     Name = "london-metrics-production"
