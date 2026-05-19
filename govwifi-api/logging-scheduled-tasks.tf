@@ -203,14 +203,14 @@ resource "aws_cloudwatch_event_target" "publish_daily_total_metrics_logging" {
     platform_version    = "1.4.0"
 
     network_configuration {
-      subnets = var.subnet_ids
+      subnets = length(var.private_subnet_ids) > 0 ? var.private_subnet_ids : var.subnet_ids
 
       security_groups = concat(
         [aws_security_group.api_in.id],
         [aws_security_group.api_out.id]
       )
 
-      assign_public_ip = true
+      assign_public_ip = length(var.private_subnet_ids) > 0 ? false : true
     }
   }
 
