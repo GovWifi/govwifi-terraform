@@ -14,10 +14,4 @@ data "aws_secretsmanager_secret" "metrics_api_docker_image" {
   name = "govwifi/metrics/ecr/image"
 }
 
-data "aws_secretsmanager_secret_version" "tableau_bridge_docker_image" {
-  secret_id = data.aws_secretsmanager_secret.tableau_bridge_docker_image.id
-}
 
-data "aws_secretsmanager_secret" "tableau_bridge_docker_image" {
-  name = "govwifi/tableau-bridge/ecr/image"
-}
