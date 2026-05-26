@@ -438,7 +438,7 @@ module "london_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api", "tableau-bridge"]
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api"]
 
   env_name = "staging"
 
@@ -573,7 +573,6 @@ module "london_metrics" {
   bastion_sg_id = module.london_backend.bastion_sg_id
 
   metrics_api_docker_image        = local.metrics_api_docker_image
-  tableau_bridge_docker_image     = local.tableau_bridge_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
 
   administrator_cidrs     = var.administrator_cidrs

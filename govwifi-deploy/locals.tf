@@ -38,10 +38,7 @@ locals {
       repo    = "govwifi-user-signup-api"
       regions = ["eu-west-2"]
     }
-    tableau-bridge = {
-      repo    = "govwifi-tableau-bridge"
-      regions = ["eu-west-2"]
-    }
+
     metrics-api = {
       repo    = "govwifi-metrics-api"
       regions = ["eu-west-2"]
