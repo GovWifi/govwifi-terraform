@@ -44,7 +44,6 @@ resource "aws_codebuild_project" "govwifi_codebuild_project_restart_ecs_cluster"
       name  = "ENV_NAME"
       value = var.env_name
     }
-
   }
 
   logs_config {

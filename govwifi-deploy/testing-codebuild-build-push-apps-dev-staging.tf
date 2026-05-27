@@ -1,7 +1,7 @@
 resource "aws_codebuild_project" "testing_codebuild_build_push_app" {
   #for_each      = toset(var.deployed_app_names)
   for_each       = toset(var.test_app_pipeline)
-  name           = "TESTING-${each.key}-app-build-push-image-ECR-ALL-ENVS"
+  name           = "TESTING-${each.key}-app-build-push-image-ECR"
   description    = "A common project that builds the ${each.key} app docker image and pushes to provided environment ECR"
   build_timeout  = "20"
   service_role   = aws_iam_role.govwifi_codebuild.arn

@@ -3,6 +3,7 @@ resource "aws_codepipeline" "testing_staging_prod_apps_pipeline" {
   for_each = toset(var.test_app_pipeline)
   name     = "TESTING-STAGING-PROD-${each.key}-app-pipeline"
   role_arn = aws_iam_role.govwifi_codepipeline_global_role.arn
+  pipeline_type = "V2"
 
   artifact_store {
     location = aws_s3_bucket.codepipeline_bucket.bucket
