@@ -113,7 +113,94 @@ resource "aws_alb_target_group" "metrics_tg" {
     path                = "/health"
   }
 
+}
+
+resource "aws_ecs_task_definition" "metrics_data_publisher" {
+  family                   = "metrics-data-publisher-task-${var.env_name}"
+  requires_compatibilities = ["FARGATE"]
+  task_role_arn            = aws_iam_role.metrics_api_task_role.arn
+  execution_role_arn       = aws_iam_role.metrics_api_task_execution_role.arn
+  cpu                      = "256"
+  memory                   = "512"
+  network_mode             = "awsvpc"
+
+  container_definitions = <<EOF
+[
+    {
+      "name": "metrics-data-publisher",
+      "image": "${var.metrics_data_publisher_docker_image}",
+      "essential": true,
+      "command": ["recover_and_publish"],
+      "environment": [
+        {
+          "name": "METRICS_API_URL",
+          "value": "https://metrics.${var.env_subdomain}.service.gov.uk"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "METRICS_API_KEY",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+        },
+        {
+          "name": "TOKEN_NAME",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}:TOKEN_NAME::"
+        },
+        {
+          "name": "TOKEN_VALUE",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}:TOKEN_VALUE::"
+        },
+        {
+          "name": "SITE_ID",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}:SITE_ID::"
+        },
+        {
+          "name": "SERVER_URL",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}:SERVER_URL::"
+        },
+        {
+          "name": "PROJECT_NAME",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}:PROJECT_NAME::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${aws_cloudwatch_log_group.metrics_log_group.name}",
+          "awslogs-region": "${var.aws_region}",
+          "awslogs-stream-prefix": "metrics-data-publisher"
+        }
+      }
+    }
+]
+EOF
+
   tags = var.tags
 }
 
+resource "aws_cloudwatch_event_rule" "metrics_data_publisher_schedule" {
+  name                = "metrics-data-publisher-schedule-${var.env_name}"
+  description         = "Trigger metrics-data-publisher at 05:00 UTC daily"
+  schedule_expression = "cron(0 5 * * ? *)"
+  tags                = var.tags
+}
 
+resource "aws_cloudwatch_event_target" "metrics_data_publisher_target" {
+  rule      = aws_cloudwatch_event_rule.metrics_data_publisher_schedule.name
+  target_id = "metrics-data-publisher-target-${var.env_name}"
+  arn       = aws_ecs_cluster.metrics_cluster.arn
+  role_arn  = aws_iam_role.metrics_events_role.arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.metrics_data_publisher.arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets          = var.backend_subnet_ids
+      security_groups  = [aws_security_group.metrics_service_out.id]
+      assign_public_ip = true
+    }
+  }
+}

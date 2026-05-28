@@ -120,7 +120,10 @@ variable "metrics_api_docker_image" {
   description = "Docker image for the metrics API"
 }
 
-
+variable "metrics_data_publisher_docker_image" {
+  type        = string
+  description = "Docker image for the metrics data publisher scheduled task"
+}
 
 variable "vpc_endpoints_security_group_id" {
   type        = string

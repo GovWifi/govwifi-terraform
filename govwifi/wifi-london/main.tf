@@ -703,8 +703,9 @@ module "london_metrics" {
 
   bastion_sg_id = module.backend.bastion_sg_id
 
-  metrics_api_docker_image        = local.metrics_api_docker_image
-  vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
+  metrics_api_docker_image            = local.metrics_api_docker_image
+  metrics_data_publisher_docker_image = format("%s/metrics-data-publisher:%s", local.docker_image_path, local.env)
+  vpc_endpoints_security_group_id     = module.backend.vpc_endpoints_security_group_id
 
   administrator_cidrs     = var.administrator_cidrs
   nat_gateway_elastic_ips = module.backend.nat_gateway_elastic_ips
