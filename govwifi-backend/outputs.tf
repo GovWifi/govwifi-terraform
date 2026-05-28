@@ -26,6 +26,10 @@ output "vpc_cidr_block" {
   value = var.vpc_cidr_block
 }
 
+output "default_network_acl_id" {
+  value = aws_vpc.wifi_backend.default_network_acl_id
+}
+
 output "rds_mysql_backup_bucket" {
   value = var.backup_mysql_rds ? aws_s3_bucket.rds_mysql_backup_bucket[0].id : null
 }

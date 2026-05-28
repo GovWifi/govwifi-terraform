@@ -1,8 +1,8 @@
 
 resource "aws_default_network_acl" "frontend_london" {
   count                  = var.aws_region == "eu-west-2" ? 1 : 0
-  default_network_acl_id = aws_vpc.wifi_frontend.default_network_acl_id
-  subnet_ids             = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
+  default_network_acl_id = var.bakend_default_network_acl_id
+  subnet_ids             = var.backend_subnet_ids
 
   tags = {
     Name = "ACL GovWifi Frontend - ${var.env_name}"
@@ -90,8 +90,8 @@ resource "aws_default_network_acl" "frontend_london" {
 
 resource "aws_default_network_acl" "frontend_dublin" {
   count                  = var.aws_region == "eu-west-1" ? 1 : 0
-  default_network_acl_id = aws_vpc.wifi_frontend.default_network_acl_id
-  subnet_ids             = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
+  default_network_acl_id = var.bakend_default_network_acl_id
+  subnet_ids             = var.backend_subnet_ids
 
   tags = {
     Name = "ACL GovWifi Frontend - ${var.env_name}"
@@ -155,7 +155,7 @@ resource "aws_default_network_acl" "frontend_dublin" {
 
   ingress {
     action          = "allow"
-    cidr_block      = var.vpc_cidr_block
+    cidr_block      = data.aws_vpc.backend.cidr_block
     from_port       = 0
     icmp_code       = 0
     icmp_type       = 0

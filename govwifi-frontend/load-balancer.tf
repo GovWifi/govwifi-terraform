@@ -5,7 +5,7 @@ resource "aws_lb" "main" {
   enable_cross_zone_load_balancing = false
 
   dynamic "subnet_mapping" {
-    for_each = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
+    for_each = var.backend_subnet_ids
     iterator = subnet_id
 
     content {
@@ -30,7 +30,7 @@ resource "aws_lb_target_group" "main" {
   name        = "frontend"
   port        = 1812
   protocol    = "UDP"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
   target_type = "ip"
 
   health_check {

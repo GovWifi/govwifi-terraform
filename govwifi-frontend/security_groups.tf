@@ -3,7 +3,7 @@
 resource "aws_security_group" "fe_ecs_out" {
   name        = "fe-ecs-out"
   description = "Allow the ECS agent to talk to the ECS endpoints"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
 
   tags = {
     Name = "${title(var.env_name)} Frontend ECS out"
@@ -37,7 +37,7 @@ resource "aws_security_group" "fe_ecs_out" {
 resource "aws_security_group" "fe_prometheus_in" {
   name        = "fe-prometheus-in"
   description = "Allow inbound traffic from Prometheus server in London"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
 
   tags = {
     Name = "${title(var.env_name)} Frontend Prometheus in"
@@ -60,7 +60,7 @@ resource "aws_security_group" "fe_prometheus_in" {
 resource "aws_security_group" "fe_radius_out" {
   name        = "fe-radius-out"
   description = "Allow outbound API calls from the RADIUS servers"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
 
   tags = {
     Name = "${title(var.env_name)} Frontend RADIUS out"
@@ -104,7 +104,7 @@ resource "aws_security_group" "fe_radius_out" {
 resource "aws_security_group" "fe_radius_in" {
   name        = "fe-radius-in"
   description = "Allow inbound API calls to the RADIUS servers"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
 
   tags = {
     Name = "${title(var.env_name)} Frontend RADIUS in"
@@ -166,7 +166,7 @@ data "aws_ip_ranges" "route53_healthcheck" {
 resource "aws_security_group" "load_balanced_frontend_service" {
   name        = "load-balanced-frontend-service"
   description = "Security group for the load balanced frontend service"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
   tags = {
     Name = "${title(var.env_name)} Frontend service"
   }
@@ -210,7 +210,7 @@ resource "aws_security_group" "load_balanced_frontend_service" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
+    cidr_blocks = [data.aws_vpc.backend.cidr_block]
   }
 
   ingress {
@@ -248,7 +248,7 @@ resource "aws_security_group" "load_balanced_frontend_service" {
 resource "aws_security_group" "vpc_endpoints" {
   name        = "frontend_vpc_endpoints"
   description = "Permit traffic to the frontend VPC endpoints"
-  vpc_id      = aws_vpc.wifi_frontend.id
+  vpc_id      = var.backend_vpc_id
 
   tags = {
     Name = "${title(var.env_name)} Frontend VPC Endpoints"
@@ -271,6 +271,6 @@ resource "aws_security_group" "vpc_endpoints" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
+    cidr_blocks = [data.aws_vpc.backend.cidr_block]
   }
 }

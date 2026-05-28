@@ -203,6 +203,8 @@ module "dublin_frontend" {
   sentry_current_env = "development"
 
   backend_vpc_id = module.dublin_backend.backend_vpc_id
+  backend_subnet_ids = module.dublin_backend.backend_subnet_ids
+  bakend_default_network_acl_id = module.dublin_backend.default_network_acl_id
 
   # Instance-specific setup -------------------------------
   radius_instance_count      = 3

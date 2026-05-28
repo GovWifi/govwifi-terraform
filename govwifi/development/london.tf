@@ -123,6 +123,8 @@ module "london_frontend" {
   sentry_current_env = "development"
 
   backend_vpc_id = module.london_backend.backend_vpc_id
+  backend_subnet_ids = module.london_backend.backend_subnet_ids
+  bakend_default_network_acl_id = module.london_backend.default_network_acl_id
 
   # Instance-specific setup -------------------------------
   radius_instance_count = 3
@@ -389,9 +391,9 @@ module "london_prometheus" {
 
   ssh_key_name = var.ssh_key_name
 
-  frontend_vpc_id = module.london_frontend.frontend_vpc_id
+  frontend_vpc_id = module.london_backend.backend_vpc_id
 
-  wifi_frontend_subnet       = module.london_frontend.frontend_subnet_id
+  wifi_frontend_subnet       = module.london_backend.backend_subnet_ids
   london_radius_ip_addresses = module.london_frontend.eip_public_ips
   dublin_radius_ip_addresses = module.dublin_frontend.eip_public_ips
 

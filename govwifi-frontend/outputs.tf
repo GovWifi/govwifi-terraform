@@ -1,9 +1,9 @@
 output "frontend_vpc_id" {
-  value = aws_vpc.wifi_frontend.id
+  value = var.backend_vpc_id
 }
 
 output "frontend_subnet_id" {
-  value = [for subnet in aws_subnet.wifi_frontend_subnet : subnet.id]
+  value = var.backend_subnet_ids
 }
 
 output "fe_ecs_out" {

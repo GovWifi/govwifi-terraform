@@ -19,6 +19,14 @@ variable "vpc_cidr_block" {
 variable "backend_vpc_id" {
 }
 
+variable "backend_subnet_ids" {
+  type = list(string)
+}
+
+variable "bakend_default_network_acl_id" {
+  type = string
+}
+
 variable "aws_region" {
 }
 
