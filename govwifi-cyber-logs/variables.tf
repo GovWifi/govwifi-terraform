@@ -15,7 +15,7 @@ variable "env" {
   description = "The environment to be deployed to (development, staging, prod)"
 
   validation {
-    condition     = contains(["development", "staging", "prod"], var.env)
+    condition     = contains(["development", "staging", "production"], var.env)
     error_message = "Environment must be one of: development, staging or prod"
   }
 }
