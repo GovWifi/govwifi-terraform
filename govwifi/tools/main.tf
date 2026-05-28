@@ -36,8 +36,8 @@ module "govwifi_deploy" {
 
   source = "../../govwifi-deploy"
 
-  deployed_app_names     = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api"]
-  built_app_names        = ["frontend", "safe-restarter", "database-backup", "smoke-tests", "metrics-data-publisher"]
+  deployed_app_names     = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api", "metrics-data-publisher"]
+  built_app_names        = ["frontend", "safe-restarter", "database-backup", "smoke-tests", ]
   frontend_docker_images = ["raddb", "frontend"]
 }
 
