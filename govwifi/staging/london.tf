@@ -578,6 +578,9 @@ module "london_metrics" {
   administrator_cidrs     = var.administrator_cidrs
   nat_gateway_elastic_ips = module.london_backend.nat_gateway_elastic_ips
 
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
+
   tags = {
     Name = "london-metrics-staging"
   }

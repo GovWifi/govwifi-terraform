@@ -1,9 +1,8 @@
 resource "aws_codebuild_project" "tableau_data_source_publication" {
-  name           = "tableau-data-source-publication"
-  description    = "This publishes the metrics data source(s) to Tableau using the https://github.com/GovWifi/govwifi-metrics-data-publisher repo"
-  service_role   = aws_iam_role.govwifi_codebuild.arn
-  encryption_key = aws_kms_key.codepipeline_key.arn
-  build_timeout  = "20"
+  name          = "tableau-data-source-publication"
+  description   = "This publishes the metrics data source(s) to Tableau using the https://github.com/GovWifi/govwifi-metrics-data-publisher repo"
+  service_role  = var.govwifi_codebuild_role_arn
+  build_timeout = "20"
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -33,35 +32,50 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
 
     environment_variable {
       name  = "TOKEN_NAME"
-      value = "gowwifi/metrics-api/key"
+      value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["TOKEN_NAME"]
     }
 
     environment_variable {
       name  = "TOKEN_VALUE"
-      value = data.aws_secretsmanager_secret_version.metrics_api_key_data.secret_string
+      value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["TOKEN_VALUE"]
     }
 
     environment_variable {
       name  = "SITE_ID"
-      value = data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.SITE_ID
+      value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["SITE_ID"]
     }
 
     environment_variable {
       name  = "SERVER_URL"
-      value = data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.SERVER_URL
+      value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["SERVER_URL"]
     }
 
     environment_variable {
       name  = "PROJECT_NAME"
-      value = data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.PROJECT_NAME
+      value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["PROJECT_NAME"]
     }
+  }
+
+  vpc_config {
+    vpc_id             = var.backend_vpc_id
+    subnets            = var.backend_subnet_ids
+    security_group_ids = [aws_security_group.tableau_publication_sg.id]
   }
 
   source {
     type            = "GITHUB"
     location        = var.metrics_data_publisher_repository
     git_clone_depth = 1
-    buildspec       = "buildspec.yml"
+    buildspec       = <<EOF
+version: 0.2
+phases:
+  build:
+    commands:
+      - echo "Building docker image..."
+      - docker build --target production -t metrics-data-publisher:latest .
+      - echo "Running recover_and_publish inside the container..."
+      - docker run --rm -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME metrics-data-publisher:latest recover_and_publish
+EOF
   }
 
   logs_config {
@@ -78,17 +92,59 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
 
 }
 
-# Trigger metrics-data-publisher every 15 minutes
+resource "aws_security_group" "tableau_publication_sg" {
+  name        = "tableau-publication-sg-${var.env}"
+  description = "Security group for Tableau publication CodeBuild project"
+  vpc_id      = var.backend_vpc_id
+
+  egress {
+    description = "Allow HTTPS outbound traffic"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow HTTP outbound traffic"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow DNS TCP outbound traffic"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow DNS UDP outbound traffic"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.env} Tableau Publication SG"
+  })
+}
+
+# Trigger metrics-data-publisher daily at 05:00 UTC
 resource "aws_cloudwatch_event_target" "trigger_tableau_publication" {
-  rule = aws_cloudwatch_event_rule.tableau_publication_schedule_rule.name
-  arn  = aws_codebuild_project.tableau_publication.id
-
-  # role_arn = var.govwifi_codebuild_role_arn
+  rule     = aws_cloudwatch_event_rule.tableau_publication_schedule_rule.name
+  arn      = aws_codebuild_project.tableau_data_source_publication.arn
+  role_arn = var.govwifi_codebuild_role_arn
 }
 
-# Enable scheduled smoke tests in production environment only
+# Enable scheduled publisher in wifi-london environment only
 resource "aws_cloudwatch_event_rule" "tableau_publication_schedule_rule" {
-  state               = var.env == "wifi" ? "ENABLED" : "DISABLED"
+  state               = (var.env == "wifi" && var.aws_region == "eu-west-2") ? "ENABLED" : "DISABLED"
   name                = "metrics-data-publisher-scheduled-build"
-  schedule_expression = "cron(0/15 * * * ? *)"
+  schedule_expression = "cron(0 5 * * ? *)"
 }
+

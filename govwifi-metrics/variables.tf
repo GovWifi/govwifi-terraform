@@ -148,3 +148,14 @@ variable "nat_gateway_elastic_ips" {
   description = "Elastic IPs of the NAT gateways"
   default     = []
 }
+
+variable "govwifi_codebuild_role_arn" {
+  type        = string
+  description = "The ARN of the CodeBuild service role"
+}
+
+variable "govwifi_codebuild_role_name" {
+  type        = string
+  description = "The name of the CodeBuild service role"
+}
+
