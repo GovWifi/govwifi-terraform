@@ -120,7 +120,17 @@ variable "metrics_api_docker_image" {
   description = "Docker image for the metrics API"
 }
 
+variable "metrics_data_publisher_repository" {
+  type        = string
+  description = "The GitHub repository containing the code to publish the metrics data source(s) to Tableau."
+  default     = "https://github.com/GovWifi/govwifi-metrics-data-publisher.git"
+}
 
+variable "metrics_data_publisher_repository_branch" {
+  type        = string
+  description = "The branch to use, main is the default."
+  default     = "main"
+}
 
 variable "vpc_endpoints_security_group_id" {
   type        = string
