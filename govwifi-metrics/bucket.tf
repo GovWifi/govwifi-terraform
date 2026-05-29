@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "tableau_publication_bucket" {
-  bucket = "govwifi-smoketests-logs-${var.env}"
+  bucket = "govwifi-tableau-publication-logs-${var.env}"
 }
 
 resource "aws_s3_bucket_public_access_block" "tableau_publication_bucket" {
