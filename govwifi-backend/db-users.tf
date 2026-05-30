@@ -3,7 +3,7 @@ resource "aws_db_instance" "users_db" {
   allocated_storage           = var.user_db_storage_gb
   storage_type                = "gp3"
   engine                      = "mysql"
-  engine_version              = "8.0"
+  engine_version              = "8.4"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
   apply_immediately           = true
@@ -25,7 +25,7 @@ resource "aws_db_instance" "users_db" {
   skip_final_snapshot         = true
   deletion_protection         = true
 
-  enabled_cloudwatch_logs_exports = ["error", "slowquery"]
+  enabled_cloudwatch_logs_exports = ["error", "slowquery", "audit"]
   option_group_name               = aws_db_option_group.user_mariadb_audit[0].name
   parameter_group_name            = aws_db_parameter_group.user_db_parameters[0].name
 
@@ -36,7 +36,8 @@ resource "aws_db_instance" "users_db" {
   lifecycle {
     ignore_changes = [
       username,
-      password
+      password,
+      engine_version
     ]
   }
 
@@ -75,7 +76,8 @@ resource "aws_db_instance" "users_read_replica" {
   lifecycle {
     ignore_changes = [
       username,
-      password
+      password,
+      engine_version
     ]
   }
 }
