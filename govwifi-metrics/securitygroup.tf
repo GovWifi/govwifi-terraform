@@ -159,64 +159,7 @@ resource "aws_security_group_rule" "permit_metrics_app_ingress_to_vpc_endpoints"
   source_security_group_id = aws_security_group.metrics_service_out.id
 }
 
-resource "aws_security_group" "tableau_bridge_service_out" {
-  name        = "tableau-bridge-service-out-${var.env}"
-  description = "Allow Outbound Traffic From the Tableau Bridge container"
-  vpc_id      = var.backend_vpc_id
 
-  tags = merge(var.tags, {
-    Name = "${var.env} Tableau Bridge Traffic Out"
-  })
-
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 53
-    to_port     = 53
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    # This is for the bridge to talk to the metrics-db (postgresql)
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [var.backend_vpc_cidr_block]
-  }
-}
-
-resource "aws_security_group_rule" "permit_tableau_bridge_ingress_to_vpc_endpoints" {
-  security_group_id = var.vpc_endpoints_security_group_id
-
-  type      = "ingress"
-  from_port = 443
-  to_port   = 443
-  protocol  = "tcp"
-
-  source_security_group_id = aws_security_group.tableau_bridge_service_out.id
-}
-
-resource "aws_security_group_rule" "metrics_db_ingress_from_tableau_bridge" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.tableau_bridge_service_out.id
-  security_group_id        = aws_security_group.london_metrics_db_sg.id
-}
 
 resource "aws_security_group_rule" "metrics_db_ingress_from_bastion" {
   type                     = "ingress"
