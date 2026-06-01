@@ -120,10 +120,7 @@ variable "metrics_api_docker_image" {
   description = "Docker image for the metrics API"
 }
 
-variable "tableau_bridge_docker_image" {
-  type        = string
-  description = "Docker image for the Tableau Bridge"
-}
+
 
 variable "vpc_endpoints_security_group_id" {
   type        = string
@@ -133,5 +130,11 @@ variable "vpc_endpoints_security_group_id" {
 variable "administrator_cidrs" {
   type        = list(string)
   description = "IPs associated with the GDS/CDIO VPN to allow access"
+  default     = []
+}
+
+variable "nat_gateway_elastic_ips" {
+  type        = list(string)
+  description = "Elastic IPs of the NAT gateways"
   default     = []
 }

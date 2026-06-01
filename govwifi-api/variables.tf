@@ -122,7 +122,8 @@ variable "subnet_ids" {
 }
 
 variable "private_subnet_ids" {
-  type = list(string)
+  type    = list(string)
+  default = []
 }
 
 variable "user_signup_docker_image" {
@@ -242,4 +243,10 @@ variable "smoke_test_ips" {
 
 variable "log_retention" {
   type = number
+}
+
+variable "metrics_api_endpoint" {
+  type        = string
+  default     = ""
+  description = "The metrics API endpoint URL (e.g. https://metrics.wifi.service.gov.uk)"
 }

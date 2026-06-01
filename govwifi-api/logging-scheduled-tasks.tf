@@ -189,6 +189,44 @@ EOF
 
 }
 
+resource "aws_cloudwatch_event_target" "publish_daily_total_metrics_logging" {
+  count     = var.logging_enabled
+  target_id = "${var.env_name}-logging-daily-metrics-totals"
+  arn       = aws_ecs_cluster.api_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_metrics_logging_event[0].name
+  role_arn  = aws_iam_role.logging_scheduled_task_role[0].arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.logging_api_scheduled_task[0].arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = length(var.private_subnet_ids) > 0 ? var.private_subnet_ids : var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.api_in.id],
+        [aws_security_group.api_out.id]
+      )
+
+      assign_public_ip = length(var.private_subnet_ids) > 0 ? false : true
+    }
+  }
+
+  input = <<EOF
+{
+  "containerOverrides": [
+    {
+      "name": "logging-api",
+      "command": ["bundle", "exec", "rake", "publish_daily_total_metrics"]
+    }
+  ]
+}
+EOF
+
+}
+
 
 resource "aws_cloudwatch_event_target" "publish_metrics_to_data_bucket" {
   count     = var.logging_enabled
@@ -301,7 +339,7 @@ resource "aws_ecs_task_definition" "logging_api_scheduled_task" {
         },{
           "name": "SMOKE_TEST_IPS",
           "value": "${join(",", var.smoke_test_ips)}"
-        }
+        }${var.metrics_api_endpoint != "" ? ",{\"name\":\"METRICS_API_ENDPOINT\",\"value\":\"${var.metrics_api_endpoint}\"}" : ""}
       ],
       "secrets": [
         {
@@ -319,7 +357,7 @@ resource "aws_ecs_task_definition" "logging_api_scheduled_task" {
         },{
           "name": "SENTRY_DSN",
           "valueFrom": "${data.aws_secretsmanager_secret.logging_api_sentry_dsn.arn}"
-        }
+        }${var.metrics_api_endpoint != "" ? ",{\"name\":\"METRICS_API_BEARER_TOKEN\",\"valueFrom\":\"${data.aws_secretsmanager_secret.metrics_api_key[0].arn}\"}" : ""}
       ],
       "links": null,
       "workingDirectory": null,
