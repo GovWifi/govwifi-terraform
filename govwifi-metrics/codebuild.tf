@@ -74,7 +74,7 @@ phases:
       - echo "Building docker image..."
       - docker build --target production -t metrics-data-publisher:latest .
       - echo "Running recover_and_publish inside the container..."
-      - docker run --rm -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME metrics-data-publisher:latest recover_and_publish
+      - docker run --rm -w /tmp -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME metrics-data-publisher:latest recover_and_publish
 EOF
   }
 
