@@ -58,7 +58,7 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
 
   vpc_config {
     vpc_id             = var.backend_vpc_id
-    subnets            = var.backend_subnet_ids
+    subnets            = var.backend_private_subnet_ids
     security_group_ids = [aws_security_group.tableau_publication_sg.id]
   }
 

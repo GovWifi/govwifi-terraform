@@ -159,3 +159,10 @@ variable "govwifi_codebuild_role_name" {
   description = "The name of the CodeBuild service role"
 }
 
+variable "backend_private_subnet_ids" {
+  type        = list(string)
+  description = "List of backend private subnet IDs"
+  default     = []
+}
+
+

@@ -125,7 +125,7 @@ resource "aws_iam_policy" "metrics_codebuild_vpc_policy" {
         },
         "ArnEquals": {
           "ec2:Subnet": [
-            ${join(",\n            ", [for subnet_id in var.backend_subnet_ids : "\"arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/${subnet_id}\""])}
+            ${join(",\n            ", [for subnet_id in var.backend_private_subnet_ids : "\"arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/${subnet_id}\""])}
           ]
         }
       }
