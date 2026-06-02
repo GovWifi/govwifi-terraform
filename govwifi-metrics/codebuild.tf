@@ -26,6 +26,11 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
     }
 
     environment_variable {
+      name  = "ENVIRONMENT_NAME"
+      value = var.env_name
+    }
+
+    environment_variable {
       name  = "METRICS_API_KEY"
       value = data.aws_secretsmanager_secret_version.metrics_api_key_data.secret_string
     }
@@ -143,8 +148,10 @@ resource "aws_cloudwatch_event_target" "trigger_tableau_publication" {
 
 # Enable scheduled publisher in wifi-london environment only
 resource "aws_cloudwatch_event_rule" "tableau_publication_schedule_rule" {
-  state               = (var.env == "wifi" && var.aws_region == "eu-west-2") ? "ENABLED" : "DISABLED"
-  name                = "metrics-data-publisher-scheduled-build"
-  schedule_expression = "cron(0 5 * * ? *)"
+  state = (var.env_name == "wifi" && var.aws_region == "eu-west-2") ? "ENABLED" : "DISABLED"
+  name  = "metrics-data-publisher-scheduled-build"
+  # Note: check this is scheduled for 1hr+ after the scheduled job to run the
+  # rake metrics gathering tasks have completed, and the results published to
+  # the API
+  schedule_expression = "cron(0 7 * * ? *)"
 }
-
