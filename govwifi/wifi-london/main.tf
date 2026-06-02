@@ -16,7 +16,7 @@ module "tfstate" {
 }
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = "~> 1.14"
 
   backend "s3" {
     # Interpolation is not allowed here.
@@ -30,7 +30,8 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
@@ -149,7 +150,7 @@ module "backend" {
   rr_storage_gb              = 1000
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
-  user_replica_source_db     = "wifi-production-user-db"
+  user_replica_source_db     = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-production-user-db"
 
   # Seconds. Set to zero to disable monitoring
   db_monitoring_interval = 60
@@ -386,6 +387,8 @@ module "api" {
 
   elasticsearch_endpoint = module.govwifi_elasticsearch.endpoint
   smoke_test_ips         = module.london_tests_vpc.eip_public_ips
+
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
 }
 
 module "london_critical_notifications" {
@@ -594,7 +597,7 @@ module "london_govwifi-ecs-update-service" {
 
   source = "../../govwifi-ecs-update-service"
 
-  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api"]
+  deployed_app_names = ["user-signup-api", "logging-api", "admin", "authentication-api", "metrics-api"]
 
   env_name = local.env_name
 
@@ -669,4 +672,49 @@ module "london_log_management" {
   region_name                = lower(var.aws_region_name)
   log_retention              = local.log_retention
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
+}
+
+
+module "london_metrics" {
+  providers = {
+    aws = aws.main
+  }
+
+  source = "../../govwifi-metrics"
+
+  aws_region     = var.aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+  region_name    = lower(var.aws_region_name)
+
+  database_name              = "govwifi_metrics"
+  skip_final_snapshot        = true
+  backend_subnet_ids         = module.backend.backend_subnet_ids
+  backend_private_subnet_ids = module.backend.backend_private_subnet_ids
+  backend_vpc_id             = module.backend.backend_vpc_id
+  backend_vpc_cidr_block     = module.backend.vpc_cidr_block
+
+  env_name      = local.env_name
+  env_subdomain = local.env_subdomain
+  log_retention = local.log_retention
+
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+
+  admin_sg_id = module.govwifi_admin.admin_ec2_out_sg_id
+  api_sg_id   = module.api.api_out_sg_id
+
+  bastion_sg_id = module.backend.bastion_sg_id
+
+  metrics_api_docker_image        = local.metrics_api_docker_image
+  vpc_endpoints_security_group_id = module.backend.vpc_endpoints_security_group_id
+
+  administrator_cidrs     = var.administrator_cidrs
+  nat_gateway_elastic_ips = module.backend.nat_gateway_elastic_ips
+
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
+
+  tags = {
+    Name = "london-metrics-production"
+  }
 }

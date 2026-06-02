@@ -78,6 +78,11 @@ data "aws_secretsmanager_secret" "logging_api_sentry_dsn" {
   name = "sentry/logging_api_dsn"
 }
 
+data "aws_secretsmanager_secret" "metrics_api_key" {
+  count = var.metrics_api_endpoint != "" ? 1 : 0
+  name  = "govwifi/metrics-api/key"
+}
+
 data "aws_secretsmanager_secret_version" "tools_account" {
   secret_id = data.aws_secretsmanager_secret.tools_account.id
 }

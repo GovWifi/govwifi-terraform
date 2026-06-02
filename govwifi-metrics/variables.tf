@@ -110,12 +110,59 @@ variable "api_sg_id" {
   description = "Security group ID of the api services for ingress"
 }
 
+variable "bastion_sg_id" {
+  type        = string
+  description = "Security group ID of the bastion for ingress"
+}
+
 variable "metrics_api_docker_image" {
   type        = string
   description = "Docker image for the metrics API"
+}
+
+variable "metrics_data_publisher_repository" {
+  type        = string
+  description = "The GitHub repository containing the code to publish the metrics data source(s) to Tableau."
+  default     = "https://github.com/GovWifi/govwifi-metrics-data-publisher.git"
+}
+
+variable "metrics_data_publisher_repository_branch" {
+  type        = string
+  description = "The branch to use, main is the default."
+  default     = "main"
 }
 
 variable "vpc_endpoints_security_group_id" {
   type        = string
   description = "Security group ID for VPC endpoints"
 }
+
+variable "administrator_cidrs" {
+  type        = list(string)
+  description = "IPs associated with the GDS/CDIO VPN to allow access"
+  default     = []
+}
+
+variable "nat_gateway_elastic_ips" {
+  type        = list(string)
+  description = "Elastic IPs of the NAT gateways"
+  default     = []
+}
+
+variable "govwifi_codebuild_role_arn" {
+  type        = string
+  description = "The ARN of the CodeBuild service role"
+}
+
+variable "govwifi_codebuild_role_name" {
+  type        = string
+  description = "The name of the CodeBuild service role"
+}
+
+variable "backend_private_subnet_ids" {
+  type        = list(string)
+  description = "List of backend private subnet IDs"
+  default     = []
+}
+
+

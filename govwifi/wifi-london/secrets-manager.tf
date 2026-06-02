@@ -13,3 +13,13 @@ data "aws_secretsmanager_secret" "pagerduty_config" {
 data "aws_secretsmanager_secret_version" "pagerduty_config" {
   secret_id = data.aws_secretsmanager_secret.pagerduty_config.id
 }
+
+data "aws_secretsmanager_secret" "metrics_api_docker_image" {
+  name = "govwifi/metrics/ecr/image"
+}
+
+data "aws_secretsmanager_secret_version" "metrics_api_docker_image" {
+  secret_id = data.aws_secretsmanager_secret.metrics_api_docker_image.id
+}
+
+

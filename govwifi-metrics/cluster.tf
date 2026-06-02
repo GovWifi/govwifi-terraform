@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "metrics_cluster" {
-  name = "metrics-cluster-${var.env}"
+  name = "${var.env_name}-metrics-cluster"
 
   tags = var.tags
 }
@@ -13,7 +13,7 @@ resource "aws_cloudwatch_log_group" "metrics_log_group" {
 }
 
 resource "aws_ecs_task_definition" "metrics_api" {
-  family                   = "metrics-api-task-${var.env}"
+  family                   = "metrics-api-task-${var.env_name}"
   requires_compatibilities = ["FARGATE"]
   task_role_arn            = aws_iam_role.metrics_api_task_role.arn
   execution_role_arn       = aws_iam_role.metrics_api_task_execution_role.arn
@@ -43,6 +43,12 @@ resource "aws_ecs_task_definition" "metrics_api" {
           "value": "metrics.${var.env_subdomain}.service.gov.uk"
         }
       ],
+      "secrets": [
+        {
+          "name": "METRICS_API_KEY",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -59,7 +65,7 @@ EOF
 }
 
 resource "aws_ecs_service" "metrics_service" {
-  name             = "metrics-api-service-${var.env}"
+  name             = "metrics-api-service-${var.env_name}"
   cluster          = aws_ecs_cluster.metrics_cluster.id
   task_definition  = aws_ecs_task_definition.metrics_api.arn
   desired_count    = 1
@@ -109,3 +115,5 @@ resource "aws_alb_target_group" "metrics_tg" {
 
   tags = var.tags
 }
+
+

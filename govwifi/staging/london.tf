@@ -312,6 +312,8 @@ module "london_api" {
 
   elasticsearch_endpoint = module.london_elasticsearch.endpoint
   smoke_test_ips         = module.london_tests_vpc.eip_public_ips
+
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
 }
 
 module "london_route53_notifications" {
@@ -553,11 +555,12 @@ module "london_metrics" {
   aws_account_id = local.aws_account_id
   region_name    = local.london_aws_region_name
 
-  database_name          = "govwifi_metrics"
-  skip_final_snapshot    = true
-  backend_subnet_ids     = module.london_backend.backend_subnet_ids
-  backend_vpc_id         = module.london_backend.backend_vpc_id
-  backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+  database_name              = "govwifi_metrics"
+  skip_final_snapshot        = true
+  backend_subnet_ids         = module.london_backend.backend_subnet_ids
+  backend_private_subnet_ids = module.london_backend.backend_private_subnet_ids
+  backend_vpc_id             = module.london_backend.backend_vpc_id
+  backend_vpc_cidr_block     = module.london_backend.vpc_cidr_block
 
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
@@ -568,8 +571,16 @@ module "london_metrics" {
   admin_sg_id = module.london_admin.admin_ec2_out_sg_id
   api_sg_id   = module.london_api.api_out_sg_id
 
+  bastion_sg_id = module.london_backend.bastion_sg_id
+
   metrics_api_docker_image        = local.metrics_api_docker_image
   vpc_endpoints_security_group_id = module.london_backend.vpc_endpoints_security_group_id
+
+  administrator_cidrs     = var.administrator_cidrs
+  nat_gateway_elastic_ips = module.london_backend.nat_gateway_elastic_ips
+
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
 
   tags = {
     Name = "london-metrics-staging"

@@ -22,3 +22,8 @@ output "cluster_database_name" {
   description = "Database name"
   value       = aws_rds_cluster.metrics_db_cluster.database_name
 }
+
+output "metrics_api_endpoint" {
+  description = "The metrics API endpoint hostname"
+  value       = "metrics.${var.env_subdomain}.service.gov.uk"
+}

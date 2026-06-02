@@ -56,6 +56,20 @@ resource "aws_security_group" "metrics_alb_in" {
     protocol    = "tcp"
     cidr_blocks = [var.backend_vpc_cidr_block]
   }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = var.administrator_cidrs
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [for ip in var.nat_gateway_elastic_ips : "${ip}/32"]
+  }
 }
 
 resource "aws_security_group" "metrics_alb_out" {
@@ -143,4 +157,15 @@ resource "aws_security_group_rule" "permit_metrics_app_ingress_to_vpc_endpoints"
   protocol  = "tcp"
 
   source_security_group_id = aws_security_group.metrics_service_out.id
+}
+
+
+
+resource "aws_security_group_rule" "metrics_db_ingress_from_bastion" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = var.bastion_sg_id
+  security_group_id        = aws_security_group.london_metrics_db_sg.id
 }

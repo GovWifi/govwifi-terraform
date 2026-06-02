@@ -13,3 +13,5 @@ data "aws_secretsmanager_secret_version" "metrics_api_docker_image" {
 data "aws_secretsmanager_secret" "metrics_api_docker_image" {
   name = "govwifi/metrics/ecr/image"
 }
+
+
