@@ -16,7 +16,7 @@ module "tfstate" {
 }
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = "~> 1.14"
 
   backend "s3" {
     # Interpolation is not allowed here.
@@ -30,7 +30,8 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
@@ -149,7 +150,7 @@ module "backend" {
   rr_storage_gb              = 1000
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
-  user_replica_source_db     = "wifi-production-user-db"
+  user_replica_source_db     = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-production-user-db"
 
   # Seconds. Set to zero to disable monitoring
   db_monitoring_interval = 60

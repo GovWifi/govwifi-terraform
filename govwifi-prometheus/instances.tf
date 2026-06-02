@@ -89,7 +89,7 @@ resource "aws_volume_attachment" "prometheus_ebs_attach" {
 }
 
 resource "aws_eip" "eip" {
-  vpc = true
+  domain = "vpc"
 
   tags = {
     Name = "prometheus"
