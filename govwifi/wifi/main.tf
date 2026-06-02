@@ -16,7 +16,7 @@ module "tfstate" {
 }
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = "~> 1.14"
 
   backend "s3" {
     # Interpolation is not allowed here.
@@ -30,7 +30,8 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
