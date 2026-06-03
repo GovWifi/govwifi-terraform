@@ -525,12 +525,12 @@ module "govwifi_slack_alerts" {
 
   source = "../../govwifi-slack-alerts"
 
-  london_critical_notifications_topic_arn = module.london_critical_notifications.topic_arn
-  london_capacity_notifications_topic_arn = module.london_capacity_notifications.topic_arn
-  dublin_critical_notifications_topic_arn = data.terraform_remote_state.dublin.outputs.dublin_critical_notifications_arn
-  dublin_capacity_notifications_topic_arn = data.terraform_remote_state.dublin.outputs.dublin_capacity_notifications_arn
-
+  london_critical_notifications_topic_arn  = module.london_critical_notifications.topic_arn
+  london_capacity_notifications_topic_arn  = module.london_capacity_notifications.topic_arn
+  dublin_critical_notifications_topic_arn  = data.terraform_remote_state.dublin.outputs.dublin_critical_notifications_arn
+  dublin_capacity_notifications_topic_arn  = data.terraform_remote_state.dublin.outputs.dublin_capacity_notifications_arn
   route53_critical_notifications_topic_arn = module.route53_critical_notifications.topic_arn
+  smoketest_notifications_topic_arn        = module.smoke_tests.topic_arn
   create_slack_alert                       = 1 # set to 1 to create config for slack chat bot.
 }
 

@@ -362,6 +362,7 @@ module "govwifi_slack_alerts" {
   dublin_capacity_notifications_topic_arn = module.dublin_notifications.topic_arn
 
   route53_critical_notifications_topic_arn = module.london_route53_notifications.topic_arn
+  smoketest_notifications_topic_arn        = module.london_smoke_tests.topic_arn
   # set to 1 to create config for slack chat bot.
   create_slack_alert = 0
 }
