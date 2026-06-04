@@ -92,4 +92,82 @@ resource "aws_iam_role_policy" "metrics_api_task_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "metrics_codebuild_vpc_policy" {
+  name = "GovwifiMetricsCodeBuildVPC-${var.env}"
+  path = "/"
 
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateNetworkInterface",
+        "ec2:DescribeDhcpOptions",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeVpcs"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:CreateNetworkInterfacePermission"
+      ],
+      "Resource": "arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:network-interface/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:AuthorizedService": "codebuild.amazonaws.com"
+        },
+        "ArnEquals": {
+          "ec2:Subnet": [
+            ${join(",\n            ", [for subnet_id in var.backend_private_subnet_ids : "\"arn:aws:ec2:${var.aws_region}:${var.aws_account_id}:subnet/${subnet_id}\""])}
+          ]
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "metrics_codebuild_vpc" {
+  role       = var.govwifi_codebuild_role_name
+  policy_arn = aws_iam_policy.metrics_codebuild_vpc_policy.arn
+}
+
+resource "aws_iam_policy" "metrics_codebuild_s3_policy" {
+  name = "GovwifiMetricsCodeBuildS3-${var.env}"
+  path = "/"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:GetBucketAcl",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:PutObject"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "${aws_s3_bucket.tableau_publication_bucket.arn}",
+        "${aws_s3_bucket.tableau_publication_bucket.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "metrics_codebuild_s3" {
+  role       = var.govwifi_codebuild_role_name
+  policy_arn = aws_iam_policy.metrics_codebuild_s3_policy.arn
+}

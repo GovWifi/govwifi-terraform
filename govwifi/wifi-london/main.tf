@@ -16,7 +16,7 @@ module "tfstate" {
 }
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = "~> 1.14"
 
   backend "s3" {
     # Interpolation is not allowed here.
@@ -30,7 +30,8 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
@@ -149,7 +150,7 @@ module "backend" {
   rr_storage_gb              = 1000
   critical_notifications_arn = module.london_critical_notifications.topic_arn
   capacity_notifications_arn = module.london_capacity_notifications.topic_arn
-  user_replica_source_db     = "wifi-production-user-db"
+  user_replica_source_db     = "arn:aws:rds:eu-west-2:${local.aws_account_id}:db:wifi-production-user-db"
 
   # Seconds. Set to zero to disable monitoring
   db_monitoring_interval = 60
@@ -686,11 +687,12 @@ module "london_metrics" {
   aws_account_id = local.aws_account_id
   region_name    = lower(var.aws_region_name)
 
-  database_name          = "govwifi_metrics"
-  skip_final_snapshot    = true
-  backend_subnet_ids     = module.backend.backend_subnet_ids
-  backend_vpc_id         = module.backend.backend_vpc_id
-  backend_vpc_cidr_block = module.backend.vpc_cidr_block
+  database_name              = "govwifi_metrics"
+  skip_final_snapshot        = true
+  backend_subnet_ids         = module.backend.backend_subnet_ids
+  backend_private_subnet_ids = module.backend.backend_private_subnet_ids
+  backend_vpc_id             = module.backend.backend_vpc_id
+  backend_vpc_cidr_block     = module.backend.vpc_cidr_block
 
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
@@ -708,6 +710,9 @@ module "london_metrics" {
 
   administrator_cidrs     = var.administrator_cidrs
   nat_gateway_elastic_ips = module.backend.nat_gateway_elastic_ips
+
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
 
   tags = {
     Name = "london-metrics-production"
