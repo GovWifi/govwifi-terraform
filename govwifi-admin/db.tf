@@ -1,5 +1,5 @@
 resource "aws_db_parameter_group" "db_parameters_v8" {
-  name        = "${var.env_name}-mysql8-admin-db-parameter-group"
+  name        = "${var.env_name}-mysql8-4-admin-db-parameter-group"
   family      = "mysql8.4"
   description = "DB parameter configuration for govwifi-admin"
 
@@ -79,7 +79,8 @@ resource "aws_db_instance" "admin_db" {
   lifecycle {
     ignore_changes = [
       username,
-      password
+      password,
+      engine_version
     ]
   }
 }
