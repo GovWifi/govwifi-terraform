@@ -243,11 +243,11 @@ module "london_api" {
   env_subdomain = local.env_subdomain
   log_retention = local.log_retention
 
-  auth_task_count_min    = 1
+  auth_task_count_min    = 2
   auth_task_count_max    = 5
-  logging_task_count_min = 1
+  logging_task_count_min = 2
   logging_task_count_max = 5
-  user_task_count_min    = 1
+  user_task_count_min    = 2
   user_task_count_max    = 5
 
 
