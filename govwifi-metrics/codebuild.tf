@@ -139,19 +139,17 @@ resource "aws_security_group" "tableau_publication_sg" {
   })
 }
 
-# Trigger metrics-data-publisher daily at 05:00 UTC
-resource "aws_cloudwatch_event_target" "trigger_tableau_publication" {
-  rule     = aws_cloudwatch_event_rule.tableau_publication_schedule_rule.name
-  arn      = aws_codebuild_project.tableau_data_source_publication.arn
-  role_arn = var.govwifi_codebuild_role_arn
-}
+resource "aws_scheduler_schedule" "metrics_recover_and_publish_schedule" {
+  name = "metrics-recover-and-publish-schedule"
 
-# Enable scheduled publisher in wifi-london environment only
-resource "aws_cloudwatch_event_rule" "tableau_publication_schedule_rule" {
-  state = (var.env_name == "wifi" && var.aws_region == "eu-west-2") ? "ENABLED" : "DISABLED"
-  name  = "metrics-data-publisher-scheduled-build"
-  # Note: check this is scheduled for 1hr+ after the scheduled job to run the
-  # rake metrics gathering tasks have completed, and the results published to
-  # the API
-  schedule_expression = "cron(0 7 * * ? *)"
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "cron(05 7 * * ? *)"
+
+  target {
+    arn      = aws_codebuild_project.tableau_data_source_publication.arn
+    role_arn = aws_iam_role.scheduler_tableau_publication_role.arn
+  }
 }
