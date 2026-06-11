@@ -171,3 +171,41 @@ resource "aws_iam_role_policy_attachment" "metrics_codebuild_s3" {
   role       = var.govwifi_codebuild_role_name
   policy_arn = aws_iam_policy.metrics_codebuild_s3_policy.arn
 }
+
+resource "aws_iam_role" "scheduler_tableau_publication_role" {
+  name = "scheduler-tableau-publication-role-${var.env}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "scheduler.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "scheduler_tableau_publication_policy" {
+  name = "scheduler-tableau-publication-policy-${var.env}"
+  role = aws_iam_role.scheduler_tableau_publication_role.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "codebuild:StartBuild",
+      "Resource": "${aws_codebuild_project.tableau_data_source_publication.arn}"
+    }
+  ]
+}
+EOF
+}
+
