@@ -401,16 +401,16 @@ module "dublin_sync_certs" {
 
 }
 
-# To be implimented soon
-# module "dublin_cyber_logs" {
-#   providers = {
-#     aws = aws.dublin
-#   }
+module "dublin_cyber_logs" {
+  providers = {
+    aws = aws.dublin
+  }
 
-#   source = "../../govwifi-cyber-logs"
+  source = "../../govwifi-cyber-logs"
 
-#   region         = local.dublin_aws_region
-#   region_name    = lower(local.dublin_aws_region_name)
-#   env            = lower(local.env)
-#   aws_account_id = local.aws_account_id
-# }
+  region         = local.dublin_aws_region
+  region_name    = lower(local.dublin_aws_region_name)
+  env            = lower(local.env)
+  env_name       = lower(local.env_name)
+  aws_account_id = local.aws_account_id
+}
