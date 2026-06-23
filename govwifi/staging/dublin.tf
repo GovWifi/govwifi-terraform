@@ -411,5 +411,6 @@ module "dublin_cyber_logs" {
   region         = local.dublin_aws_region
   region_name    = lower(local.dublin_aws_region_name)
   env            = lower(local.env)
+  env_name       = lower(local.env_name)
   aws_account_id = local.aws_account_id
 }

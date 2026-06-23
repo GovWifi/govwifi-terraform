@@ -12,11 +12,21 @@ variable "cribl_worker_arn" {
 
 variable "env" {
   type        = string
-  description = "The environment to be deployed to (development, staging, prod)"
+  description = "The environment to be deployed to (development, staging, production)"
 
   validation {
     condition     = contains(["development", "staging", "production"], var.env)
-    error_message = "Environment must be one of: development, staging or prod"
+    error_message = "Environment must be one of: development, staging or production"
+  }
+}
+
+variable "env_name" {
+  type        = string
+  description = "The environment to be deployed to (development, staging, prod)"
+
+  validation {
+    condition     = contains(["development", "staging", "production", "wifi"], var.env_name)
+    error_message = "Environment must be one of: development, staging or prod, or for prod wifi for legacy reasons"
   }
 }
 
