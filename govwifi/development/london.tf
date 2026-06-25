@@ -570,6 +570,7 @@ module "london_cyber_logs" {
   region         = local.london_aws_region
   region_name    = lower(local.london_aws_region_name)
   env            = lower(local.env)
+  env_name       = lower(local.env_name)
   aws_account_id = local.aws_account_id
 }
 
@@ -599,11 +600,12 @@ module "london_metrics" {
   aws_account_id = local.aws_account_id
   region_name    = local.london_aws_region_name
 
-  database_name          = "govwifi_metrics"
-  skip_final_snapshot    = true
-  backend_subnet_ids     = module.london_backend.backend_subnet_ids
-  backend_vpc_id         = module.london_backend.backend_vpc_id
-  backend_vpc_cidr_block = module.london_backend.vpc_cidr_block
+  database_name              = "govwifi_metrics"
+  skip_final_snapshot        = true
+  backend_subnet_ids         = module.london_backend.backend_subnet_ids
+  backend_private_subnet_ids = module.london_backend.backend_private_subnet_ids
+  backend_vpc_id             = module.london_backend.backend_vpc_id
+  backend_vpc_cidr_block     = module.london_backend.vpc_cidr_block
 
   env_name      = local.env_name
   env_subdomain = local.env_subdomain
@@ -621,6 +623,9 @@ module "london_metrics" {
 
   administrator_cidrs     = var.administrator_cidrs
   nat_gateway_elastic_ips = module.london_backend.nat_gateway_elastic_ips
+
+  govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
+  govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
 
   tags = {
     Name = "london-metrics-development"

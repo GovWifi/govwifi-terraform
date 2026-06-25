@@ -16,7 +16,7 @@ module "tfstate" {
 }
 
 terraform {
-  required_version = "~> 1.9.6"
+  required_version = "~> 1.14"
 
   backend "s3" {
     # Interpolation is not allowed here.
@@ -30,7 +30,8 @@ terraform {
   }
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
     }
   }
 }
@@ -499,4 +500,18 @@ module "dublin_log_management" {
   region_name                = lower(var.aws_region_name)
   log_retention              = local.log_retention
   capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
+}
+
+module "london_cyber_logs" {
+  providers = {
+    aws = aws.main
+  }
+
+  source = "../../govwifi-cyber-logs"
+
+  region         = var.aws_region
+  region_name    = lower(var.aws_region_name)
+  env_name       = lower(local.env_name)
+  env            = lower(local.env)
+  aws_account_id = local.aws_account_id
 }

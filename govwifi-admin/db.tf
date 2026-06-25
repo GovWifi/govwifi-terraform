@@ -1,6 +1,6 @@
 resource "aws_db_parameter_group" "db_parameters_v8" {
-  name        = "${var.env_name}-mysql8-admin-db-parameter-group"
-  family      = "mysql8.0"
+  name        = "${var.env_name}-mysql8-4-admin-db-parameter-group"
+  family      = "mysql8.4"
   description = "DB parameter configuration for govwifi-admin"
 
   parameter {
@@ -24,7 +24,22 @@ resource "aws_db_parameter_group" "db_parameters_v8" {
   }
 
   tags = {
-    Name = "${title(var.env_name)} mysql 8 DB parameter group for govwifi-admin"
+    Name = "${title(var.env_name)} mysql 8.4 DB parameter group for govwifi-admin"
+  }
+}
+
+resource "aws_db_option_group" "admin_db_audit" {
+  name                     = "${var.env_name}-mysql8-admin-audit"
+  option_group_description = "MySQL audit configuration for govwifi-admin"
+  engine_name              = "mysql"
+  major_engine_version     = "8.4"
+
+  option {
+    option_name = "MARIADB_AUDIT_PLUGIN"
+  }
+
+  tags = {
+    Name = "${title(var.env_name)} DB Audit configuration for govwifi-admin"
   }
 }
 
@@ -32,7 +47,7 @@ resource "aws_db_instance" "admin_db" {
   allocated_storage           = var.db_storage_gb
   storage_type                = "gp2"
   engine                      = "mysql"
-  engine_version              = "8.0"
+  engine_version              = "8.4"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
   apply_immediately           = true
@@ -54,7 +69,7 @@ resource "aws_db_instance" "admin_db" {
   deletion_protection         = true
 
   enabled_cloudwatch_logs_exports = ["audit", "error", "general", "slowquery"]
-  option_group_name               = "default:mysql-8-0"
+  option_group_name               = aws_db_option_group.admin_db_audit.name
   parameter_group_name            = aws_db_parameter_group.db_parameters_v8.name
 
   tags = {
@@ -64,7 +79,8 @@ resource "aws_db_instance" "admin_db" {
   lifecycle {
     ignore_changes = [
       username,
-      password
+      password,
+      engine_version
     ]
   }
 }

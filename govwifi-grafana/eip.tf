@@ -1,5 +1,5 @@
 resource "aws_eip" "grafana_eip" {
-  vpc = true
+  domain = "vpc"
 
   tags = {
     Name = "grafana-${var.env_name}"
