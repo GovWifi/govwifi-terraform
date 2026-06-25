@@ -11,7 +11,7 @@ resource "aws_db_subnet_group" "db_subnets" {
 resource "aws_db_parameter_group" "db_parameters" {
   count       = var.db_instance_count
   name        = "${var.env_name}-db-parameter-group"
-  family      = "mysql8.0"
+  family      = "mysql8.4"
   description = "DB parameter configuration"
 
   parameter {
@@ -73,7 +73,7 @@ resource "aws_db_parameter_group" "user_db_parameters" {
 resource "aws_db_parameter_group" "rr_parameters" {
   name = "${var.env_name}-rr-parameter-group"
 
-  family      = "mysql8.0"
+  family      = "mysql8.4"
   description = "DB read replica parameter configuration"
 
   parameter {
@@ -138,7 +138,7 @@ resource "aws_db_option_group" "mariadb_audit" {
 
   option_group_description = "Mariadb audit configuration"
   engine_name              = "mysql"
-  major_engine_version     = "8.0"
+  major_engine_version     = "8.4"
 
   option {
     option_name = "MARIADB_AUDIT_PLUGIN"

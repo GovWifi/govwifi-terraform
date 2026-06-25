@@ -3,7 +3,7 @@ resource "aws_db_instance" "db" {
   allocated_storage           = var.session_db_storage_gb
   storage_type                = "gp3"
   engine                      = "mysql"
-  engine_version              = "8.0"
+  engine_version              = "8.4"
   auto_minor_version_upgrade  = true
   allow_major_version_upgrade = false
   apply_immediately           = true
@@ -25,9 +25,9 @@ resource "aws_db_instance" "db" {
   skip_final_snapshot         = true
   deletion_protection         = true
 
-  enabled_cloudwatch_logs_exports = ["error"]
-  option_group_name               = "default:mysql-8-0"
-  parameter_group_name            = "default.mysql8.0"
+  enabled_cloudwatch_logs_exports = ["error", "audit"]
+  option_group_name               = aws_db_option_group.mariadb_audit.name
+  parameter_group_name            = aws_db_parameter_group.db_parameters[var.db_instance_count].name
 
   tags = {
     Name = "${title(var.env_name)} DB"
@@ -36,7 +36,8 @@ resource "aws_db_instance" "db" {
   lifecycle {
     ignore_changes = [
       username,
-      password
+      password,
+      engine_version
     ]
   }
 }
@@ -61,7 +62,7 @@ resource "aws_db_instance" "read_replica" {
   maintenance_window          = var.db_maintenance_window
   backup_window               = var.db_backup_window
   skip_final_snapshot         = true
-  option_group_name           = "default:mysql-8-0"
+  option_group_name           = aws_db_option_group.mariadb_audit.name
   parameter_group_name        = aws_db_parameter_group.rr_parameters.name
   deletion_protection         = true
 
