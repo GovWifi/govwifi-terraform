@@ -50,28 +50,31 @@ To route a new set of alerts to a brand-new Slack channel, follow these steps:
 3. Scroll to the very bottom of the pop-up window to find and copy the **Channel ID** (it usually starts with a `C`).
 
 #### Step B: Store the Channel ID
-Add the channel ID to your environment configuration secrets or local variables (depending on how the project manages secrets/environment definitions):
-```hcl
-# Example placeholder in locals.tf or secrets
-local.slack_new_feature_channel_id = "C0123456789"
-Step C: Update the Terraform Map
-Open the file containing local.chatbot_configs and append your new channel block to the map:
+Add the channel ID to your environment configuration secret, via secrets manager (depending on how the project manages secrets/environment definitions):
+In Secrets Manager you'll find this at
+slack/credential
+The json code would looke like.
+``` "new-channel-id":"xxxxx-xxxxx" ```
 
-Terraform
+#### Step C: Update the Terraform Map
+Open the file containing local.chatbot_configs and append your new channel block to the map:
+```hcl
+
+slack_new_channel_id     = jsondecode(data.aws_secretsmanager_secret_version.slack_credentials.secret_string)["new-channel-id"] ## this must match the id given in the secrets json.
+
 "new_feature" = {
   configuration_name = "govwifi-chatbot-new-feature-configuration"
-  slack_channel_id   = local.slack_new_feature_channel_id
+  slack_channel_id   = local.slack_new_channel_id
   sns_topic_arns     = [
     aws_sns_topic.my_new_feature_sns_topic.arn
   ]
 }
-Step D: Deploy
+```
+
+#### Step D: Deploy
 Run your standard deployment pipeline:
 
-``` Bash
-make development plan
-make development apply
-```
+
 2. How to Edit or Update an Existing Channel
 Adding/Removing SNS Topics
 If you create a new alarm or event rule and want it to post to an existing channel (e.g., sending a new type of test failure to the #smoke-tests channel):
