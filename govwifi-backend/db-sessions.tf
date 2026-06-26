@@ -27,7 +27,7 @@ resource "aws_db_instance" "db" {
 
   enabled_cloudwatch_logs_exports = ["error", "audit"]
   option_group_name               = aws_db_option_group.mariadb_audit.name
-  parameter_group_name            = aws_db_parameter_group.db_parameters[var.db_instance_count].name
+  parameter_group_name            = aws_db_parameter_group.db_parameters[0].name
 
   tags = {
     Name = "${title(var.env_name)} DB"
