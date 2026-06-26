@@ -714,6 +714,8 @@ module "london_metrics" {
   govwifi_codebuild_role_arn  = module.london_deployment_roles.govwifi_codebuild_role_arn
   govwifi_codebuild_role_name = module.london_deployment_roles.govwifi_codebuild_role_name
 
+  capacity_notifications_arn = module.london_capacity_notifications.topic_arn
+
   tags = {
     Name = "london-metrics-production"
   }
