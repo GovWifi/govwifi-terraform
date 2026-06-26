@@ -151,7 +151,7 @@ resource "aws_db_option_group" "mariadb_audit" {
 
 resource "aws_db_option_group" "user_mariadb_audit" {
   count = var.db_instance_count
-  name  = "${var.env}-user-db-audit"
+  name  = "${var.env}-user-db-audit-8-4"
 
   option_group_description = "Mariadb audit configuration"
   engine_name              = "mysql"
