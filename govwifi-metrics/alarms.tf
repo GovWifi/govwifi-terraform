@@ -5,6 +5,7 @@ resource "aws_cloudwatch_metric_alarm" "tableau_publication_failed" {
   evaluation_periods  = "1"
   metric_name         = "FailedBuilds"
   namespace           = "AWS/CodeBuild"
+  # 86400s == 1day
   period              = "86400"
   statistic           = "Sum"
   threshold           = "1"
