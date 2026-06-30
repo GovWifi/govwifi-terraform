@@ -162,3 +162,8 @@ variable "metrics_api_endpoint" {
   type    = string
   default = ""
 }
+
+variable "private_subnet_ids" {
+  type    = list(string)
+  default = []
+}

@@ -307,6 +307,7 @@ module "govwifi_admin" {
 
   metrics_bucket_name  = module.govwifi_dashboard.metrics_bucket_name
   metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
+  private_subnet_ids   = module.backend.backend_private_subnet_ids
 }
 
 module "api" {
