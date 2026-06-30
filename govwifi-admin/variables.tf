@@ -153,3 +153,12 @@ variable "smoke_test_ips" {
   type    = list(string)
   default = []
 }
+
+variable "metrics_bucket_name" {
+  type = string
+}
+
+variable "metrics_api_endpoint" {
+  type    = string
+  default = ""
+}

@@ -230,6 +230,9 @@ module "london_admin" {
 
   frontend_cert_bucket     = module.london_frontend.frontend_certs_bucket_name
   trusted_certificates_key = module.london_frontend.trusted_certificates_key
+
+  metrics_bucket_name  = module.london_dashboard.metrics_bucket_name
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
 }
 
 module "london_api" {
