@@ -502,7 +502,7 @@ module "dublin_log_management" {
   capacity_notifications_arn = module.dublin_capacity_notifications.topic_arn
 }
 
-module "london_cyber_logs" {
+module "dublin_cyber_logs" {
   providers = {
     aws = aws.main
   }
