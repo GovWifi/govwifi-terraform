@@ -718,3 +718,17 @@ module "london_metrics" {
     Name = "london-metrics-production"
   }
 }
+
+module "london_cyber_logs" {
+  providers = {
+    aws = aws.main
+  }
+
+  source = "../../govwifi-cyber-logs"
+
+  region         = var.aws_region
+  region_name    = lower(var.aws_region_name)
+  env_name       = lower(local.env_name)
+  env            = lower(local.env)
+  aws_account_id = local.aws_account_id
+}
