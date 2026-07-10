@@ -104,6 +104,18 @@ Update the variable or secret tied to that configuration's slack_channel_id.
 🔴 Prerequisite: Workspace Authorization
 AWS Chatbot requires a one-time manual OAuth handshake between your AWS Account and the Slack Workspace. If this is a brand new AWS account, someone must log into the AWS Console manually once, navigate to AWS Chatbot, click Configure New Client (Slack), and authorize the workspace before Terraform can successfully apply these configurations.
 
+To do this
+* Log into the AWS Management Console for your Staging account.
+* Navigate to the AWS Chatbot (or Amazon Q Developer in chat applications) console.
+* Under Configured clients, look for Slack.If your workspace is missing, click Configure client, select Slack, and follow the prompts to complete the OAuth handshake to authorize the Staging AWS account.
+* Once authorized, return to your terminal and re-run terraform apply.
+
+How to find workspace id
+* Open Slack in your web browser (go to app.slack.com and open your workspace).
+* Look closely at the URL in the browser's address bar. It will look like this: https://app.slack.com/client/T0123456789/C0123456789
+* The first ID right after /client/ that starts with a T is your Workspace ID.
+* In the app, find the channel name, right click and select copy link.
+
 Chatbot is not posting to Slack?
 If your EventBridge rules are firing but nothing appears in Slack, verify the following:
 

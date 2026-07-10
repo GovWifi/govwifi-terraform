@@ -6,7 +6,7 @@ locals {
 }
 
 locals {
-  chatbot_configs = var.create_slack_alert > 0 ? {
+  chatbot_configs = { #var.create_slack_alert > 0 ? {
     "alert" = {
       configuration_name = "govwifi-chatbot-alert-configuration"
       slack_channel_id   = local.slack_alerts_channel_id
@@ -31,5 +31,5 @@ locals {
         var.smoketest_notifications_topic_arn
       ]
     }
-  } : {}
+  } #: {}
 }

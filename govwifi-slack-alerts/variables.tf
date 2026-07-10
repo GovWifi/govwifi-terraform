@@ -23,6 +23,6 @@ variable "smoketest_notifications_topic_arn" {
 }
 
 
-variable "create_slack_alert" {
+variable "create_slack_alerts" {
   type = number
 }

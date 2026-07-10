@@ -1,5 +1,5 @@
-resource "aws_iam_role" "govwifi_wifi_london_aws_chatbot_role" {
-  count       = var.create_slack_alert
+resource "aws_iam_role" "govwifi_london_aws_chatbot_role" {
+  count       = var.create_slack_alerts
   name        = "govwifi-aws-chatbot-role"
   path        = "/"
   description = "Role to enable Amazon Chatbot to function."
