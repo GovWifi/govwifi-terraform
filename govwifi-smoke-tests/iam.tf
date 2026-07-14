@@ -125,7 +125,7 @@ resource "aws_sns_topic_policy" "smoke_tests" {
       "Sid": "__default_statement_ID",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "*"
+        "AWS": "arn:aws:iam::${var.aws_account_id}:root"
       },
       "Action": [
         "SNS:GetTopicAttributes",
@@ -151,7 +151,12 @@ resource "aws_sns_topic_policy" "smoke_tests" {
         "Service": "events.amazonaws.com"
       },
       "Action": "sns:Publish",
-      "Resource": "${aws_sns_topic.smoke_tests[0].arn}"
+      "Resource": "${aws_sns_topic.smoke_tests[0].arn}",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceArn": "${aws_cloudwatch_event_rule.smoke_tests[0].arn}"
+        }
+      }
     }
   ]
 }
