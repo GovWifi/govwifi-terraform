@@ -366,8 +366,10 @@ module "govwifi_slack_alerts" {
   dublin_capacity_notifications_topic_arn = module.dublin_notifications.topic_arn
 
   route53_critical_notifications_topic_arn = module.london_route53_notifications.topic_arn
+  smoketest_notifications_topic_arn        = module.london_smoke_tests.topic_arn
   # set to 1 to create config for slack chat bot.
-  create_slack_alert = 0
+  # make sure smoke tests enale_slack_alert is set to 1 as well, otherwise the slack alert config will be created but the smoke tests will not be able to send messages to it.
+  create_slack_alerts = 0
 }
 
 module "london_dashboard" {
@@ -481,7 +483,7 @@ module "london_smoke_tests" {
   default_security_group_id   = module.london_tests_vpc.default_security_group_id
   smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
   smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert          = 0
+  enable_slack_alert          = 0
   govwifi_phone_number        = "+447537417039"
   notify_field                = "govwifistaging"
   smoke_tests_repo_name       = "govwifi-smoke-tests"
