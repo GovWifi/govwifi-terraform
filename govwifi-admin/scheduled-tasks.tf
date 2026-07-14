@@ -296,14 +296,14 @@ resource "aws_cloudwatch_event_target" "publish_organisation_count" {
     platform_version    = "1.4.0"
 
     network_configuration {
-      subnets = length(var.private_subnet_ids) > 0 ? var.private_subnet_ids : var.subnet_ids
+      subnets = var.subnet_ids
 
       security_groups = concat(
         [aws_security_group.admin_ec2_in.id],
         [aws_security_group.admin_ec2_out.id]
       )
 
-      assign_public_ip = length(var.private_subnet_ids) > 0 ? false : true
+      assign_public_ip = true
     }
   }
 
