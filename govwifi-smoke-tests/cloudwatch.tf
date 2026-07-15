@@ -33,7 +33,7 @@ resource "aws_cloudwatch_event_target" "smoketest-sns" {
       log_deep_link = "$.detail.additional-information.logs.deep-link"
     }
     # HERE BE DRAGONS, edit with caution, formatted explicitly to satisfy AWS Chatbot's custom JSON contract, also jasonencode() is not used here because it would escape the JSON and break the formatting, which prevents the input_path from being parsed correctly.
-    input_template = "{\"version\":\"1.0\",\"source\":\"custom\",\"content\":{\"textType\":\"client-markdown\",\"title\":\"GovWifi Smoke Test Status\",\"description\":\"The <project_name> job on *${title(var.env)}* triggered by <initiator> has *<phase_status>* at *<failed_phase>* \\n Reason: <phase_context> \\nBuild ID: <build_id> \\nLogs: <log_deep_link>\"}}"
+    input_template = "{\"version\":\"1.0\",\"source\":\"custom\",\"content\":{\"textType\":\"client-markdown\",\"title\":\"GovWifi Smoke Test Status\",\"description\":\"The <project_name> job on *${title(var.environment)}* triggered by <initiator> has *<phase_status>* at *<failed_phase>* \\n Reason: <phase_context> \\nBuild ID: <build_id> \\nLogs: <log_deep_link>\"}}"
   }
 }
 
