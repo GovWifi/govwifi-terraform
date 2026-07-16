@@ -12,7 +12,7 @@ resource "aws_iam_role" "cribl_ingest" {
         Action : "sts:AssumeRole",
         Condition : {
           StringEquals : {
-            "sts:ExternalId" : "${data.aws_secretsmanager_secret_version.cribl_external_id_val.secret_string}"
+            "sts:ExternalId" : jsondecode(data.aws_secretsmanager_secret_version.cribl_external_id_val.secret_string)["id"]
           }
         }
       }

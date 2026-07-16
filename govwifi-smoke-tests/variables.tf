@@ -13,7 +13,7 @@ variable "smoketest_subnet_private_a" {
 variable "smoketest_subnet_private_b" {
 }
 
-variable "create_slack_alert" {
+variable "enable_slack_alert" {
 }
 
 variable "govwifi_phone_number" {

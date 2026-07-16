@@ -147,7 +147,7 @@ resource "aws_ecs_service" "logging_api_service" {
 
   ## DEPLOYMENT CONFIGURATION - Rolling using dynamic calculation to allow 1 in and 1 out during deployment, while ensuring 100% of tasks stay up.
   deployment_minimum_healthy_percent = 100
-  deployment_maximum_percent         = 134 ## replaces tasks on a sliding scale, depending on desired task count.
+  deployment_maximum_percent         = 200
 
   lifecycle {
     ignore_changes = [desired_count]
