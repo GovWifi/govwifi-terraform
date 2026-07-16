@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "admin_cluster" {
   name = "${var.env_name}-admin-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enhanced"
+  }
 }
 
 resource "aws_cloudwatch_log_group" "admin_log_group" {
