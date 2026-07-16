@@ -5,7 +5,7 @@ resource "aws_ecs_cluster" "frontend_fargate" {
 
   setting {
     name  = "containerInsights"
-    value = "enabled"
+    value = "enhanced"
   }
 }
 
