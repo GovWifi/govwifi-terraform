@@ -53,3 +53,11 @@ resource "aws_cloudwatch_event_rule" "daily_publish_organisation_count" {
   schedule_expression = "cron(00 5 * * ? *)"
   state               = "ENABLED"
 }
+
+# rake metrics:publish_orgs_with_dormant_admins_count
+resource "aws_cloudwatch_event_rule" "daily_publish_orgs_with_dormant_admins_count" {
+  name                = "${var.env_name}-daily-publish-orgs-with-dormant-admins-count"
+  description         = "Triggers daily 05:15 UTC"
+  schedule_expression = "cron(15 5 * * ? *)"
+  state               = "ENABLED"
+}
