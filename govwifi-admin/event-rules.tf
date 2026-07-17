@@ -45,3 +45,11 @@ resource "aws_cloudwatch_event_rule" "daily_smoke_test_reset_event" {
   schedule_expression = "cron(30 23 * * ? *)"
   state               = "ENABLED"
 }
+
+# rake metrics:publish_organisation_count
+resource "aws_cloudwatch_event_rule" "daily_publish_organisation_count" {
+  name                = "${var.env_name}-daily-publish-organisation-count"
+  description         = "Triggers daily 05:00 UTC"
+  schedule_expression = "cron(00 5 * * ? *)"
+  state               = "ENABLED"
+}
