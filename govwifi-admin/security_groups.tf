@@ -88,11 +88,26 @@ resource "aws_security_group" "admin_db_in" {
     protocol    = "tcp"
     cidr_blocks = distinct(data.aws_subnet.backend_subnet.*.cidr_block)
   }
+
+  dynamic "ingress" {
+    for_each = length(var.private_subnet_ids) > 0 ? [1] : []
+    content {
+      from_port   = 3306
+      to_port     = 3306
+      protocol    = "tcp"
+      cidr_blocks = distinct(data.aws_subnet.backend_private_subnet.*.cidr_block)
+    }
+  }
 }
 
 data "aws_subnet" "backend_subnet" {
   count = length(var.subnet_ids)
   id    = var.subnet_ids[count.index]
+}
+
+data "aws_subnet" "backend_private_subnet" {
+  count = length(var.private_subnet_ids)
+  id    = var.private_subnet_ids[count.index]
 }
 
 resource "aws_security_group_rule" "permit_admin_app_ingress_to_vpc_endpoints" {

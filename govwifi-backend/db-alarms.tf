@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "db_queue_depth_alarm" {
   namespace           = "AWS/RDS"
   period              = 60 # 3 minutes total
   statistic           = "Average"
-  threshold           = 5
+  threshold           = 15
   unit                = "Count"
   alarm_description   = "Triggers when I/O requests consistently wait in the disk queue. log into to database and look at processelist for stalled queries."
   treat_missing_data  = "notBreaching"
@@ -150,6 +150,7 @@ resource "aws_cloudwatch_metric_alarm" "db_queue_depth_alarm" {
 
   alarm_actions = [var.capacity_notifications_arn]
 }
+
 
 
 

@@ -84,6 +84,12 @@ resource "aws_iam_role_policy" "ecs_admin_instance_policy" {
         "s3:PutObjectVersionAcl"
       ],
       "Resource": ["${aws_s3_bucket.product_page_data_bucket.arn}/*"]
+    },{
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject"
+      ],
+      "Resource": ["arn:aws:s3:::${var.metrics_bucket_name}/*"]
     }
   ]
 }
@@ -161,6 +167,7 @@ data "aws_iam_policy_document" "secrets_manager_policy" {
       data.aws_secretsmanager_secret_version.admin_db.arn,
       data.aws_secretsmanager_secret_version.google_service_account_backup_credentials.arn,
       data.aws_secretsmanager_secret.sentry_dsn.arn,
+      data.aws_secretsmanager_secret.metrics_api_key.arn,
     ]
   }
 }

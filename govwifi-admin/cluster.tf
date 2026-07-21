@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "admin_cluster" {
   name = "${var.env_name}-admin-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enhanced"
+  }
 }
 
 resource "aws_cloudwatch_log_group" "admin_log_group" {
@@ -120,6 +125,15 @@ resource "aws_ecs_task_definition" "admin_task" {
         },{
           "name": "FULLY_QUALIFIED_DOMAIN_NAME",
           "value": "${aws_route53_record.admin.name}"
+        },{
+          "name": "S3_METRICS_BUCKET",
+          "value": "${var.metrics_bucket_name}"
+        },{
+          "name": "S3_METRICS_BUCKET_OBJECT_KEY",
+          "value": "account-health-organisation-count"
+        },{
+          "name": "METRICS_API_ENDPOINT",
+          "value": "${var.metrics_api_endpoint}"
         }
       ],
       "secrets": [
@@ -162,6 +176,9 @@ resource "aws_ecs_task_definition" "admin_task" {
         },{
           "name": "SENTRY_DSN",
           "valueFrom": "${data.aws_secretsmanager_secret.sentry_dsn.arn}"
+        },{
+          "name": "METRICS_API_BEARER_TOKEN",
+          "valueFrom": "${data.aws_secretsmanager_secret.metrics_api_key.arn}"
         }
       ],
       "image": "${local.admin_docker_image_new}",

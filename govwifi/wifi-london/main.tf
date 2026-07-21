@@ -304,6 +304,10 @@ module "govwifi_admin" {
 
   frontend_cert_bucket     = module.frontend.frontend_certs_bucket_name
   trusted_certificates_key = module.frontend.trusted_certificates_key
+
+  metrics_bucket_name  = module.govwifi_dashboard.metrics_bucket_name
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
+  private_subnet_ids   = module.backend.backend_private_subnet_ids
 }
 
 module "api" {
@@ -525,13 +529,13 @@ module "govwifi_slack_alerts" {
 
   source = "../../govwifi-slack-alerts"
 
-  london_critical_notifications_topic_arn = module.london_critical_notifications.topic_arn
-  london_capacity_notifications_topic_arn = module.london_capacity_notifications.topic_arn
-  dublin_critical_notifications_topic_arn = data.terraform_remote_state.dublin.outputs.dublin_critical_notifications_arn
-  dublin_capacity_notifications_topic_arn = data.terraform_remote_state.dublin.outputs.dublin_capacity_notifications_arn
-
+  london_critical_notifications_topic_arn  = module.london_critical_notifications.topic_arn
+  london_capacity_notifications_topic_arn  = module.london_capacity_notifications.topic_arn
+  dublin_critical_notifications_topic_arn  = data.terraform_remote_state.dublin.outputs.dublin_critical_notifications_arn
+  dublin_capacity_notifications_topic_arn  = data.terraform_remote_state.dublin.outputs.dublin_capacity_notifications_arn
   route53_critical_notifications_topic_arn = module.route53_critical_notifications.topic_arn
-  create_slack_alert                       = 1 # set to 1 to create config for slack chat bot.
+  smoketest_notifications_topic_arn        = module.smoke_tests.topic_arn
+  create_slack_alerts                      = 1 # set to 1 to create config for slack chat bot.
 }
 
 module "govwifi_elasticsearch" {
@@ -566,7 +570,7 @@ module "smoke_tests" {
   default_security_group_id   = module.london_tests_vpc.default_security_group_id
   smoketest_subnet_private_a  = module.london_tests_vpc.subnet_private_a_id
   smoketest_subnet_private_b  = module.london_tests_vpc.subnet_private_b_id
-  create_slack_alert          = 1
+  enable_slack_alert          = 1
   govwifi_phone_number        = "+447537417417"
   notify_field                = "govwifi"
   smoke_tests_repo_name       = "govwifi-smoke-tests"
