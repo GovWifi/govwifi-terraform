@@ -133,3 +133,7 @@ data "aws_secretsmanager_secret_version" "admin_db" {
 data "aws_secretsmanager_secret" "admin_db" {
   name = "rds/admin-db/credentials"
 }
+
+data "aws_secretsmanager_secret" "metrics_api_key" {
+  name = "govwifi/metrics-api/key"
+}

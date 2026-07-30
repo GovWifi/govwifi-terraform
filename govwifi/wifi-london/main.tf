@@ -304,6 +304,10 @@ module "govwifi_admin" {
 
   frontend_cert_bucket     = module.frontend.frontend_certs_bucket_name
   trusted_certificates_key = module.frontend.trusted_certificates_key
+
+  metrics_bucket_name  = module.govwifi_dashboard.metrics_bucket_name
+  metrics_api_endpoint = "https://metrics.${local.env_subdomain}.service.gov.uk"
+  private_subnet_ids   = module.backend.backend_private_subnet_ids
 }
 
 module "api" {
