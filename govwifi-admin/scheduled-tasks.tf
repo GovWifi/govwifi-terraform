@@ -358,6 +358,44 @@ resource "aws_cloudwatch_event_target" "publish_orgs_with_dormant_admins_count" 
 
 }
 
+# rake metrics:publish_orgs_with_less_than_two_admins_count
+resource "aws_cloudwatch_event_target" "publish_orgs_with_less_than_two_admins_count" {
+  target_id = "${var.env_name}-publish-orgs-with-less-than-two-admins-count"
+  arn       = aws_ecs_cluster.admin_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_publish_orgs_with_less_than_two_admins_count.name
+  role_arn  = aws_iam_role.scheduled_task.arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.admin_task.arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = length(var.private_subnet_ids) > 0 ? var.private_subnet_ids : var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.admin_ec2_in.id],
+        [aws_security_group.admin_ec2_out.id]
+      )
+
+      assign_public_ip = length(var.private_subnet_ids) > 0 ? false : true
+    }
+  }
+
+  input = <<EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "metrics:publish_orgs_with_less_than_two_admins_count"]
+      }
+    ]
+  }
+  EOF
+
+}
+
 # Resets the GW and Super user creds used in smoke tests
 resource "aws_cloudwatch_event_target" "smoke_test_reset" {
   target_id = "${var.env_name}-smoke-test-reset"
