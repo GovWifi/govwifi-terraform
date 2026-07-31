@@ -69,3 +69,11 @@ resource "aws_cloudwatch_event_rule" "daily_publish_orgs_with_less_than_two_admi
   schedule_expression = "cron(30 5 * * ? *)"
   state               = "ENABLED"
 }
+
+# rake metrics:publish_orgs_with_no_signed_mou_count
+resource "aws_cloudwatch_event_rule" "daily_publish_orgs_with_no_signed_mou_count" {
+  name                = "${var.env_name}-daily-publish-orgs-with-no-signed-mou-count"
+  description         = "Triggers daily 05:30 UTC"
+  schedule_expression = "cron(30 5 * * ? *)"
+  state               = "ENABLED"
+}
