@@ -172,32 +172,6 @@ resource "aws_iam_role_policy_attachment" "metrics_codebuild_s3" {
   policy_arn = aws_iam_policy.metrics_codebuild_s3_policy.arn
 }
 
-# Lets the buildspec in codebuild.tf read the tableau secret's LastChangedDate
-# to auto-derive the Tableau PAT's expiry when TOKEN_EXPIRES_AT isn't set
-# explicitly. DescribeSecret returns metadata only, not the secret value.
-resource "aws_iam_policy" "metrics_codebuild_secrets_describe_policy" {
-  name = "GovwifiMetricsCodeBuildSecretsDescribe-${var.env}"
-  path = "/"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "secretsmanager:DescribeSecret",
-      "Resource": "${data.aws_secretsmanager_secret.metrics_data_publisher_tableau.arn}"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "metrics_codebuild_secrets_describe" {
-  role       = var.govwifi_codebuild_role_name
-  policy_arn = aws_iam_policy.metrics_codebuild_secrets_describe_policy.arn
-}
-
 resource "aws_iam_role" "scheduler_tableau_publication_role" {
   name = "scheduler-tableau-publication-role-${var.env}"
 

@@ -62,8 +62,9 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
 
     # Optional: an explicit expiry date (YYYY-MM-DD) for the Tableau PAT above.
     # Looked up safely (defaults to "") so this doesn't require ops to add the
-    # field before applying. When absent, the buildspec below derives it from
-    # the secret's own Secrets Manager LastChangedDate instead.
+    # field before applying. When absent, the expiry check inside the
+    # publisher is skipped -- see the "Rotating the Tableau Personal Access
+    # Token" section in the dev docs.
     environment_variable {
       name  = "TOKEN_EXPIRES_AT"
       value = lookup(jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string), "TOKEN_EXPIRES_AT", "")
@@ -87,7 +88,6 @@ phases:
     commands:
       - echo "Building docker image..."
       - docker build --target production -t metrics-data-publisher:latest .
-      - if [ -z "$TOKEN_EXPIRES_AT" ]; then LAST_CHANGED_DATE=$(aws secretsmanager describe-secret --secret-id govwifi/metrics-data-publisher/tableau --query LastChangedDate --output text); export TOKEN_EXPIRES_AT=$(date -u -d "$LAST_CHANGED_DATE +365 days" +%Y-%m-%d); echo "TOKEN_EXPIRES_AT not set on the secret -- derived $TOKEN_EXPIRES_AT from Secrets Manager LastChangedDate ($LAST_CHANGED_DATE) + 365 days"; fi
       - echo "Running recover_and_publish inside the container..."
       - docker run --rm -w /tmp -e ENVIRONMENT_NAME -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME -e TOKEN_EXPIRES_AT metrics-data-publisher:latest recover_and_publish
 EOF
