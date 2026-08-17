@@ -85,3 +85,12 @@ resource "aws_cloudwatch_event_rule" "daily_publish_orgs_have_no_active_admins_c
   schedule_expression = "cron(45 5 * * ? *)"
   state               = "ENABLED"
 }
+
+# rake metrics:publish_orgs_with_no_physical_address_for_ip_count
+resource "aws_cloudwatch_event_rule" "daily_publish_orgs_with_no_physical_address_for_ip_count" {
+  name                = "${var.env_name}-daily-publish-orgs-with-no-physical-address-for-ip-count"
+  description         = "Triggers daily 06:00 UTC"
+  schedule_expression = "cron(0 6 * * ? *)"
+  state               = "ENABLED"
+}
+
