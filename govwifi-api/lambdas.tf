@@ -10,7 +10,7 @@ resource "aws_lambda_function" "user_api_sns_lambda" {
   # The unzipped source code can be found at: https://github.com/GovWifi/govwifi-lambda-for-user-signup-api
   # Documentation can found in the README of this directory
 
-  runtime       = "python3.8"
+  runtime       = "python3.13"
   architectures = ["x86_64"]
 
   vpc_config {
