@@ -59,6 +59,16 @@ resource "aws_codebuild_project" "tableau_data_source_publication" {
       name  = "PROJECT_NAME"
       value = jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string)["PROJECT_NAME"]
     }
+
+    # Optional: an explicit expiry date (YYYY-MM-DD) for the Tableau PAT above.
+    # Looked up safely (defaults to "") so this doesn't require ops to add the
+    # field before applying. When absent, the expiry check inside the
+    # publisher is skipped -- see the "Rotating the Tableau Personal Access
+    # Token" section in the dev docs.
+    environment_variable {
+      name  = "TOKEN_EXPIRES_AT"
+      value = lookup(jsondecode(data.aws_secretsmanager_secret_version.metrics_data_publisher_tableau_data.secret_string), "TOKEN_EXPIRES_AT", "")
+    }
   }
 
   vpc_config {
@@ -79,7 +89,7 @@ phases:
       - echo "Building docker image..."
       - docker build --target production -t metrics-data-publisher:latest .
       - echo "Running recover_and_publish inside the container..."
-      - docker run --rm -w /tmp -e ENVIRONMENT_NAME -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME metrics-data-publisher:latest recover_and_publish
+      - docker run --rm -w /tmp -e ENVIRONMENT_NAME -e METRICS_API_URL -e METRICS_API_KEY -e TOKEN_NAME -e TOKEN_VALUE -e SITE_ID -e SERVER_URL -e PROJECT_NAME -e TOKEN_EXPIRES_AT metrics-data-publisher:latest recover_and_publish
 EOF
   }
 
