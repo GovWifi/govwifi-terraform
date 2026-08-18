@@ -165,4 +165,9 @@ variable "backend_private_subnet_ids" {
   default     = []
 }
 
+variable "capacity_notifications_arn" {
+  type        = string
+  description = "ARN of the SNS topic for capacity notifications (routes to #govwifi-monitoring via AWS Chatbot)"
+}
+
 

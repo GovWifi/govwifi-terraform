@@ -126,7 +126,7 @@ resource "aws_ecs_service" "logging_api_service" {
 
   enable_execute_command = true
 
-  health_check_grace_period_seconds = 20
+  health_check_grace_period_seconds = 90
 
   network_configuration {
     security_groups = concat(

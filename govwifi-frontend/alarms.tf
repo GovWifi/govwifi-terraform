@@ -45,14 +45,14 @@ resource "aws_cloudwatch_metric_alarm" "no_healthy_hosts" {
 
 resource "aws_cloudwatch_metric_alarm" "radius_cannot_connect_to_api" {
   alarm_name          = "${var.env_name}-${var.aws_region_name}-radius-cannot-connect-to-api"
-  alarm_description   = "FreeRADIUS cannot connect to the Logging and/or Authentication API. Investigate CloudWatch logs for root cause."
+  alarm_description   = "FreeRADIUS cannot connect to the Logging and/or Authentication API. Investigate CloudWatch logs and ECS API Cluster tasks for root cause."
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 10
-  evaluation_periods  = 5
-  datapoints_to_alarm = 3
+  threshold           = 100
+  evaluation_periods  = 10
+  datapoints_to_alarm = 5
   period              = 60
   statistic           = "Sum"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "notBreaching"
   metric_name         = aws_cloudwatch_log_metric_filter.radius_cannot_connect_to_api.metric_transformation[0].name
   namespace           = aws_cloudwatch_log_metric_filter.radius_cannot_connect_to_api.metric_transformation[0].namespace
 
