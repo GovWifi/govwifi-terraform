@@ -474,7 +474,7 @@ resource "aws_cloudwatch_event_target" "publish_orgs_have_no_active_admins_count
 
 # rake metrics:publish_orgs_with_no_physical_address_for_ip_count
 resource "aws_cloudwatch_event_target" "publish_orgs_with_no_physical_address_for_ip_count" {
-  target_id = "${var.env_name}-publish-orgs-with-no-physical-address-for-ip-count"
+  target_id = "${var.env_name}-pub-orgs-no-addr-for-ip-count"
   arn       = aws_ecs_cluster.admin_cluster.arn
   rule      = aws_cloudwatch_event_rule.daily_publish_orgs_with_no_physical_address_for_ip_count.name
   role_arn  = aws_iam_role.scheduled_task.arn
