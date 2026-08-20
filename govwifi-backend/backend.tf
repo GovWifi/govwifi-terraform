@@ -28,7 +28,9 @@ resource "aws_route" "internet_access" {
   gateway_id             = aws_internet_gateway.wifi_backend.id
 }
 
-data "aws_availability_zones" "zones" {}
+data "aws_availability_zones" "zones" {
+  exclude_names = ["eu-west-2d"]
+}
 
 resource "aws_subnet" "wifi_backend_subnet" {
   for_each = toset(data.aws_availability_zones.zones.names)
