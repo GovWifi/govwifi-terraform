@@ -57,7 +57,7 @@ resource "aws_cloudwatch_metric_alarm" "metrics_api_no_records_written" {
   ok_actions    = [var.capacity_notifications_arn]
 }
 
-# The five account-health rake tasks in govwifi-admin (see metrics:publish_*
+# The six account-health rake tasks in govwifi-admin (see metrics:publish_*
 # in govwifi-admin/scheduled-tasks.tf) each post one metric a day under this
 # prefix via the same POST /v1/record path the performance metrics use.
 locals {
@@ -67,6 +67,7 @@ locals {
     "account-health-orgs-with-dormant-admins-count",
     "account-health-orgs-have-no-active-admins-count",
     "account-health-orgs-with-no-signed-mou-count",
+    "account-health-orgs-with-no-physical-address-for-ip-count",
   ]
 }
 
