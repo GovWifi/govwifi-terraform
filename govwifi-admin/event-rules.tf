@@ -94,3 +94,12 @@ resource "aws_cloudwatch_event_rule" "daily_publish_orgs_with_no_physical_addres
   state               = "ENABLED"
 }
 
+# rake metrics:publish_locations_added
+resource "aws_cloudwatch_event_rule" "daily_publish_locations_added" {
+  name                = "${var.env_name}-daily-publish-locations-added"
+  description         = "Triggers daily 06:15 UTC"
+  schedule_expression = "cron(15 6 * * ? *)"
+  state               = "ENABLED"
+}
+
+
