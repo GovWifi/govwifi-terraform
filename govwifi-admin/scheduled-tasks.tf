@@ -510,6 +510,44 @@ resource "aws_cloudwatch_event_target" "publish_orgs_with_no_physical_address_fo
 
 }
 
+# rake metrics:publish_organisations_added
+resource "aws_cloudwatch_event_target" "publish_organisations_added" {
+  target_id = "${var.env_name}-publish-organisations-added"
+  arn       = aws_ecs_cluster.admin_cluster.arn
+  rule      = aws_cloudwatch_event_rule.daily_publish_organisations_added.name
+  role_arn  = aws_iam_role.scheduled_task.arn
+
+  ecs_target {
+    task_count          = 1
+    task_definition_arn = aws_ecs_task_definition.admin_task.arn
+    launch_type         = "FARGATE"
+    platform_version    = "1.4.0"
+
+    network_configuration {
+      subnets = length(var.private_subnet_ids) > 0 ? var.private_subnet_ids : var.subnet_ids
+
+      security_groups = concat(
+        [aws_security_group.admin_ec2_in.id],
+        [aws_security_group.admin_ec2_out.id]
+      )
+
+      assign_public_ip = length(var.private_subnet_ids) > 0 ? false : true
+    }
+  }
+
+  input = <<EOF
+  {
+    "containerOverrides": [
+      {
+        "name": "admin",
+        "command": ["bundle", "exec", "rake", "metrics:publish_organisations_added"]
+      }
+    ]
+  }
+  EOF
+
+}
+
 # rake metrics:publish_locations_added
 resource "aws_cloudwatch_event_target" "publish_locations_added" {
   target_id = "${var.env_name}-publish-locations-added"
