@@ -110,3 +110,12 @@ resource "aws_cloudwatch_event_rule" "daily_publish_locations_added" {
   state               = "ENABLED"
 }
 
+# rake metrics:publish_user_signups
+resource "aws_cloudwatch_event_rule" "daily_publish_user_signups" {
+  name                = "${var.env_name}-daily-publish-user-signups"
+  description         = "Triggers daily 06:30 UTC"
+  schedule_expression = "cron(30 6 * * ? *)"
+  state               = "ENABLED"
+}
+
+
