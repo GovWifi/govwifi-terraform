@@ -19,6 +19,14 @@ provider "aws" {
   }
 }
 
+module "govwifi20_ssm_test"{
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../ssm-test"
+
+}
 
 module "london_deployment_roles" {
   providers = {
