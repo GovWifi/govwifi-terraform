@@ -5,6 +5,6 @@ variable "aws_region" {
 }
 variable "parameter_prefix" {
   type        = string
-  default     = "/dev/govwifi20/tf-layer-test"
+  default     = "/dev/govwifi20/tf-layers"
   description = "SSM namespace prefix to keep cleanup easy"
 }

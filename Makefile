@@ -33,6 +33,10 @@ plan: check-env unencrypt-secrets plan_task delete-secrets ## Run terraform plan
 apply_task: check-env
 	@for variable in ${modules}; do module_flags="$$module_flags -target=module.$$variable"; done; [ "$$module_flags" != "" ] && echo " Apply Warning: Modules have been set to '$$module_flags'"; scripts/run-terraform.sh apply ${terraform_flags} $$module_flags
 apply: check-env unencrypt-secrets apply_task delete-secrets ## Run terraform apply after decrypting secrets. Must run in form make <env> apply
+test_task: check-env
+	@for variable in ${modules}; do module_flags="$$module_flags -target=module.$$variable"; done; [ "$$module_flags" != "" ] && echo " Test Warning: Modules have been set to '$$module_flags'"; scripts/run-terraform.sh test ${terraform_flags} $$module_flags
+test: check-env unencrypt-secrets test_task delete-secrets ## Run terraform test after decrypting secrets. Must run in form make <env> apply
+
 .PHONY: terraform
 terraform_task: check-env
 terraform: check-env unencrypt-secrets
