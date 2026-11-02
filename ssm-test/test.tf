@@ -1,3 +1,40 @@
+check "validate_boolean" {
+  assert {
+    condition = (
+      local.reconstituted_bool == true
+    )
+    error_message = "Primitive boolean recovery failed."
+  }
+}
+
+check "validate_integer" {
+  assert {
+    condition = (
+      local.reconstituted_int == 8080
+    )
+    error_message = "Integer recovery failed."
+  }
+}
+
+check "validate_string" {
+  assert {
+    condition = (
+      local.reconstituted_string == "vpc-0123456789abcdef0"
+
+    )
+    error_message = "string recovery failed."
+  }
+}
+
+check "validate_secure_string" {
+  assert {
+    condition = (
+      local.reconstituted_secret == "SuperSecretGovWifiToken123!"
+    )
+    error_message = "KMS-encrypted recovery failed."
+  }
+}
+
 check "validate_list_fidelity" {
   assert {
     condition     = local.reconstituted_list == tolist(local.source_list)
