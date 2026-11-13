@@ -24,22 +24,22 @@ resource "aws_codebuild_project" "renew_certs" {
 
     environment_variable {
       name  = "DIGICERT_API_KEY"
-      value = data.aws_secretsmanager_secret_version.DIGICERT_API_KEY.secret_string
+      value = data.aws_secretsmanager_secret_version.digicert_api_key.secret_string
     }
 
     environment_variable {
       name  = "CSR_FILE"
-      value = data.aws_secretsmanager_secret_version.CSR_FILE.secret_string
+      value = data.aws_secretsmanager_secret_version.csr_file.secret_string
     }
 
     environment_variable {
       name  = "ORDER_ID"
-      value = data.aws_secretsmanager_secret_version.DEV_ORDER_ID.secret_string
+      value = data.aws_secretsmanager_secret_version.dev_order_id.secret_string
     }
 
     environment_variable {
       name  = "FRONTEND_CERT_BUCKET_LONDON"
-      value = data.aws_secretsmanager_secret_version.FRONTEND_CERT_BUCKET.secret_string
+      value = data.aws_secretsmanager_secret_version.frontend_cert_bucket_london.secret_string
     }
 
   }

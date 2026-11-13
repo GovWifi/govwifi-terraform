@@ -35,7 +35,7 @@ resource "aws_iam_role_policy" "renew_certs" {
       "Sid": "WriteRenewalStatus",
       "Effect": "Allow",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::${data.aws_ssm_parameter.frontend_cert_bucket.value}/renewal-status.txt"
+      "Resource": "arn:aws:s3:::${data.aws_secretsmanager_secret_version.frontend_cert_bucket_london.secret_string}/cert_tests_to_delete/*"
     },
     {
       "Sid": "WriteCodeBuildS3Logs",

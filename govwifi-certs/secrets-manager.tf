@@ -23,7 +23,7 @@ data "aws_secretsmanager_secret" "csr_file" {
 }
 
 data "aws_secretsmanager_secret_version" "dev_order_id" {
-  secret_id = data.aws_secretsmanager_secret.order_id.id
+  secret_id = data.aws_secretsmanager_secret.dev_order_id.id
 }
 
 data "aws_secretsmanager_secret" "dev_order_id" {
