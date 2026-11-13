@@ -54,3 +54,12 @@ module "govwifi_account_policy" {
   region_name    = "London"
 
 }
+
+module "govwifi_certs" {
+  providers = {
+    aws        = aws.main
+    aws.dublin = aws.dublin
+  }
+
+  source = "../../govwifi-certs"
+}

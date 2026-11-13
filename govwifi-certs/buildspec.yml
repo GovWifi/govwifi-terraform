@@ -1,0 +1,22 @@
+phases:
+  build:
+    commands:
+      - |
+        set -eu
+        # curl -sS -X POST \
+        #   "https://www.digicert.com/services/v2/order/certificate/ssl" \
+        #   -H "Content-Type: application/json" \
+        #   -H "X-DC-DEVKEY: ${DIGICERT_API_KEY}" \
+        #   -d '{
+        #     "certificate": {
+        #       "common_name": "example.com",
+        #       "dns_names": ["www.example.com"],
+        #       "csr": "'"${CSR}"'",
+        #       "signature_hash": "sha256"
+        #     },
+        #     "renewal_of_order_id": '"${ORDER_ID}"',
+        #     "skip_approval": false
+        #   }' | jq .
+
+        printf 'Certificate renewal build ran at %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > renewal-status.txt
+        aws s3 cp renewal-status.txt "s3://${FRONTEND_CERT_BUCKET_LONDON}/cert_tests_to_delete/renewal-status.txt"

@@ -7,7 +7,7 @@ resource "aws_codebuild_project" "renew_certs" {
   name          = "govwifi-renew-certs"
   description   = "This project renews the GovWifi certificate periodically"
   build_timeout = "15"
-  service_role  = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
+  service_role  = aws_iam_role.renew_certs.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -21,11 +21,6 @@ resource "aws_codebuild_project" "renew_certs" {
     privileged_mode             = true
 
     ## Use this to over ride the branch, unable to use the normal source method as accounts would need github access.
-    environment_variable {
-      name  = "BRANCH"
-      value = "main"
-    }
-
 
     environment_variable {
       name  = "DIGICERT_API_KEY"
@@ -33,13 +28,18 @@ resource "aws_codebuild_project" "renew_certs" {
     }
 
     environment_variable {
-      name  = "CSR"
-      value = data.aws_secretsmanager_secret_version.CSR.secret_string
+      name  = "CSR_FILE"
+      value = data.aws_secretsmanager_secret_version.CSR_FILE.secret_string
     }
 
     environment_variable {
       name  = "ORDER_ID"
-      value = data.aws_secretsmanager_secret_version.ORDER_ID.secret_string
+      value = data.aws_secretsmanager_secret_version.DEV_ORDER_ID.secret_string
+    }
+
+    environment_variable {
+      name  = "FRONTEND_CERT_BUCKET_LONDON"
+      value = data.aws_secretsmanager_secret_version.FRONTEND_CERT_BUCKET.secret_string
     }
 
   }
@@ -50,19 +50,6 @@ resource "aws_codebuild_project" "renew_certs" {
 
   }
 
-  vpc_config {
-    vpc_id = var.vpc_id
-
-    # IDs of the two PRIVATE subnets
-    subnets = [
-      "${var.smoketest_subnet_private_a}",
-      "${var.smoketest_subnet_private_b}",
-    ] #
-
-    security_group_ids = [
-      "${var.default_security_group_id}"
-    ] #The default vpc security group goes here. Lets all traffic in and out (this is what all the codebuild jobs do anyway)
-  }
 
   logs_config {
     cloudwatch_logs {
@@ -79,15 +66,15 @@ resource "aws_codebuild_project" "renew_certs" {
 }
 
 # Trigger renew-certs every month
-resource "aws_cloudwatch_event_target" "trigger_renew_certs" {
-  rule = aws_cloudwatch_event_rule.renew_certs_schedule_rule.name
-  arn  = aws_codebuild_project.renew_certs.id
+# resource "aws_cloudwatch_event_target" "trigger_renew_certs" {
+#   rule = aws_cloudwatch_event_rule.renew_certs_schedule_rule.name
+#   arn  = aws_codebuild_project.renew_certs.id
 
-  role_arn = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
-}
+#   role_arn = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
+# }
 
-# Enable scheduled cert rotation every 40 days
-resource "aws_cloudwatch_event_rule" "renew_certs_schedule_rule" {
-  name                = "renew-certs-scheduled-build"
-  schedule_expression = "cron(0 0 */40 * *)"
-}
+# # Enable scheduled cert rotation every 40 days
+# resource "aws_cloudwatch_event_rule" "renew_certs_schedule_rule" {
+#   name                = "renew-certs-scheduled-build"
+#   schedule_expression = "cron(0 0 */40 * *)"
+# }
