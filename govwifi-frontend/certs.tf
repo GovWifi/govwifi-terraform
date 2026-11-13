@@ -48,7 +48,7 @@ resource "aws_s3_bucket_policy" "frontend_cert_bucket" {
       Resource = "${aws_s3_bucket.frontend_cert_bucket.arn}/cert_tests_to_delete/*"
     }]
   })
-
+}
 
 resource "aws_s3_bucket_public_access_block" "frontend_cert_bucket" {
   bucket = aws_s3_bucket.frontend_cert_bucket.id
