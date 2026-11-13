@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "renew_certs_bucket" {
-  bucket = "govwifi-renew-certs-logs"
+  bucket_prefix = "govwifi-renew-certs-logs"
 }
 
 resource "aws_s3_bucket_public_access_block" "renew_certs_bucket" {

@@ -29,11 +29,3 @@ data "aws_secretsmanager_secret_version" "dev_order_id" {
 data "aws_secretsmanager_secret" "dev_order_id" {
   name = "cert_rotate/dev_order_id"
 }
-
-data "aws_secretsmanager_secret_version" "frontend_cert_bucket_london" {
-  secret_id = data.aws_secretsmanager_secret.frontend_cert_bucket_london.id
-}
-
-data "aws_secretsmanager_secret" "frontend_cert_bucket_london" {
-  name = "cert_rotate/frontend_cert_bucket_london"
-}

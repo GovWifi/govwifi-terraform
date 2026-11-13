@@ -34,22 +34,6 @@ resource "aws_s3_bucket" "frontend_cert_bucket" {
   }
 }
 
-resource "aws_s3_bucket_policy" "frontend_cert_bucket" {
-  bucket = aws_s3_bucket.frontend_cert_bucket.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        AWS = "arn:aws:iam::${local.tools_account_id}:role/govwifi-renew-certs-codebuild-role"
-      }
-      Action   = "s3:PutObject"
-      Resource = "${aws_s3_bucket.frontend_cert_bucket.arn}/cert_tests_to_delete/*"
-    }]
-  })
-}
-
 resource "aws_s3_bucket_public_access_block" "frontend_cert_bucket" {
   bucket = aws_s3_bucket.frontend_cert_bucket.id
 

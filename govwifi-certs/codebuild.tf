@@ -1,3 +1,7 @@
+data "aws_ssm_parameter" "frontend_cert_bucket" {
+  name = "/govwifi-terraform/frontend-certs-bucket"
+}
+
 resource "aws_cloudwatch_log_group" "renew_certs" {
   name              = "govwifi-renew-certs-group"
   retention_in_days = 90
@@ -37,9 +41,9 @@ resource "aws_codebuild_project" "renew_certs" {
       value = data.aws_secretsmanager_secret_version.dev_order_id.secret_string
     }
 
-    environment_variable {
+   environment_variable {
       name  = "FRONTEND_CERT_BUCKET_LONDON"
-      value = data.aws_secretsmanager_secret_version.frontend_cert_bucket_london.secret_string
+      value = data.aws_ssm_parameter.frontend_cert_bucket.value
     }
 
   }

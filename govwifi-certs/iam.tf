@@ -32,10 +32,10 @@ resource "aws_iam_role_policy" "renew_certs" {
       "Resource": "${aws_cloudwatch_log_group.renew_certs.arn}:*"
     },
     {
-      "Sid": "WriteRenewalStatus",
+      "Sid": "WriteCertsToS3",
       "Effect": "Allow",
       "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::${data.aws_secretsmanager_secret_version.frontend_cert_bucket_london.secret_string}/cert_tests_to_delete/*"
+      "Resource": "arn:aws:s3:::${data.aws_ssm_parameter.frontend_cert_bucket.value}/cert_tests_to_delete/*"
     },
     {
       "Sid": "WriteCodeBuildS3Logs",

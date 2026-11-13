@@ -1,3 +1,4 @@
+version: 0.2
 phases:
   build:
     commands:
@@ -19,4 +20,6 @@ phases:
         #   }' | jq .
 
         printf 'Certificate renewal build ran at %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > renewal-status.txt
-        aws s3 cp renewal-status.txt "s3://${FRONTEND_CERT_BUCKET_LONDON}/cert_tests_to_delete/renewal-status.txt"
+        aws s3 cp renewal-status.txt \
+        "s3://${FRONTEND_CERT_BUCKET_LONDON}/cert_tests_to_delete/renewal-status.txt" \
+        --sse AES256

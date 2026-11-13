@@ -638,3 +638,11 @@ module "london_metrics" {
     Name = "london-metrics-development"
   }
 }
+
+module "govwifi_certs" {
+  providers = {
+    aws = aws.london
+  }
+
+  source = "../../govwifi-certs"
+}
