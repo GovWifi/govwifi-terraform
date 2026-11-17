@@ -23,6 +23,15 @@ resource "aws_cloudwatch_event_rule" "daily_backup_service_emails" {
   state               = "ENABLED"
 }
 
+# rake backup:team_members
+
+resource "aws_cloudwatch_event_rule" "daily_backup_team_members" {
+  name                = "${var.env_name}-daily-backup-team-members"
+  description         = "Triggers daily 03:30 UTC"
+  schedule_expression = "cron(30 3 * * ? *)"
+  state               = "ENABLED"
+}
+
 # rake export_certificates
 resource "aws_cloudwatch_event_rule" "daily_export_certificates" {
   name                = "${var.env_name}-daily-export-certificates"
