@@ -645,4 +645,11 @@ module "govwifi_certs" {
   }
 
   source = "../../govwifi-certs"
+
+  aws_region     = local.london_aws_region
+  env            = local.env
+  aws_account_id = local.aws_account_id
+
+  route53_zone_id = data.aws_route53_zone.main.zone_id
+
 }

@@ -19,32 +19,10 @@ resource "aws_codebuild_project" "renew_certs" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/standard:7.0"
+    image                       = "aws/codebuild/standard:8.0"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
-
-    ## Use this to over ride the branch, unable to use the normal source method as accounts would need github access.
-
-    environment_variable {
-      name  = "DIGICERT_API_KEY"
-      value = data.aws_secretsmanager_secret_version.digicert_api_key.secret_string
-    }
-
-    environment_variable {
-      name  = "CSR_FILE"
-      value = data.aws_secretsmanager_secret_version.csr_file.secret_string
-    }
-
-    environment_variable {
-      name  = "ORDER_ID"
-      value = data.aws_secretsmanager_secret_version.dev_order_id.secret_string
-    }
-
-   environment_variable {
-      name  = "FRONTEND_CERT_BUCKET_LONDON"
-      value = data.aws_ssm_parameter.frontend_cert_bucket.value
-    }
 
   }
 

@@ -1,25 +1,131 @@
 version: 0.2
+
+env:
+  variables:
+    # Replace these with your values
+    CERT_NAME: "govwifi-radius-cert"
+    S3_PREFIX: "cert_tests_to_delete/"
+    RENEW_BEFORE_DAYS: "3"
+  
+  parameter-store:
+    # Make sure to create these parameters in AWS Parameter Store and provide the correct names here.
+    S3_BUCKET: "/govwifi-terraform/frontend-certs-bucket"
+
+  secrets-manager:
+    # Make sure to create these secrets in AWS Secrets Manager and provide the correct names here.
+    CERT_DOMAIN: "cert-rotate/cert_domain"
+    ACME_EMAIL: "cert-rotate/acme_email"
+    ACME_DIRECTORY_URL: "cert-rotate/acme_directory_url"
+    ACME_EAB_KID: "cert-rotate/acme_eab_kid"
+    ACME_EAB_HMAC_KEY: "cert-rotate/acme_eab_hmac_key"
+    DIGICERT_ORDER_ID: "cert_rotate/dev_order_id"
+
 phases:
+  install:
+    runtime-versions:
+      python: 3.12
+    commands:
+      - echo "Installing Certbot and the Route 53 DNS plugin"
+      - apt-get update -y
+      - apt-get install -y certbot python3-certbot-dns-route53
+
+  pre_build:
+    commands:
+      - echo "Certificate domain: ${CERT_DOMAIN}"
+      - mkdir -p /tmp/current-cert /tmp/certbot
+
+      # Download the currently deployed certificate, if present.
+      # This is used only to decide whether renewal is due.
+      - |
+        if aws s3 cp "s3://${S3_BUCKET}/${S3_PREFIX}/cert.pem" /tmp/current-cert/cert.pem; then
+          echo "Downloaded existing certificate."
+        else
+          echo "No existing certificate found in S3. A new certificate will be issued."
+        fi
+
+      - |
+        if [ -f /tmp/current-cert/cert.pem ]; then
+          EXPIRY_EPOCH=$(
+            openssl x509 -enddate -noout -in /tmp/current-cert/cert.pem \
+              | cut -d= -f2 \
+              | xargs -I{} date -d "{}" +%s
+          )
+
+          RENEWAL_EPOCH=$(date -d "+${RENEW_BEFORE_DAYS} days" +%s)
+          NOW_EPOCH=$(date +%s)
+
+          DAYS_REMAINING=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+          echo "Certificate expires in ${DAYS_REMAINING} days."
+
+          if [ "${EXPIRY_EPOCH}" -le "${RENEWAL_EPOCH}" ]; then
+            echo "Certificate is due for renewal."
+            echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+          else
+            echo "Certificate is not yet due for renewal."
+            echo "RENEW_REQUIRED=false" >> /tmp/renew-required
+          fi
+        else
+          echo "No existing certificate; issuance is required."
+          echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+        fi
+
   build:
     commands:
-      - |
-        set -eu
-        # curl -sS -X POST \
-        #   "https://www.digicert.com/services/v2/order/certificate/ssl" \
-        #   -H "Content-Type: application/json" \
-        #   -H "X-DC-DEVKEY: ${DIGICERT_API_KEY}" \
-        #   -d '{
-        #     "certificate": {
-        #       "common_name": "example.com",
-        #       "dns_names": ["www.example.com"],
-        #       "csr": "'"${CSR}"'",
-        #       "signature_hash": "sha256"
-        #     },
-        #     "renewal_of_order_id": '"${ORDER_ID}"',
-        #     "skip_approval": false
-        #   }' | jq .
+      - source /tmp/renew-required
 
-        printf 'Certificate renewal build ran at %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > renewal-status.txt
-        aws s3 cp renewal-status.txt \
-        "s3://${FRONTEND_CERT_BUCKET_LONDON}/cert_tests_to_delete/renewal-status.txt" \
-        --sse AES256
+      - |
+        if [ "${RENEW_REQUIRED}" = "true" ]; then
+          echo "Requesting/renewing certificate from DigiCert via ACME."
+
+          certbot certonly \
+            --non-interactive \
+            --agree-tos \
+            --email "${ACME_EMAIL}" \
+            --server "${ACME_DIRECTORY_URL}?action=reissue&orderId=${DIGICERT_ORDER_ID}" \
+            --eab-kid "${ACME_EAB_KID}" \
+            --eab-hmac-key "${ACME_EAB_HMAC_KEY}" \
+            --dns-route53 \
+            -d "${CERT_DOMAIN}" \
+            --cert-name "${CERT_NAME}" \
+            --config-dir /tmp/certbot/config \
+            --work-dir /tmp/certbot/work \
+            --logs-dir /tmp/certbot/logs \
+            --force-renewal
+        else
+          echo "Skipping ACME renewal."
+        fi
+
+  post_build:
+    commands:
+      - source /tmp/renew-required
+
+      - |
+        if [ "${RENEW_REQUIRED}" = "true" ]; then
+          CERT_DIR="/tmp/certbot/config/live/${CERT_NAME}"
+
+          echo "Validating renewed certificate."
+          openssl x509 -in "${CERT_DIR}/fullchain.pem" -noout -enddate
+
+          echo "Uploading renewed certificate artifacts to S3."
+
+          aws s3 cp "${CERT_DIR}/fullchain.pem" \
+            "s3://${S3_BUCKET}/${S3_PREFIX}/server.pem" \
+            --sse AES256
+
+          aws s3 cp "${CERT_DIR}/privkey.pem" \
+            "s3://${S3_BUCKET}/${S3_PREFIX}/server.key" \
+            --sse AES256
+
+          echo "Certificate renewal complete."
+        else
+          echo "No renewal performed; nothing uploaded."
+        fi
+
+artifacts:
+  files:
+    - "**/*"
+  base-directory: /tmp/certbot/config/live/${CERT_NAME}
+
+# Add this line back in to certbot command to automatically renew the certs when they are due for renewal:
+# --server "${ACME_DIRECTORY_URL}" \
+

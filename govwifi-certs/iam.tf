@@ -49,10 +49,52 @@ resource "aws_iam_role_policy" "renew_certs" {
     {
       "Sid": "UploadCodeBuildS3Logs",
       "Effect": "Allow",
-      "Action": "s3:PutObject",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
       "Resource": "${aws_s3_bucket.renew_certs_bucket.arn}/renew-certs-log/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:eu-west-2:${var.aws_account_id}:secret:cert-rotate/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "route53:ChangeResourceRecordSets",
+      "Resource": "arn:aws:route53:::hostedzone/${var.route53_zone_id}",
+      "Condition": {
+        "ForAllValues:StringEquals": {
+          "route53:ChangeResourceRecordSetsRecordTypes": ["TXT"],
+          "route53:ChangeResourceRecordSetsActions": ["CREATE", "DELETE"]
+        },
+        "ForAllValues:StringLike": {
+          "route53:ChangeResourceRecordSetsNormalizedRecordNames": [
+            "_acme-challenge*"
+          ]
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListResourceRecordSets",
+        "route53:GetChange"
+      ],
+      "Resource": "arn:aws:route53:::hostedzone/${var.route53_zone_id}"
     }
-  ]
-}
 EOF
 }
+
+
+
+
+
+
+
+
+
+
