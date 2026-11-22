@@ -34,8 +34,17 @@ resource "aws_iam_role_policy" "renew_certs" {
     {
       "Sid": "WriteCertsToS3",
       "Effect": "Allow",
-      "Action": "s3:PutObject",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject"
+      ],
       "Resource": "arn:aws:s3:::${data.aws_ssm_parameter.frontend_cert_bucket.value}/cert_tests_to_delete/*"
+    },
+    {
+      "Sid": "ListCertBucketS3",
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::${data.aws_ssm_parameter.frontend_cert_bucket.value}"
     },
     {
       "Sid": "WriteCodeBuildS3Logs",
@@ -58,9 +67,16 @@ resource "aws_iam_role_policy" "renew_certs" {
     {
       "Effect": "Allow",
       "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": "arn:aws:ssm:eu-west-2:${var.aws_account_id}:parameter/govwifi-terraform/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "secretsmanager:GetSecretValue"
       ],
-      "Resource": "arn:aws:secretsmanager:eu-west-2:${var.aws_account_id}:secret:cert-rotate/*"
+      "Resource": "arn:aws:secretsmanager:eu-west-2:${var.aws_account_id}:secret:cert_rotate/*"
     },
     {
       "Effect": "Allow",
@@ -69,7 +85,7 @@ resource "aws_iam_role_policy" "renew_certs" {
       "Condition": {
         "ForAllValues:StringEquals": {
           "route53:ChangeResourceRecordSetsRecordTypes": ["TXT"],
-          "route53:ChangeResourceRecordSetsActions": ["CREATE", "DELETE"]
+          "route53:ChangeResourceRecordSetsActions": ["CREATE", "DELETE", "UPSERT"]
         },
         "ForAllValues:StringLike": {
           "route53:ChangeResourceRecordSetsNormalizedRecordNames": [
@@ -81,11 +97,23 @@ resource "aws_iam_role_policy" "renew_certs" {
     {
       "Effect": "Allow",
       "Action": [
-        "route53:ListResourceRecordSets",
-        "route53:GetChange"
+        "route53:ListResourceRecordSets"
       ],
       "Resource": "arn:aws:route53:::hostedzone/${var.route53_zone_id}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "route53:GetChange",
+      "Resource": "arn:aws:route53:::change/*"
+    },
+    {
+      "Sid": "ListHostedZonesForCertbot",
+      "Effect": "Allow",
+      "Action": "route53:ListHostedZones",
+      "Resource": "*"
     }
+  ]
+}
 EOF
 }
 

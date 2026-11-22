@@ -651,5 +651,6 @@ module "govwifi_certs" {
   aws_account_id = local.aws_account_id
 
   route53_zone_id = data.aws_route53_zone.main.zone_id
+  domain_name     = data.aws_route53_zone.main.name
 
 }

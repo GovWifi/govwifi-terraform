@@ -4,8 +4,10 @@ env:
   variables:
     # Replace these with your values
     CERT_NAME: "govwifi-radius-cert"
-    S3_PREFIX: "cert_tests_to_delete/"
+    S3_PREFIX: "cert_tests_to_delete"
     RENEW_BEFORE_DAYS: "3"
+    CERT_FILE_PATH: "${S3_PREFIX}/cert.pem"
+
   
   parameter-store:
     # Make sure to create these parameters in AWS Parameter Store and provide the correct names here.
@@ -13,11 +15,11 @@ env:
 
   secrets-manager:
     # Make sure to create these secrets in AWS Secrets Manager and provide the correct names here.
-    CERT_DOMAIN: "cert-rotate/cert_domain"
-    ACME_EMAIL: "cert-rotate/acme_email"
-    ACME_DIRECTORY_URL: "cert-rotate/acme_directory_url"
-    ACME_EAB_KID: "cert-rotate/acme_eab_kid"
-    ACME_EAB_HMAC_KEY: "cert-rotate/acme_eab_hmac_key"
+    CERT_DOMAIN: "cert_rotate/cert_domain"
+    ACME_EMAIL: "cert_rotate/acme_email"
+    ACME_DIRECTORY_URL: "cert_rotate/acme_directory_url"
+    ACME_EAB_KID: "cert_rotate/acme_eab_kid"
+    ACME_EAB_HMAC_KEY: "cert_rotate/acme_eab_hmac_key"
     DIGICERT_ORDER_ID: "cert_rotate/dev_order_id"
 
 phases:
@@ -31,51 +33,66 @@ phases:
 
   pre_build:
     commands:
-      - echo "Certificate domain: ${CERT_DOMAIN}"
-      - mkdir -p /tmp/current-cert /tmp/certbot
+    - |
+      echo "Certificate domain: ${CERT_DOMAIN}"
+      mkdir -p /tmp/current-cert /tmp/certbot
+      echo "cert location is: s3://${S3_BUCKET}/${S3_PREFIX}/cert.pem"
 
       # Download the currently deployed certificate, if present.
       # This is used only to decide whether renewal is due.
-      - |
-        if aws s3 cp "s3://${S3_BUCKET}/${S3_PREFIX}/cert.pem" /tmp/current-cert/cert.pem; then
+    
+    - |
+      if FOUND_FILE=$(aws s3api list-objects-v2 \
+        --bucket "$S3_BUCKET" \
+        --prefix "$CERT_FILE_PATH" \
+        --query "Contents[?Key=='${CERT_FILE_PATH}'].Key | [0]" \
+        --output text); then
+        if [ "$FOUND_KEY" = "$CERT_FILE_PATH" ]; then
+          aws s3 cp "s3://${S3_BUCKET}/${CERT_FILE_PATH}" /tmp/current-cert/cert.pem
           echo "Downloaded existing certificate."
         else
           echo "No existing certificate found in S3. A new certificate will be issued."
         fi
+      else
+        echo "Could not check the S3 bucket for the certificate." >&2
+        exit 1
+      fi
 
-      - |
-        if [ -f /tmp/current-cert/cert.pem ]; then
-          EXPIRY_EPOCH=$(
-            openssl x509 -enddate -noout -in /tmp/current-cert/cert.pem \
-              | cut -d= -f2 \
-              | xargs -I{} date -d "{}" +%s
-          )
 
-          RENEWAL_EPOCH=$(date -d "+${RENEW_BEFORE_DAYS} days" +%s)
-          NOW_EPOCH=$(date +%s)
+    - |
+      if [ -f /tmp/current-cert/cert.pem ]; then
+        EXPIRY_EPOCH=$(
+          openssl x509 -enddate -noout -in /tmp/current-cert/cert.pem \
+            | cut -d= -f2 \
+            | xargs -I{} date -d "{}" +%s
+        )
 
-          DAYS_REMAINING=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
-          echo "Certificate expires in ${DAYS_REMAINING} days."
+        RENEWAL_EPOCH=$(date -d "+${RENEW_BEFORE_DAYS} days" +%s)
+        NOW_EPOCH=$(date +%s)
 
-          if [ "${EXPIRY_EPOCH}" -le "${RENEWAL_EPOCH}" ]; then
-            echo "Certificate is due for renewal."
-            echo "RENEW_REQUIRED=true" >> /tmp/renew-required
-          else
-            echo "Certificate is not yet due for renewal."
-            echo "RENEW_REQUIRED=false" >> /tmp/renew-required
-          fi
-        else
-          echo "No existing certificate; issuance is required."
+        DAYS_REMAINING=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+        echo "Certificate expires in ${DAYS_REMAINING} days."
+
+        if [ "${EXPIRY_EPOCH}" -le "${RENEWAL_EPOCH}" ]; then
+          echo "Certificate is due for renewal."
           echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+        else
+          echo "Certificate is not yet due for renewal."
+          echo "RENEW_REQUIRED=false" >> /tmp/renew-required
         fi
+      else
+        echo "No existing certificate; issuance is required."
+        echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+      fi
 
   build:
     commands:
-      - source /tmp/renew-required
+      - . /tmp/renew-required
 
       - |
         if [ "${RENEW_REQUIRED}" = "true" ]; then
           echo "Requesting/renewing certificate from DigiCert via ACME."
+          echo "Using ACME directory URL: ${ACME_DIRECTORY_URL}?action=reissue&orderId=${DIGICERT_ORDER_ID}"
 
           certbot certonly \
             --non-interactive \
@@ -87,17 +104,19 @@ phases:
             --dns-route53 \
             -d "${CERT_DOMAIN}" \
             --cert-name "${CERT_NAME}" \
+            --preferred-challenges dns \
             --config-dir /tmp/certbot/config \
             --work-dir /tmp/certbot/work \
             --logs-dir /tmp/certbot/logs \
-            --force-renewal
+            --force-renewal \
+            -v
         else
           echo "Skipping ACME renewal."
         fi
 
   post_build:
     commands:
-      - source /tmp/renew-required
+      - . /tmp/renew-required
 
       - |
         if [ "${RENEW_REQUIRED}" = "true" ]; then
