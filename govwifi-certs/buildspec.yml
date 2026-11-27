@@ -2,25 +2,21 @@ version: 0.2
 
 env:
   variables:
-    # Replace these with your values
     CERT_NAME: "govwifi-radius-cert"
     S3_PREFIX: "cert_tests_to_delete"
     RENEW_BEFORE_DAYS: "3"
     CERT_FILE_PATH: "${S3_PREFIX}/cert.pem"
-
   
   parameter-store:
-    # Make sure to create these parameters in AWS Parameter Store and provide the correct names here.
     S3_BUCKET: "/govwifi-terraform/frontend-certs-bucket"
 
   secrets-manager:
-    # Make sure to create these secrets in AWS Secrets Manager and provide the correct names here.
     CERT_DOMAIN: "cert_rotate/cert_domain"
     ACME_EMAIL: "cert_rotate/acme_email"
     ACME_DIRECTORY_URL: "cert_rotate/acme_directory_url"
     ACME_EAB_KID: "cert_rotate/acme_eab_kid"
     ACME_EAB_HMAC_KEY: "cert_rotate/acme_eab_hmac_key"
-    DIGICERT_ORDER_ID: "cert_rotate/dev_order_id"
+    DIGICERT_ORDER_ID: "cert_rotate/order_id"
 
 phases:
   install:
@@ -75,14 +71,14 @@ phases:
 
         if [ "${EXPIRY_EPOCH}" -le "${RENEWAL_EPOCH}" ]; then
           echo "Certificate is due for renewal."
-          echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+          echo "RENEW_REQUIRED=true" > /tmp/renew-required
         else
           echo "Certificate is not yet due for renewal."
-          echo "RENEW_REQUIRED=false" >> /tmp/renew-required
+          echo "RENEW_REQUIRED=false" > /tmp/renew-required
         fi
       else
-        echo "No existing certificate; issuance is required."
-        echo "RENEW_REQUIRED=true" >> /tmp/renew-required
+        echo "No existing certificate; certificate will be issued."
+        echo "RENEW_REQUIRED=true" > /tmp/renew-required
       fi
 
   build:
@@ -134,6 +130,22 @@ phases:
           aws s3 cp "${CERT_DIR}/privkey.pem" \
             "s3://${S3_BUCKET}/${S3_PREFIX}/server.key" \
             --sse AES256
+
+          echo "Upload complete. Sending notification via SNS."
+          
+          FINGERPRINT=$(openssl x509 -in "${CERT_DIR}/fullchain.pem" \
+            -noout -fingerprint -sha256)
+          EXPIRY=$(openssl x509 -in "${CERT_DIR}/fullchain.pem" \
+            -noout -enddate)
+
+          aws sns publish \
+            --topic-arn "${CERT_NOTIFICATION_TOPIC_ARN}" \
+            --subject "GovWifi certificate renewed" \
+            --message "Certificate: ${CERT_DOMAIN}
+          ${FINGERPRINT}
+          ${EXPIRY}"
+
+          echo "Notification sent."
 
           echo "Certificate renewal complete."
         else

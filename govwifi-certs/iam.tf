@@ -111,6 +111,11 @@ resource "aws_iam_role_policy" "renew_certs" {
       "Effect": "Allow",
       "Action": "route53:ListHostedZones",
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "sns:Publish",
+      "Resource": "${aws_sns_topic.cert_notifications.arn}"
     }
   ]
 }

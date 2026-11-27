@@ -24,6 +24,10 @@ resource "aws_codebuild_project" "renew_certs" {
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
 
+    environment_variable {
+      name  = "CERT_NOTIFICATION_TOPIC_ARN"
+      value = aws_sns_topic.cert_notifications.arn
+    }
   }
 
   source {
@@ -47,16 +51,15 @@ resource "aws_codebuild_project" "renew_certs" {
 
 }
 
-# Trigger renew-certs every month
-# resource "aws_cloudwatch_event_target" "trigger_renew_certs" {
-#   rule = aws_cloudwatch_event_rule.renew_certs_schedule_rule.name
-#   arn  = aws_codebuild_project.renew_certs.id
+resource "aws_cloudwatch_event_target" "trigger_renew_certs" {
+  rule = aws_cloudwatch_event_rule.renew_certs_schedule_rule.name
+  arn  = aws_codebuild_project.renew_certs.id
 
-#   role_arn = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
-# }
+  role_arn = "arn:aws:iam::${var.aws_account_id}:role/govwifi-codebuild-role"
+}
 
-# # Enable scheduled cert rotation every 40 days
-# resource "aws_cloudwatch_event_rule" "renew_certs_schedule_rule" {
-#   name                = "renew-certs-scheduled-build"
-#   schedule_expression = "cron(0 0 */40 * *)"
-# }
+# Enable check for expired certificates every evening at midnight, UTC 
+resource "aws_cloudwatch_event_rule" "renew_certs_schedule_rule" {
+  name                = "renew-certs-scheduled-build"
+  schedule_expression = "cron(0 0 ? * MON-FRI *)"
+}
